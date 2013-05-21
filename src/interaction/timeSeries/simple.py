@@ -23,7 +23,7 @@ def activePassiveMap(tag):
 	else:
 		return 0.5
 
-print "loading", fileLoc
+print "loading", viewFileLoc
 
 # read in csv
 loadingDisplay=""	# this is a simple string to print so you know it's working
@@ -33,7 +33,7 @@ count = 0
 
 div = 1000	# to reduce the amount of data (we don't really need or have millisecond-accurate readings)
 import csv
-with open(fileLoc, 'rb') as csvfile:
+with open(viewFileLoc, 'rb') as csvfile:
 	spamreader = csv.reader(csvfile, delimiter=',')
 	x = list()
 	y = list()
@@ -50,26 +50,6 @@ with open(fileLoc, 'rb') as csvfile:
 			t = time-startTime	#time from start of study
 			hrs = t/60/60
 			x.append(hrs)	# x is time in hrs
-
-			tag = row[3]
-			# passives 
-			if tag == 'onComputer':
-				return -1
-			elif tag == 'videoGames':
-				return -2
-			elif tag == 'watchingTV':
-				return -3
-			# actives are positive
-			elif tag == 'bicyling':
-				return 1
-			elif tag == 'playingBasketball':
-				return 2
-			elif tag == 'running':
-				return 3
-			elif tag == 'inBed':
-				return -0.2
-			else:
-				return 0.5
 			y.append(float(activePassiveMap(row[3])))
 			count+=1
 			if count % updateFreq == 0:

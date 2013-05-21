@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+# creates a stacked bar graph of subject exposure to avatar
+
 import pylab # for plotting commands & array
 
 from ...settings import * 
@@ -23,7 +26,7 @@ def activePassiveMap(tag):
 	else:
 		return 0.5
 
-print "loading", fileLoc
+print "loading", viewFileLoc
 
 # read in csv
 loadingDisplay=""	# this is a simple string to print so you know it's working
@@ -33,7 +36,7 @@ count = 0
 
 div = 1000	# to reduce the amount of data (we don't really need or have millisecond-accurate readings)
 import csv
-with open(fileLoc, 'rb') as csvfile:
+with open(viewFileLoc, 'rb') as csvfile:
 	spamreader = csv.reader(csvfile, delimiter=',')
 	x = list()
 	p1 = list()
@@ -54,9 +57,10 @@ with open(fileLoc, 'rb') as csvfile:
 		# print ', '.join(row)	# print the raw data
 		# print row		# print raw data matrix
 		for time in range(int(int(row[0])/div),int(int(row[1])/div)):	# for time span
-			t = time-startTime	#time from start of study
-			hrs = t/60/60
-			x.append(hrs)	# x is time in hrs
+		#	t = time-startTime	#time from start of study
+		#	hrs = t/60/60
+		#	x.append(hrs)	# x is time in hrs
+			x.append(datetime.fromtimestamp(time))
 			p1.append(0)
 			p2.append(0)
 			p3.append(0)
@@ -75,9 +79,9 @@ with open(fileLoc, 'rb') as csvfile:
 			elif tag == 'watchingTV':
 				p3[-1] = -1
 			# actives are positive
-			elif tag == 'bicyling':
+			elif tag == 'bicycling':
 				a1[-1] = 1
-			elif tag == 'playingBasketball':
+			elif tag == 'basketball':
 				a2[-1] = 1
 			elif tag == 'running':
 				a3[-1] = 1
@@ -97,16 +101,24 @@ print 'making plots...'
 # lineGraph.plot(x,y)
 #barGraph = p.add_subplot(111)
 pl1 = pylab.plt.bar(x,p1,linewidth=0,color='b')
-pl2 = pylab.plt.bar(x,p2,linewidth=0,color='oliveDrab')
-pl3 = pylab.plt.bar(x,p3,linewidth=0,color='indigo')
-pl4 = pylab.plt.bar(x,a1,linewidth=0,color='r')
-pl5 = pylab.plt.bar(x,a2,linewidth=0,color='orange')
-pl6 = pylab.plt.bar(x,a1,linewidth=0,color='orangeRed')
-pl7 = pylab.plt.bar(x,sl,linewidth=0,color='g')
-pl8 = pylab.plt.bar(x,ER,linewidth=0,color='deepPink')
+base = p1
+pl2 = pylab.plt.bar(x,p2,linewidth=0,bottom=base,color='oliveDrab')
+base = [base[i] + p2[i] for i in range(len(base))]
+pl3 = pylab.plt.bar(x,p3,linewidth=0,bottom=base,color='indigo')
+base = [base[i] + p3[i] for i in range(len(base))]
+pl4 = pylab.plt.bar(x,a1,linewidth=0,bottom=base,color='r')
+base = [base[i] + a1[i] for i in range(len(base))]
+pl5 = pylab.plt.bar(x,a2,linewidth=0,bottom=base,color='orange')
+base = [base[i] + a2[i] for i in range(len(base))]
+pl6 = pylab.plt.bar(x,a1,linewidth=0,bottom=base,color='orangeRed')
+base = [base[i] + a3[i] for i in range(len(base))]
+pl7 = pylab.plt.bar(x,sl,linewidth=0,bottom=base,color='g')
+base = [base[i] + sl[i] for i in range(len(base))]
+pl8 = pylab.plt.bar(x,ER,linewidth=0,bottom=base,color='deepPink')
 
-#,p2,p3,a1,a2,a3,sl,ER
-
+pylab.plt.xlabel('time [hrs]')
+pylab.plt.legend( (pl1[0]      ,pl2[0]      ,pl3[0]      ,pl4[0]     ,pl5[0]      ,pl6[0]   ,pl7[0] ,pl8[0]),\
+                  ('onComputer','videoGames','watchingTV','bicycling','basketBall','running','sleep','ERROR') )
 
 pylab.plt.show()
 

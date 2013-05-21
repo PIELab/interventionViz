@@ -22,7 +22,7 @@ def activePassiveMap(tag):
 	else:
 		return 0.5
 
-print "loading", fileLoc
+print "loading", viewFileLoc
 
 # read in csv
 loadingDisplay=""	# this is a simple string to print so you know it's working
