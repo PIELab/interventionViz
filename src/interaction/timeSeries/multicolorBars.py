@@ -4,6 +4,8 @@
 
 import pylab # for plotting commands & array
 
+import datetime
+
 from ...settings import * 
 
 def activePassiveMap(tag):
@@ -34,7 +36,7 @@ updateFreq = 2000	# how many items per display update?
 rowCount = 0
 count = 0
 
-div = 1000	# to reduce the amount of data (we don't really need or have millisecond-accurate readings)
+div = 1000*60	# to reduce the amount of data (we don't really need millisecond-accurate readings)
 import csv
 with open(viewFileLoc, 'rb') as csvfile:
 	spamreader = csv.reader(csvfile, delimiter=',')
@@ -60,7 +62,7 @@ with open(viewFileLoc, 'rb') as csvfile:
 		#	t = time-startTime	#time from start of study
 		#	hrs = t/60/60
 		#	x.append(hrs)	# x is time in hrs
-			x.append(datetime.fromtimestamp(time))
+			x.append(datetime.datetime.fromtimestamp(time*60))	
 			p1.append(0)
 			p2.append(0)
 			p3.append(0)
@@ -100,6 +102,8 @@ print 'making plots...'
 # lineGraph = p.add_subplot(211)
 # lineGraph.plot(x,y)
 #barGraph = p.add_subplot(111)
+
+#TODO: maybe these shouldn't stack??? actually, it shouldn't be a problem anyway, since they should never be concurrent...
 pl1 = pylab.plt.bar(x,p1,linewidth=0,color='b')
 base = p1
 pl2 = pylab.plt.bar(x,p2,linewidth=0,bottom=base,color='oliveDrab')
