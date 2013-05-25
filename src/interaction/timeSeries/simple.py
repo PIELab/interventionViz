@@ -23,45 +23,46 @@ def activePassiveMap(tag):
 	else:
 		return 0.5
 
-print "loading", viewFileLoc
+def plot():
+	print "loading", viewFileLoc
 
-# read in csv
-loadingDisplay=""	# this is a simple string to print so you know it's working
-updateFreq = 2000	# how many items per display update?
-rowCount = 0
-count = 0
+	# read in csv
+	loadingDisplay=""	# this is a simple string to print so you know it's working
+	updateFreq = 2000	# how many items per display update?
+	rowCount = 0
+	count = 0
 
-div = 1000	# to reduce the amount of data (we don't really need or have millisecond-accurate readings)
-import csv
-with open(viewFileLoc, 'rb') as csvfile:
-	spamreader = csv.reader(csvfile, delimiter=',')
-	x = list()
-	y = list()
-	for row in spamreader:
-		if rowCount==0:	#skip header row
+	div = 1000	# to reduce the amount of data (we don't really need or have millisecond-accurate readings)
+	import csv
+	with open(viewFileLoc, 'rb') as csvfile:
+		spamreader = csv.reader(csvfile, delimiter=',')
+		x = list()
+		y = list()
+		for row in spamreader:
+			if rowCount==0:	#skip header row
+				rowCount+=1
+				continue
+			if rowCount==1:	# set startTime
+				startTime = int(int(row[0])/div)
 			rowCount+=1
-			continue
-		if rowCount==1:	# set startTime
-			startTime = int(int(row[0])/div)
-		rowCount+=1
-		# print ', '.join(row)	# print the raw data
-		# print row		# print raw data matrix
-		for time in range(int(int(row[0])/div),int(int(row[1])/div)):	# for time span
-			t = time-startTime	#time from start of study
-			hrs = t/60/60
-			x.append(hrs)	# x is time in hrs
-			y.append(float(activePassiveMap(row[3])))
-			count+=1
-			if count % updateFreq == 0:
-				loadingDisplay+="|"
-				print loadingDisplay
-print 'done. '+str(count)+' datapoints loaded from '+str(rowCount)+' rows.'
-print 'making plots...'
-p = pylab.figure()
-# lineGraph = p.add_subplot(211)
-# lineGraph.plot(x,y)
-barGraph = p.add_subplot(111)
-barGraph.bar(x,y,linewidth=0)
+			# print ', '.join(row)	# print the raw data
+			# print row		# print raw data matrix
+			for time in range(int(int(row[0])/div),int(int(row[1])/div)):	# for time span
+				t = time-startTime	#time from start of study
+				hrs = t/60/60
+				x.append(hrs)	# x is time in hrs
+				y.append(float(activePassiveMap(row[3])))
+				count+=1
+				if count % updateFreq == 0:
+					loadingDisplay+="|"
+					print loadingDisplay
+	print 'done. '+str(count)+' datapoints loaded from '+str(rowCount)+' rows.'
+	print 'making plots...'
+	p = pylab.figure()
+	# lineGraph = p.add_subplot(211)
+	# lineGraph.plot(x,y)
+	barGraph = p.add_subplot(111)
+	barGraph.bar(x,y,linewidth=0)
 
-pylab.show()
+	pylab.show()
 
