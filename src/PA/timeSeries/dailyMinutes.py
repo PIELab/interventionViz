@@ -13,6 +13,7 @@ PA.getData(PAfileLoc)
 
 def plot():
 	print 'making plots...'
+	pylab.figure('dailyMinutes')
 	#p = pylab.figure()
 	# lineGraph = p.add_subplot(211)
 	# lineGraph.plot(x,y)
@@ -31,5 +32,5 @@ def plot():
 	pylab.plt.legend( (pl1[0],pl2[0],pl3[0],pl4[0],pl5[0]),\
 		    ('sedentary','light','mod_vig','nonWear','unknown') )
 
-	pylab.plt.show()
+	pylab.plt.draw()
 

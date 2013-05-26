@@ -58,11 +58,11 @@ def plot():
 					print loadingDisplay
 	print 'done. '+str(count)+' datapoints loaded from '+str(rowCount)+' rows.'
 	print 'making plots...'
-	p = pylab.figure()
+	p = pylab.figure('simple')
 	# lineGraph = p.add_subplot(211)
 	# lineGraph.plot(x,y)
 	barGraph = p.add_subplot(111)
 	barGraph.bar(x,y,linewidth=0)
 
-	pylab.show()
+	pylab.draw()
 

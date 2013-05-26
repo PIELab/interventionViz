@@ -99,11 +99,11 @@ def plot():
 					print loadingDisplay
 	print 'done. '+str(count)+' datapoints loaded from '+str(rowCount)+' rows.'
 	print 'making plots...'
+	pylab.figure('multicolorBars')
 	#p = pylab.figure()
 	# lineGraph = p.add_subplot(211)
 	# lineGraph.plot(x,y)
 	#barGraph = p.add_subplot(111)
-
 	#TODO: maybe these shouldn't stack??? actually, it shouldn't be a problem anyway, since they should never be concurrent...
 	pl1 = pylab.plt.bar(x,p1,linewidth=0,color='b')
 	base = p1
@@ -125,5 +125,5 @@ def plot():
 	pylab.plt.legend( (pl1[0]      ,pl2[0]      ,pl3[0]      ,pl4[0]     ,pl5[0]      ,pl6[0]   ,pl7[0] ,pl8[0]),\
 		          ('onComputer','videoGames','watchingTV','bicycling','basketBall','running','sleep','ERROR') )
 
-	pylab.plt.show()
+	pylab.plt.draw()
 
