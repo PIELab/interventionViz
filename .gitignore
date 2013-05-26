@@ -1,6 +1,9 @@
 # ubuntu backup files
 *~
 
+# hide the TON of extra data I have to avoid spamming 'git status'
+data
+
 *.py[cod]
 
 # C extensions
