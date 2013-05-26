@@ -15,6 +15,7 @@ class PAdata:
 		self.count = 0
 
 
+	# results in a list of values corresponding to days in the study. Dates of the days are included in 'self.time'.
 	def getData(self, PAfileLoc):
 		print "loading", PAfileLoc
 
