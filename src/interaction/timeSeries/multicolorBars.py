@@ -120,8 +120,9 @@ def plot():
 #	pl8 = pylab.plt.fill(viewData.x,viewData.ER,linewidth=0,color='deepPink')
 
 	pylab.plt.xlabel('time [hrs]')
-#	pylab.plt.legend( (pl1[0]      ,pl2[0]      ,pl3[0]      ,pl4[0]     ,pl5[0]      ,pl6[0]   ,pl7[0] ,pl8[0]),\
-#	          ('onComputer','videoGames','watchingTV','bicycling','basketBall','running','sleep','ERROR') )
+	pylab.plt.legend( (pl1[0]      ,pl1[1]      ,pl1[2]      ,pl1[3]     ,pl1[4]      ,pl1[5]   ,pl1[6] ,pl1[7]),\
+	                  ('onComputer','videoGames','watchingTV','bicycling','basketBall','running','sleep','ERROR'),\
+	                   'best')
 
 	pylab.plt.draw()
 

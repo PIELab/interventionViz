@@ -42,6 +42,13 @@ for i in range(len(PA.time)):
 
 print 'output is ' + str(len(PAscore)) + 'x' + str(len(interactScore))
 
+while len(PAscore) > len(interactScore):
+	print 'appending zero value to fix impbalance'
+	interactScore.append(0)
+while len(interactScore) > len(PAscore):
+	PAscore.append(0)
+	print 'appending zero value to fix impbalance'
+
 def plot():
 	pltName = 'PA vs interaction'
 	print 'making plot "'+pltName+'"'
