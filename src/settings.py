@@ -24,7 +24,7 @@ def setupParticipantData(n):
 		
 
 setupTestData(1)
-setupParticipantData(1)
+#setupParticipantData(1)
 
 viewFileLoc = dataLocation+pid+'/'+viewLogFile;
 PAfileLoc   = dataLocation+pid+'/'+PAfile;

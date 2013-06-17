@@ -73,7 +73,6 @@ class data:
 		print "loading", viewFileLoc
 		with open(viewFileLoc, 'rb') as csvfile:
 			spamreader = csv.reader(csvfile, delimiter=',')
-
 			for row in spamreader:
 				if self.rowCount==0:	#skip header row
 					self.rowCount+=1
@@ -83,8 +82,8 @@ class data:
 				self.rowCount+=1
 				# print ', '.join(row)	# print the raw data
 				# print row		# print raw data matrix
-				t0 = int(round(int(row[0])/div)-startTime)
-				tf = int(round(int(row[1])/div)-startTime)
+				t0 = int(round(int(row[0])/div))
+				tf = int(round(int(row[1])/div))
 				self.logPoint(t0-1,0,0) # 0 before
 				self.logPoint(t0,row[3],1) #value @ start
 				self.logPoint(tf,row[3],1) #value @ end
