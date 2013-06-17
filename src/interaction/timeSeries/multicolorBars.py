@@ -25,8 +25,9 @@ class data:
 
 	def logPoint(self,t,tag,value):
 		# t = time from start of study
-		hrs = float(t)/60.0/60.0
-		self.x.append(hrs)
+		#hrs = float(t)/60.0/60.0
+		#self.x.append(hrs)
+		self.x.append(datetime.datetime.fromtimestamp(t))
 		self.p1.append(0)
 		self.p2.append(0)
 		self.p3.append(0)
