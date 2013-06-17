@@ -1,0 +1,4 @@
+phoneID,monitor_date,lastupdate_time,nonwear_min,sedentary_min,light_min,mod_min,vig_min,mod_vig_min,total_min,total_hour,unknown_hour,MVPA_10m_bouts,breaks,MVPAReinforcementCurrentStep,MVPAReinforcementPrevStep,SedReinforcementCurrentStep,SedReinforcementPrevStep,activity_level,low_activity_min
+358344041300005,2013-06-13,23:49:13,875,323,191,40,0,0,1429,23.81,0.19,0,9,0,0,0,0,1,1371167353000
+358344041300005,2013-06-12,23:59:13,227,43,17,4,0,0,291,4.85,19.14,0,0,0,0,0,0,1,1371081553000
+358344041300005,2013-06-11,14:19:31,729,4,3,1,0,0,737,12.28,11.72,0,0,0,0,0,0,1,1370960371072
