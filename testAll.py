@@ -1,7 +1,9 @@
 import pylab
 
-#import src.interaction.timeSeries.simple
-#interaction.timeSeries.simple.plot()
+import src.interaction.timeSeries.simple
+src.interaction.timeSeries.simple.plot()
+
+pylab.plt.show()
 
 import src.interaction.timeSeries.multicolorBars
 src.interaction.timeSeries.multicolorBars.plot()

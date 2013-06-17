@@ -43,19 +43,36 @@ def plot():
 				rowCount+=1
 				continue
 			if rowCount==1:	# set startTime
-				startTime = int(int(row[0])/div)
+				startTime = int(round(int(row[0])/div))
 			rowCount+=1
 			# print ', '.join(row)	# print the raw data
 			# print row		# print raw data matrix
-			for time in range(int(int(row[0])/div),int(int(row[1])/div)):	# for time span
-				t = time-startTime	#time from start of study
-				hrs = t/60/60
-				x.append(hrs)	# x is time in hrs
-				y.append(float(activePassiveMap(row[3])))
-				count+=1
-				if count % updateFreq == 0:
-					loadingDisplay+="|"
-					print loadingDisplay
+
+			t0 = int(round(int(row[0])/div)-startTime)
+			tf = int(round(int(row[1])/div)-startTime)
+			t = t0-1 # 0 point before start
+			x.append(t/60/60)
+			y.append(float(0))
+			t = t0	# value point @ start
+			x.append(t/60/60)
+			y.append(float(activePassiveMap(row[3])))
+			t = tf # value point @ end
+			x.append(t/60/60)
+			y.append(float(activePassiveMap(row[3])))
+			t = tf+1 # 0 point after end
+			x.append(t/60/60)
+			y.append(float(0))
+
+			# old many-point implementation:
+#			for time in range(int(round(int(row[0])/div)),int(round(int(row[1])/div))):	# for time span
+#				t = time-startTime	#time from start of study
+#				hrs = t/60/60
+#				x.append(hrs)	# x is time in hrs
+#				y.append(float(activePassiveMap(row[3])))
+#				count+=1
+#				if count % updateFreq == 0:
+#					loadingDisplay+="|"
+#					print loadingDisplay
 	print 'done. '+str(count)+' datapoints loaded from '+str(rowCount)+' rows.'
 	print 'making plots...'
 	p = pylab.figure('simple')
