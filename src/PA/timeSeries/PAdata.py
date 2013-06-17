@@ -8,6 +8,8 @@ class PAdata:
 		self.nonWear = list()
 		self.sedentary = list()
 		self.light = list()
+		self.mod   = list()
+		self.vig   = list()
 		self.mod_vig = list()
 		self.unknown = list()
 
@@ -38,9 +40,12 @@ class PAdata:
 				self.nonWear.append(float(row[3]))
 				self.sedentary.append(float(row[4]))
 				self.light.append(float(row[5]))
-				self.mod_vig.append(float(row[6]))
-				self.unknown.append(float(row[9])*60)	# hrs->min
-	
+				self.mod.append(float(row[6]))
+				self.vig.append(float(row[7]))
+				self.mod_vig.append(float(row[8]))
+				# 9 total min
+				# 10 total hour
+				self.unknown.append(float(row[11])*60)	# hrs->min
 
 				self.count+=1
 				if self.count % updateFreq == 0:
