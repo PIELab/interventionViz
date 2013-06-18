@@ -1,0 +1,3 @@
+phoneID,monitor_date,lastupdate_time,nonwear_min,sedentary_min,light_min,mod_min,vig_min,mod_vig_min,total_min,total_hour,unknown_hour,MVPA_10m_bouts,breaks,MVPAReinforcementCurrentStep,MVPAReinforcementPrevStep,SedReinforcementCurrentStep,SedReinforcementPrevStep,activity_level,low_activity_min
+990002031785494,2013-06-10,23:47:05,1095,233,82,17,0,0,1427,23.78,0.21,0,3,0,0,0,0,1,1370922425000
+990002031785494,2013-06-09,23:59:00,0,0,0,0,0,0,0,0,24,0,0,0,0,0,0,1,1370836740000

@@ -1,0 +1,1 @@
+Date/time, AUC_X, AUC_Y, AUC_Z, AUC, Sampling rate
