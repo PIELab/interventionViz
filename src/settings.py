@@ -26,13 +26,21 @@ def setupParticipantData(n):
 		pid = '2'
 		viewLogFile = "mirrorMe/dataLog_Android_data_eduusfengpieavatars4change.txt"
 		PAfile = 'mMonitor/DAILY_TOTALS_354583040636059_2013-06-01.txt'
+	elif n == 3:
+		pid = '3'
+		viewLogFile = "avatarWallpaper/dataLog.txt"
+		PAfile      = "miles/DAILY_TOTALS_358344041300005_2013-07-10.txt"
+	elif n == 8:
+		pid = '8'
+		viewLogFile = "dataLog.txt"
+		PAfile      = "miles/DAILY_TOTALS_358344041300005_2013-08-28.txt"
 	else:
 		print 'ERR:PID in settings.py not recognized; loading test data!\n\n'
 		setupTestData(1)
 		
 
 setupTestData(2)
-#setupParticipantData(2)
+#setupParticipantData(8)
 
 viewFileLoc = dataLocation+pid+'/'+viewLogFile;
 PAfileLoc   = dataLocation+pid+'/'+PAfile;
