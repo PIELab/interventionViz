@@ -38,13 +38,17 @@ def setupParticipantData(n):
 		pid = '10'
 		viewLogFile = "dataLog.txt"
 		PAfile      = "miles/DAILY_TOTALS_358344041300005_2013-09-13.txt"
+	elif n == 11:
+		pid = '11'
+		viewLogFile = "dataLog.txt"
+		PAfile      = "miles/DAILY_TOTALS_358344041300005_2013-09-25.txt"
 	else:
 		print 'ERR:PID in settings.py not recognized; loading test data!\n\n'
 		setupTestData(1)
 		
 
 setupTestData(2)
-#setupParticipantData(10)
+#setupParticipantData(11)
 
 viewFileLoc = dataLocation+pid+'/'+viewLogFile;
 PAfileLoc   = dataLocation+pid+'/'+PAfile;
