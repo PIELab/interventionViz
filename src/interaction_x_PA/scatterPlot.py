@@ -25,9 +25,10 @@ def plot():
 
 	# generate interaction 'score'
 	interactScore = list()
-	interactDate   = list()
+	interactDate   = list() # list of interaction data segemented by day
 	# gather data from timestamps in interact.x together by day
 	i = 0
+
 	while i+1 < len(interact.x)-1:
 		score = 0
 		#print str(interact.x[i].date()) +'=?='+str(interact.x[i+1].date())
@@ -51,7 +52,7 @@ def plot():
 
 	# return the PA score for given inputs
 	def getPAscore(vig,mod_vig,mod,light,sed):
-		return 4*vig + 3*mod_vig + 2*mod + light - sedentary
+		return 4*vig + 3*mod_vig + 2*mod + light - sed
 
 	# generate daily PA 'score' for each day
 	PAscore = list()
