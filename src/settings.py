@@ -6,8 +6,9 @@ def setup():
 	dataLocation = "./data/"	# location of participant folders
 
 	global datasetName
-	datasetName  = 'test'
+	datasetName  = 'USF'		# change this to use a different dataset
 
+	# load appropriate setup function for chosen dataset
 	if datasetName == 'test':
 		setupTestData(getParticipantNum())
 	elif datasetName == 'USF':
@@ -62,7 +63,7 @@ def setupUSFData(n):
 	elif int(n) == 3:
 		pid = '3'
 		viewLogFile = "avatarWallpaper/dataLog.txt"
-		PAfile      = "miles/DAILY_TOTALS_358344041300005_2013-07-10.txt"
+		PAfile      = "miles (repaired)/DAILY_TOTALS_358344041300005_2013-07-10.txt"
 	elif int(n) == 8:
 		pid = '8'
 		viewLogFile = "dataLog.txt"
