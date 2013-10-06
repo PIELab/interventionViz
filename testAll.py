@@ -1,4 +1,7 @@
 import pylab
+import src.settings as settings
+
+settings.setup()
 
 #this one isn't very impressive, and I don't think it is working right now anyway
 #import src.interaction.timeSeries.simple
