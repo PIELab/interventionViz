@@ -13,46 +13,11 @@ def plot():
 	interact = interactionData()
 	interact.getData(viewFileLoc)
 
-	# return the influence score for a given interation descriptor 
-	def getInfluenceEffect(interaction):
-		return (interaction.a1[i]
-		       +interaction.a2[i]
-		       +interaction.a3[i]
-		       -(interact.p1[i]
-		        +interact.p2[i]
-		        +interact.p3[i]))
-
-
-	# generate interaction 'score'
-	interactScore = list()
-	interactDate   = list() # list of interaction data segemented by day
-	# gather data from timestamps in interact.x together by day
-	i = 0
-
-	while i+1 < len(interact.x)-1:
-		score = 0
-		#print str(interact.x[i].date()) +'=?='+str(interact.x[i+1].date())
-		while interact.x[i].date() == interact.x[i+1].date(): # count up all in same day
-			date = interact.x[i]
-			#print str(i)
-			score += getInfluenceEffect(interact)
-			i+=1
-			if i+1 > len(interact.x)-1:
-				break
-		score += getInfluenceEffect(interact)
-		i+=1
-		# now score is day's total, add it to the list
-		interactScore.append(score)
-		interactDate.append(date)
-
+	interactDate,interactScore = segmentInteractionIntoDays(interact)
 
 	# load PA data
 	PA = PAdata()
 	PA.getData(PAfileLoc)
-
-	# return the PA score for given inputs
-	def getPAscore(vig,mod_vig,mod,light,sed):
-		return 4*vig + 3*mod_vig + 2*mod + light - sed
 
 	# generate daily PA 'score' for each day
 	PAscore = list()
@@ -152,3 +117,41 @@ def plot():
 
 	pylab.plt.draw()
 
+### PRIVATE METHODS ###
+# return the influence score for a given interation descriptor 
+def getInfluenceEffect(interaction,i):
+	return (interaction.a1[i]
+	       +interaction.a2[i]
+	       +interaction.a3[i]
+	       -(interaction.p1[i]
+	        +interaction.p2[i]
+	        +interaction.p3[i]))
+
+# take in a full list of interactions and return a list of day scores & dates
+def segmentInteractionIntoDays(interact):
+	# generate interaction 'score'
+	interactScore = list()
+	interactDate   = list() # list of interaction data segemented by day
+	# gather data from timestamps in interact.x together by day
+	i = 0
+	while i+1 < len(interact.x)-1:
+		score = 0
+		#print str(interact.x[i].date()) +'=?='+str(interact.x[i+1].date())
+		while interact.x[i].date() == interact.x[i+1].date(): # count up all in same day
+			date = interact.x[i]
+			#print str(i)
+			score += getInfluenceEffect(interact,i)
+			i+=1
+			if i+1 > len(interact.x)-1:
+				break
+		score += getInfluenceEffect(interact,i)
+		i+=1
+		# now score is day's total, add it to the list
+		interactScore.append(score)
+		interactDate.append(date)
+	return [interactDate,interactScore]
+
+
+# return the PA score for given inputs
+def getPAscore(vig,mod_vig,mod,light,sed):
+	return 4*vig + 3*mod_vig + 2*mod + light - sed
