@@ -1,25 +1,29 @@
 # this file defines setup methods and configuration options 
 
-# performs needed setup for scripts
-def setup():
-	global dataLocation
-	dataLocation = "./data/"	# location of participant folders
-
-	global datasetName
-	datasetName  = 'USF'		# change this to use a different dataset
-
+def setup(dataset='test',dataLoc = "./data/"):
+# performs needed setup for scripts & returns dictionary with settings
+# 	paramters:
+#		dataset - name of dataset to use
+#		dataLoc - relative location of participant folders
+#
+#	returned settings dict items:
+#		interactionFileLoc - relative location of interaction data file
+#		PAfileLoc          - relative location of physical activity data file 
+	DEFAULT_PARTICIPANT_NUM = 1
 	# load appropriate setup function for chosen dataset
-	if datasetName == 'test':
-		setupTestData(getParticipantNum())
-	elif datasetName == 'USF':
-		setupUSFData(getParticipantNum())
+	if dataset == 'default':
+		pid,interactFile,PAfile = setupTestData(DEFAULT_PARTICIPANT_NUM)
+	elif dataset == 'test' or dataset == 'sample':
+		pid,interactFile,PAfile = setupTestData(getParticipantNum())
+	elif dataset == 'USF':
+		pid,interactFile,PAfile = setupUSFData(getParticipantNum())
 	else:
-		print 'ERR: bad dataset name in settings'
+		raise InputError('bad dataset name "'+str(dataset)+'" in settings')
 
-	global viewFileLoc
-	global PAfileLoc
-	viewFileLoc = dataLocation+pid+'/'+viewLogFile;
-	PAfileLoc   = dataLocation+pid+'/'+PAfile;
+	interactFile = dataLoc+pid+'/'+interactFile;
+	PAfile    = dataLoc+pid+'/'+PAfile;
+	return dict(interactionFileLoc=interactFile,
+	            PAfileLoc=PAfile)
 
 ### PRIVATE METHODS ###
 
@@ -36,7 +40,6 @@ def getParticipantNum():
 
 # setup details for test dataset
 def setupTestData(n):
-	global pid, viewLogFile, PAfile
 	if int(n) == 1:
 		pid = "test1"
 		viewLogFile = "dataLog.txt"
@@ -47,11 +50,11 @@ def setupTestData(n):
 		PAfile = 'miles_DAILY_TOTALS_fixed.txt'
 	else:
 		raise InputError('test PID in settings not recognized for particpant #'+str(n))
+	return [pid,viewLogFile,PAfile]
 		
 		
 # detailed setup information for USF dataset
 def setupUSFData(n):
-	global pid, viewLogFile, PAfile
 	if int(n) == 1:
 		pid          = "1"# participant folder name
 		viewLogFile = "dataLog.txt"	#name of view log file
@@ -78,3 +81,4 @@ def setupUSFData(n):
 		PAfile      = "miles/DAILY_TOTALS_358344041300005_2013-09-25.txt"
 	else:
 		raise InputError('USF data PID in settings not recognized for particpant #'+str(n))
+	return [pid,viewLogFile,PAfile]

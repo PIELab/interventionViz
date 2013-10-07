@@ -1,9 +1,11 @@
+# this file defines a data object for physical activity data
+
 import dateutil.parser	#for parsing datestrings
 import csv		#for csv file reading
 from datetime import datetime
 
 class PAdata:
-	def __init__(self):
+	def __init__(self,PAfile=None):
 		self.time = list()
 
 		self.nonWear = list()
@@ -16,7 +18,9 @@ class PAdata:
 
 		self.rowCount = 0
 		self.count = 0
-
+		
+		if PAfile != None:
+			self.getData(PAfile)
 
 	# results in a list of values corresponding to days in the study. Dates of the days are included in 'self.time'.
 	def getData(self, PAfileLoc):

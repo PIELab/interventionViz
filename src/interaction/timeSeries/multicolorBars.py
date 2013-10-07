@@ -6,7 +6,7 @@ import pylab # for plotting commands & array
 
 import datetime
 
-from ...settings import * 
+from src.settings import setup
 
 class data:
 	def __init__(self):
@@ -94,9 +94,9 @@ class data:
 					print loadingDisplay
 		print 'done. '+str(self.count)+' datapoints loaded from '+str(self.rowCount)+' rows.'
 
-def plot():
+def plot(settings):
 	viewData = data()
-	viewData.getData(viewFileLoc)
+	viewData.getData(settings['interactionFileLoc'])
 
 	print 'making plots...'
 	pylab.figure('multicolorBars')

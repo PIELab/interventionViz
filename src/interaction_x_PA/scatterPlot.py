@@ -4,20 +4,19 @@
 
 import pylab # for plotting commands & array
 
-from ..settings import * 
-from ..PA.timeSeries.PAdata import *
-from ..interaction.timeSeries.multicolorBars import data as interactionData
+from src.settings import setup
+from src.PA.PAdata import PAdata
+from src.interaction.timeSeries.multicolorBars import data as interactionData
 
-def plot():
+def plot(settings):
 	# load interaction data
 	interact = interactionData()
-	interact.getData(viewFileLoc)
+	interact.getData(settings['interactionFileLoc'])
 
 	interactDate,interactScore = segmentInteractionIntoDays(interact)
 
 	# load PA data
-	PA = PAdata()
-	PA.getData(PAfileLoc)
+	PA = PAdata(settings['PAfileLoc'])
 
 	# generate daily PA 'score' for each day
 	PAscore = list()

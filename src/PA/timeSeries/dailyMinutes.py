@@ -4,13 +4,10 @@
 
 import pylab # for plotting commands & array
 
-from ...settings import * 
-from .PAdata import *
+from src.PA.PAdata import PAdata
 
-PA = PAdata()
-PA.getData(PAfileLoc)
-
-def plot():
+def plot(settings):
+	PA = PAdata(settings['PAfileLoc'])
 	print 'making plots...'
 	pylab.figure('dailyMinutes')
 	#p = pylab.figure()
