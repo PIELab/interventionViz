@@ -5,15 +5,14 @@
 import pylab # for plotting commands & array
 
 from src.PA.PAdata import PAdata
-from src.interaction.timeSeries.multicolorBars import data as interactionData
+from src.interaction.timeSeries.multicolorBars import interactionData
 from src.interaction.score import segmentInteractionIntoDays
 from src.PA.score import segmentPAIntoDays
 
 
 def plot(settings):
 	# load interaction data
-	interact = interactionData()
-	interact.getData(settings['interactionFileLoc'])
+	interact = interactionData(settings['interactionFileLoc'])
 	interactScore,interactDate = segmentInteractionIntoDays(interact)
 
 	# load PA data

@@ -1,24 +1,18 @@
 import unittest
-import src.interaction_x_PA.scatterPlot as sPlot
+from src.interaction.interactionData import interactionData
 
-class TestScatterPlot(unittest.TestCase):
+class TestInteractionData(unittest.TestCase):
 	def setUp(self):
 		from src.settings import setup
 		self.settings = setup(dataset='default')
 
-	def test_interactionSegmentation(self):
-		from src.interaction.timeSeries.multicolorBars import data as interactionData
-		interact = interactionData()
-		interact.getData(self.settings['interactionFileLoc'])
-
-	# TODO: the testing below belongs in src.interaction.interaction_data_test !!! (which doesn't exist yet) make it and move this there.
-
-	# START OF CODE THAT SHOULD BE MOVED #
-
+	def test_dataLooksGood(self):
+		from src.interaction.timeSeries.multicolorBars import interactionData
+		interact = interactionData(self.settings['interactionFileLoc'])
 		self.assertTrue(interact.count == 180)
 		self.assertTrue(interact.rowCount == 46)
-		import datetime
-		self.assertTrue(interact.x = [datetime.datetime(2013, 6, 11, 12, 29, 47), datetime.datetime(2013, 6, 11, 12, 29, 48), datetime.datetime(2013, 6, 11, 12, 29, 48), datetime.datetime(2013, 6, 11, 12, 29, 49), datetime.datetime(2013, 6, 11, 12, 29, 47), datetime.datetime(2013, 6, 11, 12, 29, 48), datetime.datetime(2013, 6, 11, 12, 30, 26), datetime.datetime(2013, 6, 11, 12, 30, 27), datetime.datetime(2013, 6, 11, 12, 30, 25), datetime.datetime(2013, 6, 11, 12, 30, 26)])
+#		import datetime
+#		self.assertTrue(interact.x = [datetime.datetime(2013, 6, 11, 12, 29, 47), datetime.datetime(2013, 6, 11, 12, 29, 48), datetime.datetime(2013, 6, 11, 12, 29, 48), datetime.datetime(2013, 6, 11, 12, 29, 49), datetime.datetime(2013, 6, 11, 12, 29, 47), datetime.datetime(2013, 6, 11, 12, 29, 48), datetime.datetime(2013, 6, 11, 12, 30, 26), datetime.datetime(2013, 6, 11, 12, 30, 27), datetime.datetime(2013, 6, 11, 12, 30, 25), datetime.datetime(2013, 6, 11, 12, 30, 26)])
 		self.assertTrue(interact.a1 == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 		self.assertTrue(interact.a2 ==[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 		self.assertTrue(interact.a3 ==[0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0])
@@ -28,13 +22,6 @@ class TestScatterPlot(unittest.TestCase):
 		self.assertTrue(interact.sl ==[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.5, -0.5, 0, 0, -0.5, -0.5, 0, 0, -0.5, -0.5, 0, 0, -0.5, -0.5, 0, 0, -0.5, -0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.5, -0.5, 0, 0, -0.5, -0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.5, -0.5, 0, 0, -0.5, -0.5, 0, 0, -0.5, -0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 		self.assertTrue(interact.ER == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 		
-		# END OF CODE THAT SHOULD BE MOVED #
-
-		interactDate,interactScore = sPlot.segmentInteractionIntoDays(interact)
-		self.assertTrue(len(interactDate) == len(interactScore))
-		self.assertTrue(interactDate == [datetime.datetime(2013, 6, 11, 23, 15, 4), datetime.datetime(2013, 6, 12, 23, 38, 9), datetime.datetime(2013, 6, 13, 23, 1, 46), datetime.datetime(2013, 6, 14, 22, 43, 16), datetime.datetime(2013, 6, 15, 23, 46, 3), datetime.datetime(2013, 6, 16, 18, 44, 2), datetime.datetime(2013, 6, 17, 20, 21, 23)])
-		self.assertTrue(interactScore == [14, 16, 6, 2, 32])		
-
 if __name__ == '__main__':
-		suite = unittest.TestLoader().loadTestsFromTestCase(TestScatterPlot)
+		suite = unittest.TestLoader().loadTestsFromTestCase(TestInteractionData)
 		unittest.TextTestRunner(verbosity=2).run(suite)

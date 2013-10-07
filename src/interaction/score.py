@@ -1,5 +1,5 @@
 import pylab
-from src.interaction.timeSeries.multicolorBars import data as interactionData
+from src.interaction.interactionData import interactionData
 
 def plot(settings):
 	# load interaction data
