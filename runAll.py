@@ -24,6 +24,10 @@ import src.PA.score
 src.PA.score.plot(settings)
 pylab.plt.savefig('PA-Score.png')
 
+import src.interaction_x_PA.timeseries
+src.interaction_x_PA.timeseries.plot(settings)
+pylab.plt.savefig('interactVsPAtimeseries.png')
+
 import src.interaction_x_PA.scatterPlot
 src.interaction_x_PA.scatterPlot.plot(settings)
 pylab.plt.savefig('interactVsPAscatterPlot.png')

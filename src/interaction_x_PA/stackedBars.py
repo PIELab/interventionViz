@@ -106,9 +106,9 @@ def plot(settings):
 	sedentBase = 0
 	zeroBase   = 0
 	for day in range(len(PAscore)):
-		print 'day     ='+str(day)
-		print 'interact='+str(interactions[day])
-		print 'PAscore ='+str(PAscore[day])
+		#print 'day     ='+str(day)
+		#print 'interact='+str(interactions[day])
+		#print 'PAscore ='+str(PAscore[day])
 		if interactions[day] > 0:
 			pylab.plt.bar(interactions[day],PAscore[day],bottom=activeBase,linewidth=1)
 			activeBase += PAscore[day]
