@@ -28,4 +28,8 @@ import src.interaction_x_PA.scatterPlot
 src.interaction_x_PA.scatterPlot.plot(settings)
 pylab.plt.savefig('interactVsPAscatterPlot.png')
 
+import src.interaction_x_PA.stackedBars
+src.interaction_x_PA.stackedBars.plot(settings)
+pylab.plt.savefig('interactVsPAbars.png')
+
 pylab.plt.show()
