@@ -16,6 +16,7 @@ def setup(dataset='test',dataLoc = "./data/"):
 	elif dataset == 'test' or dataset == 'sample':
 		pid,interactFile,PAfile = setupTestData(getParticipantNum())
 	elif dataset == 'USF':
+		dataLoc = "../subjects/"
 		pid,interactFile,PAfile = setupUSFData(getParticipantNum())
 	else:
 		raise InputError('bad dataset name "'+str(dataset)+'" in settings')
@@ -82,7 +83,7 @@ def setupUSFData(n):
 	elif int(n) == 12:
 		pid = '12'
 		viewLogFile = "dataLog.txt"
-		PAfile      = "miles/DAILY_TOTALS_359590044855853_2013-10-24.txt"
+		PAfile      = "miles_FIXED/DAILY_TOTALS_359590044855853_2013-10-24.txt"
 	else:
 		raise InputError('USF data PID in settings not recognized for particpant #'+str(n))
 	return [pid,viewLogFile,PAfile]
