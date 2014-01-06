@@ -1,6 +1,14 @@
 import pylab
 from src.settings import setup
 
+### analysis run on all data: ###
+
+import src.interaction_x_PA.tTest as tTest
+tTest.plot(dataset='USF',dataLoc='../subjects/') # use dataset='test' to select sample dataset
+pylab.plt.savefig('tTest.png')
+
+### analysis run on just one participant: ###
+
 settings = setup(dataset='USF') # use dataset='test' to select sample dataset
 
 #this one isn't very impressive, and I don't think it is working right now anyway
