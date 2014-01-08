@@ -1,6 +1,6 @@
 # this file defines setup methods and configuration options 
 
-HIGHEST_P_NUMBER = 12
+HIGHEST_P_NUMBER = 15
 
 def setup(dataset='test',dataLoc = "./data/"):
 # performs needed setup for scripts & returns dictionary with settings
@@ -86,6 +86,20 @@ def setupUSFData(n):
 		pid = '12'
 		viewLogFile = "dataLog.txt"
 		PAfile      = "miles_FIXED/DAILY_TOTALS_359590044855853_2013-10-24.txt"
+	elif int(n) == 13:
+		pid = '13'
+		viewLogFile = 'dataLog.txt'
+	#	PAfile      = "miles2/DAILY_TOTALS_863496013125329_2013-10-31.txt"
+	#	PAfile      = "miles/DAILY_TOTALS_358344041300005_2013-10-31.txt"
+		PAfile      = "miles/DAILY_TOTALS_358344041300005_2013-10-31_fixed.txt"
+	elif int(n) == 14:
+		pid = '14'
+		viewLogFile = 'dataLog.txt'
+		PAfile      = "miles/DAILY_TOTALS_359590044855853_2013-12-06.txt"
+	elif int(n) == 15:
+		pid = '15'
+		viewLogFile = 'dataLog.txt'
+		PAfile      = "miles/DAILY_TOTALS_358344041300005_2013-12-02.txt"
 	else:
 		raise InputError('USF data PID in settings not recognized for particpant #'+str(n))
 	return [pid,viewLogFile,PAfile]

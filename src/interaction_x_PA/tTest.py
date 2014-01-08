@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pylab # for plotting commands & array
+from scipy import stats
 
 from src.PA.PAdata import PAdata
 from src.interaction.timeSeries.multicolorBars import interactionData
@@ -24,8 +25,21 @@ def plot(dataset='test',dataLoc = "./data/"):
 	activeBase = 0
 	sedentBase = 0
 	zeroBase   = 0
+	cmap       = pylab.cm.get_cmap(name='jet')
+
+	activePAs = list()
+	sedentPAs = list()
+	zeroPAs   = list()
 
 	for pNum in range(HIGHEST_P_NUMBER+1): #cycle through all participants
+		if pNum == 1 or pNum == 3 or pNum == 13 or pNum == 14: 
+			# skip p1 & p3 b/c data is incomplete
+			# skip p13 b/c data needs some massaging
+			# skip p14 b/c data is incomplete
+			continue
+		activePAtotal = sedentPAtotal = zeroPAtotal = 0
+		activePAcount = sedentPAcount = zeroPAcount = 0
+
 		try :
 			pid,interactFile,PAfile = dataSetup(pNum)
 
@@ -123,14 +137,31 @@ def plot(dataset='test',dataLoc = "./data/"):
 				#print 'interact='+str(interactions[day])
 				#print 'PAscore ='+str(PAscore[day])
 				if interactions[day] > 0:
-					pylab.plt.bar(interactions[day],PAscore[day],bottom=activeBase,linewidth=1)
+					activePAtotal+=PAscore[day]
+					activePAcount+=1
+
+					pylab.plt.bar(interactions[day], PAscore[day], bottom=activeBase, linewidth=1, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
 					activeBase += PAscore[day]
 				elif interactions[day] < 0:
-					pylab.plt.bar(interactions[day],PAscore[day],bottom=sedentBase,linewidth=1)
+					sedentPAtotal+=PAscore[day]
+					sedentPAcount+=1
+
+					pylab.plt.bar(interactions[day], PAscore[day], bottom=sedentBase, linewidth=1, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
 					sedentBase += PAscore[day] 
 				else: # interactions[day] == 0
-					pylab.plt.bar(interactions[day],PAscore[day],bottom=zeroBase,linewidth=1)
+					zeroPAtotal+=PAscore[day]
+					zeroPAcount+=1
+
+					pylab.plt.bar(interactions[day], PAscore[day], bottom=zeroBase,   linewidth=1, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
 					zeroBase   += PAscore[day]
+
+
+			activePAs.append(activePAtotal/activePAcount)
+			sedentPAs.append(sedentPAtotal/sedentPAcount)
+			try:
+				zeroPAs.append(zeroPAtotal/zeroPAcount)
+			except ZeroDivisionError:
+				zeroPAs.append(0)
 
 		except InputError: 
 			print 'participant '+str(pNum)+' not valid.'
@@ -143,4 +174,12 @@ def plot(dataset='test',dataLoc = "./data/"):
 	pylab.plt.xlabel('<-sedentary                   zero                   active->\navatar behavior')
 
 	pylab.plt.draw()
+
+	print activePAs
+	print sedentPAs
+	print zeroPAs
+
+	paired_sample = stats.ttest_rel(sedentPAs, activePAs)
+	print "The t-statistic is %.3f and the p-value is %.3f." % paired_sample
+
 	print 'done.'
