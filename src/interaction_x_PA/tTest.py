@@ -18,6 +18,11 @@ def plot(dataset='test',dataLoc = "./data/"):
 	else:
 		raise ValueError('dataset "'+str(dataset)+'" not recognized')
 
+	# change plot font
+#	font = {'family' : 'monospace',
+#	        'weight' : 'normal',
+#	        'size'   : 16}
+#	pylab.plt.rc('font', **font)
 
 	pltName = 'All participants\' PA for sedentary & active avatar days'
 	print 'making plot "'+pltName+'"'
@@ -25,14 +30,16 @@ def plot(dataset='test',dataLoc = "./data/"):
 	activeBase = 0
 	sedentBase = 0
 	zeroBase   = 0
-	cmap       = pylab.cm.get_cmap(name='jet')
+	cmap       = pylab.cm.get_cmap(name='terrain')
 
 	activePAs = list()
 	sedentPAs = list()
 	zeroPAs   = list()
 
+	dataCounter = 0 # a count of how many datapoints are used so far (for colormapping and debug)
+
 	for pNum in range(HIGHEST_P_NUMBER+1): #cycle through all participants
-		if pNum == 1 or pNum == 3 or pNum == 13 or pNum == 14: 
+		if pNum == 1 or pNum == 3 or pNum == 13 or pNum == 14 or pNum == 15: 
 			# skip p1 & p3 b/c data is incomplete
 			# skip p13 b/c data needs some massaging
 			# skip p14 b/c data is incomplete
@@ -140,19 +147,21 @@ def plot(dataset='test',dataLoc = "./data/"):
 					activePAtotal+=PAscore[day]
 					activePAcount+=1
 
-					pylab.plt.bar(interactions[day], PAscore[day], bottom=activeBase, linewidth=1, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
+					# TODO: colormapping should use dataCounter and actual number of data available (instead of pNum and HIGHEST_P_NUM, respectively)
+
+					pylab.plt.bar(interactions[day], PAscore[day], bottom=activeBase, linewidth=1, width=1.7) #, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
 					activeBase += PAscore[day]
 				elif interactions[day] < 0:
 					sedentPAtotal+=PAscore[day]
 					sedentPAcount+=1
 
-					pylab.plt.bar(interactions[day], PAscore[day], bottom=sedentBase, linewidth=1, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
+					pylab.plt.bar(interactions[day], PAscore[day], bottom=sedentBase, linewidth=1, width=1.7) #, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
 					sedentBase += PAscore[day] 
 				else: # interactions[day] == 0
 					zeroPAtotal+=PAscore[day]
 					zeroPAcount+=1
 
-					pylab.plt.bar(interactions[day], PAscore[day], bottom=zeroBase,   linewidth=1, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
+					pylab.plt.bar(interactions[day], PAscore[day], bottom=zeroBase,   linewidth=1, width=1.7) #, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
 					zeroBase   += PAscore[day]
 
 
@@ -162,6 +171,9 @@ def plot(dataset='test',dataLoc = "./data/"):
 				zeroPAs.append(zeroPAtotal/zeroPAcount)
 			except ZeroDivisionError:
 				zeroPAs.append(0)
+
+			# no exceptions means this data was good, increment counter
+			dataCounter += 1
 
 		except InputError: 
 			print 'participant '+str(pNum)+' not valid.'
