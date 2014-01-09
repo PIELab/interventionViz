@@ -3,9 +3,13 @@ from src.settings import setup
 
 ### analysis run on all data: ###
 
-import src.interaction_x_PA.tTest as tTest
-tTest.plot(dataset='USF',dataLoc='../subjects/') # use dataset='test' to select sample dataset
-pylab.plt.savefig('tTest.png')
+import src.interaction_x_PA.tTest_paired as tTest_dep
+tTest_dep.plot(dataset='USF',dataLoc='../subjects/') # use dataset='test' to select sample dataset
+pylab.plt.savefig('tTest_paired.png')
+
+import src.interaction_x_PA.tTest_indep as tTest_indep
+tTest_indep.plot(dataset='USF',dataLoc='../subjects/')
+pylab.plt.savefig('tTest_indep.png')
 
 ### analysis run on just one participant: ###
 

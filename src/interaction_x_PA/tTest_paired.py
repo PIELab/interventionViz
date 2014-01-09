@@ -39,7 +39,7 @@ def plot(dataset='test',dataLoc = "./data/"):
 	dataCounter = 0 # a count of how many datapoints are used so far (for colormapping and debug)
 
 	for pNum in range(HIGHEST_P_NUMBER+1): #cycle through all participants
-		if pNum == 1 or pNum == 3 or pNum == 13 or pNum == 14 or pNum == 15: 
+		if pNum == 1 or pNum == 3 or pNum == 13 or pNum == 14: 
 			# skip p1 & p3 b/c data is incomplete
 			# skip p13 b/c data needs some massaging
 			# skip p14 b/c data is incomplete
