@@ -24,12 +24,9 @@ def plot(dataset='test',dataLoc = "./data/"):
 #	        'size'   : 16}
 #	pylab.plt.rc('font', **font)
 
-	pltName = 'All participants\' PA for sedentary & active avatar days'
+	pltName = 'participants\' avg PA for sedentary & active avatar days'
 	print 'making plot "'+pltName+'"'
 	pylab.figure(pltName)
-	activeBase = 0
-	sedentBase = 0
-	zeroBase   = 0
 	cmap       = pylab.cm.get_cmap(name='terrain')
 
 	activePAs = list()
@@ -146,24 +143,12 @@ def plot(dataset='test',dataLoc = "./data/"):
 				if interactions[day] > 0:
 					activePAtotal+=PAscore[day]
 					activePAcount+=1
-
-					# TODO: colormapping should use dataCounter and actual number of data available (instead of pNum and HIGHEST_P_NUM, respectively)
-
-					pylab.plt.bar(interactions[day], PAscore[day], bottom=activeBase, linewidth=1, width=1.7) #, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
-					activeBase += PAscore[day]
 				elif interactions[day] < 0:
 					sedentPAtotal+=PAscore[day]
 					sedentPAcount+=1
-
-					pylab.plt.bar(interactions[day], PAscore[day], bottom=sedentBase, linewidth=1, width=1.7) #, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
-					sedentBase += PAscore[day] 
 				else: # interactions[day] == 0
 					zeroPAtotal+=PAscore[day]
 					zeroPAcount+=1
-
-					pylab.plt.bar(interactions[day], PAscore[day], bottom=zeroBase,   linewidth=1, width=1.7) #, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
-					zeroBase   += PAscore[day]
-
 
 			activePAs.append(activePAtotal/activePAcount)
 			sedentPAs.append(sedentPAtotal/sedentPAcount)
@@ -190,6 +175,20 @@ def plot(dataset='test',dataLoc = "./data/"):
 	print activePAs
 	print sedentPAs
 	print zeroPAs
+
+	# TODO: colormapping should use dataCounter and actual number of data available (instead of pNum and HIGHEST_P_NUM, respectively)
+	base = 0
+	for PA in activePAs:
+		pylab.plt.bar(1, PA, bottom=base,   linewidth=1, width=1.7) #, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
+		base += PA
+	base = 0
+	for PA in sedentPAs:
+		pylab.plt.bar(-1, PA, bottom=base,   linewidth=1, width=1.7) #, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
+		base += PA
+	base = 0
+	for PA in zeroPAs:
+		pylab.plt.bar(0, PA, bottom=base,   linewidth=1, width=1.7) #, color=cmap(float(pNum)/float(HIGHEST_P_NUMBER)) )
+		base += PA
 
 	paired_sample = stats.ttest_rel(sedentPAs, activePAs)
 	print "The t-statistic is %.3f and the p-value is %.3f." % paired_sample
