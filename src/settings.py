@@ -104,6 +104,10 @@ def setupUSFData(n):
 		pid = '21'
 		viewLogFile = 'dataLog_FIXED_TRIMMED.txt'
 		PAfile      = "miles/DAILY_TOTALS_FIXED_TRIMMED.txt"
+	elif int(n) == 28:
+		pid = '28'
+		viewLogFile = 'dataLog.txt'
+		PAfile = None
 	else:
 		raise InputError('USF data PID in settings not recognized for particpant #'+str(n))
 	return [pid,viewLogFile,PAfile]

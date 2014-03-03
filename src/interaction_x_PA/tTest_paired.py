@@ -191,6 +191,8 @@ def plot(dataset='test',dataLoc = "./data/"):
 		base += PA
 
 	paired_sample = stats.ttest_rel(sedentPAs, activePAs)
+	print "================================================"
 	print "The t-statistic is %.3f and the p-value is %.3f." % paired_sample
-
+	print "================================================"
+	
 	print 'done.'
