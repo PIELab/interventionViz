@@ -1,6 +1,6 @@
 # this file defines setup methods and configuration options 
 
-HIGHEST_P_NUMBER = 15
+HIGHEST_P_NUMBER = 40
 
 def setup(dataset='test',dataLoc = "./data/"):
 # performs needed setup for scripts & returns dictionary with settings
