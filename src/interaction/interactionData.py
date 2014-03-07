@@ -6,15 +6,18 @@ class interactionData:
 		self.rowCount = 0
 		self.count = 0
 
-		self.x = list()
-		self.p1 = list()
+		self.t = list()		# raw time value
+		self.x = list()		# datetime value (x axis)
+		self.p1 = list()	# passives
 		self.p2 = list()
 		self.p3 = list()
-		self.a1 = list()
+		self.a1 = list()	# actives
 		self.a2 = list()
 		self.a3 = list()
-		self.sl = list()
-		self.ER = list()
+		self.sl = list()	# sleep?
+		self.ER = list()	# error?
+		self.v  = list()	# +/- active/sedentary value
+		self.b  = list()	# (boolean) +1 when shown 0 when not
 
 		if(fileName!=None):
 			self.getData(fileName)
@@ -23,6 +26,7 @@ class interactionData:
 		# t = time from start of study
 		#hrs = float(t)/60.0/60.0
 		#self.x.append(hrs)
+		self.t.append(t)
 		self.x.append(datetime.datetime.fromtimestamp(t))
 		self.p1.append(0)
 		self.p2.append(0)
@@ -36,6 +40,8 @@ class interactionData:
 		self.count+=1
 
 		if value==0:
+			self.v.append(0)
+			self.b.append(0)
 			return
 		else:
 			# passives are negative
@@ -57,8 +63,14 @@ class interactionData:
 			else:	#ERROR
 				self.ER[-1] = (0.5)
 		#	y.append(float(activePassiveMap(row[3])))
+		
+		self.b.append(1)
+		self.v.append(self.p1[-1]+self.p2[-1]+self.p3[-1]+self.a1[-1]+self.a2[-1]+self.p3[-1]+self.sl[-1]+self.ER[-1])
 
-
+	def __len__(self):
+		return self.count
+		
+		
 	def getData(self, viewFileLoc):
 		import csv
 		# read in csv
