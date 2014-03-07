@@ -42,7 +42,7 @@ def segmentInteractionIntoDays(interact):
 		interactDate.append(date)
 	return [interactScore,interactDate]
 
-# return the influence score for a given interation descriptor 
+# return the influence score for a given interaction descriptor
 def getInfluenceEffect(interaction,i):
 	return (interaction.a1[i]
 	       +interaction.a2[i]
