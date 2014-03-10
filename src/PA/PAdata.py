@@ -1,6 +1,7 @@
 # this file defines a data object for physical activity data
 
 import dateutil.parser	#for parsing datestrings
+from datetime import timedelta
 import csv		#for csv file reading
 from datetime import datetime
 
@@ -8,7 +9,7 @@ DEFAULT_METHOD = 'mMonitor'
 DEFAULT_TIMESCALE = 'daily'
 
 class PAdata:
-	def __init__(self,PAfile=None):
+	def __init__(self,PAfile=None,method=DEFAULT_METHOD, timeScale=DEFAULT_TIMESCALE):
 		self.loaded = False
 	
 		self.time = list()
@@ -28,10 +29,13 @@ class PAdata:
 		
 		if PAfile != None:
 			self.sourceFile = PAfile
-			self.getData(PAfile)
+			self.getData(PAfile,method,timeScale)
 			self.loaded = True 
+			
+	def __len__(self):
+		return self.count
 	
-	def reset():
+	def reset(self):
 		''' 
 		clears all data in the object and resets counters
 		'''
@@ -65,18 +69,31 @@ class PAdata:
 		else:
 			raise valueError('data getter method "'+str(method)+'" not recognized')
 		
-	def getMinuteLevelFitbitData(self,PAfileLoc):
+	def getMinuteLevelFitbitData(self, PAfileLoc):
 		with open(PAfileLoc, 'rb') as csvfile:
-			spamreader = csv.reader(csvfile,delimter=',')
+			spamreader = csv.reader(csvfile,delimiter=',')
 			for row in spamreader:
 				if self.rowCount==0: # skip header row
 					self.rowCount+=1
 					continue
 				self.rowCount+=1
-				time = datetime.strptime(row[0]), "%x %I %p"
+				
+				timestr = row[0]
+				# fix the date formatting...
+				date, time, ampm = timestr.split()
+				m,d,y = date.split('/')
+				time = time.zfill(8)
+				m = m.zfill(2)
+				d = d.zfill(2)
+				y = y.zfill(4)
+				newTimeStr = y+m+d+'T'+time+ampm
+				
+				time = datetime.strptime(newTimeStr, "%Y%m%dT%I:%M:%S%p")
+								
 				for min in range(0,59):
-					self.time.append(time+timedelta(min=1))
-					self.steps.append(row[1+min])
+					self.time.append( time+timedelta(seconds=1*60) )
+					self.steps.append(int( row[1+min] ))
+					self.count += 1
 					
 	def getDailymMonitorData(self, PAfileLoc):
 		print "loading", PAfileLoc
