@@ -17,15 +17,6 @@ import Image
 DATA_LOC = '../subjects/'
 
 def plot():
-	### analysis run on all data: ###
-	import src.interaction_x_PA.tTest_paired as tTest_dep
-	tTest_dep.plot(dataset='USF',dataLoc=DATA_LOC) # use dataset='test' to select sample dataset
-	pylab.plt.savefig(DATA_LOC+'tTest_paired.png')
-
-	import src.interaction_x_PA.tTest_indep as tTest_indep
-	tTest_indep.plot(dataset='USF',dataLoc=DATA_LOC)
-	pylab.plt.savefig(DATA_LOC+'tTest_indep.png')
-
 	# load in all the data
 	participants = list()
 	interactions = list()
