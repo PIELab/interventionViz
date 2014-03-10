@@ -56,9 +56,20 @@ def setupTestData(n):
 	return [pid,viewLogFile,PAfile]
 		
 		
+def getFileName(type):
+	if type == 'viewLog':
+		return "viewTimes.txt"
+	elif type == 'mMonitor':
+		return "daily_totals.txt"
+	elif type == 'fitbit':
+		return "minuteSteps.csv"
+		
 # detailed setup information for USF dataset
 def setupUSFData(n):
+	'''
+	DEPRECIATED!!! old way of getting the file names for USF dataset use getFileName() now
+	'''
 	pid = str(n)
-	viewLogFile = "viewTimes.txt"
-	PAfile = "daily_totals.txt"
+	viewLogFile = getFileName('viewLog')
+	PAfile = getFileName('mMonitor')
 	return [pid,viewLogFile,PAfile]
