@@ -37,6 +37,10 @@ class setup:
 		self.dataset = dataset
 		self.settings = dict(interactionFileLoc=interactFile,
 					PAfileLoc=PAfile)
+					
+	def __getitem__(self,item):
+		''' this is to maintain backwards compatibility '''
+		return self.settings[item]
 		
 	def getFileName(self,type):
 		prefix = self.dataLoc+self.pid+'/'

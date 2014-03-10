@@ -3,22 +3,6 @@ from src.settings import setup
 
 ### analysis run on all data: ###
 
-# dashboards #
-
-import src.PA.scatterplotDashboard as PAscatterDash
-PAscatterDash.plot()
-pylab.savefig('PA_scatterplotDashboard.png',dpi=100)
-
-pylab.show()
-
-import src.interaction.scatterplotDashboard as interactionScatterDash
-interactionScatterDash.plot()
-pylab.savefig('interaction_scatterplotDashboard.png',dpi=100)
-
-import src.interaction.sparkLineDashboard as sparkDash
-sparkDash.plot()
-pylab.savefig('interaction_sparkLineDashboard.png',dpi=100)
-
 # t-tests #
 
 import src.interaction_x_PA.tTest_paired as tTest_dep
@@ -29,9 +13,19 @@ import src.interaction_x_PA.tTest_indep as tTest_indep
 tTest_indep.plot(dataset='USF',dataLoc='../subjects/')
 pylab.plt.savefig('tTest_indep.png')
 
+# dashboards #
 
-pylab.plt.show()
+import src.PA.scatterplotDashboard as PAscatterDash
+PAscatterDash.plot()
+pylab.savefig('PA_scatterplotDashboard.png',dpi=100)
 
+import src.interaction.scatterplotDashboard as interactionScatterDash
+interactionScatterDash.plot()
+pylab.savefig('interaction_scatterplotDashboard.png',dpi=100)
+
+import src.interaction.sparkLineDashboard as sparkDash
+sparkDash.plot()
+pylab.savefig('interaction_sparkLineDashboard.png',dpi=100)
 
 
 

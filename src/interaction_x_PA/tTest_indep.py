@@ -8,15 +8,9 @@ from src.interaction.timeSeries.multicolorBars import interactionData
 from src.interaction.score import segmentInteractionIntoDays
 from src.PA.score import segmentPAIntoDays,getPAscore_postiveOnly
 
-from src.settings import InputError, HIGHEST_P_NUMBER
+from src.settings import InputError, HIGHEST_P_NUMBER, setup
 
 def plot(dataset='test',dataLoc = "./data/"):
-	if dataset=='test':
-		from src.settings import setupTestData as dataSetup
-	elif dataset == 'USF':
-		from src.settings import setupUSFData as dataSetup
-	else:
-		raise ValueError('dataset "'+str(dataset)+'" not recognized')
 
 	# change plot font
 #	font = {'family' : 'monospace',
@@ -46,19 +40,14 @@ def plot(dataset='test',dataLoc = "./data/"):
 			continue
 
 		try :
-			pid,interactFile,PAfile = dataSetup(pNum)
-
-			interactFile = dataLoc+pid+'/'+interactFile;
-			PAfile    = dataLoc+pid+'/'+PAfile;
-			settings = dict(interactionFileLoc=interactFile,
-					      PAfileLoc=PAfile)
+			settings = setup(dataset=dataset, dataLoc=dataLoc, subjectN=pNum)
 
 			# load interaction data
-			interact = interactionData(settings['interactionFileLoc'])
+			interact = interactionData(settings.getFileName('viewLog'))
 			interactScore,interactDate = segmentInteractionIntoDays(interact)
 
 			# load PA data
-			PA = PAdata(settings['PAfileLoc'])
+			PA = PAdata(settings.getFileName('mMonitor'))
 			PAscore,PAdate = segmentPAIntoDays(PA,PAscoreFunction=getPAscore_postiveOnly)
 
 			while (interactDate[0].date() != PAdate[0].date()) or (interactDate[-1].date() != PAdate[-1].date()) or (len(interactScore) != len(PAscore)):
