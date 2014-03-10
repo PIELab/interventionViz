@@ -11,6 +11,19 @@ import src.interaction_x_PA.tTest_indep as tTest_indep
 tTest_indep.plot(dataset='USF',dataLoc='../subjects/')
 pylab.plt.savefig('tTest_indep.png')
 
+import src.interaction.scatterplotDashboard as scatterDash
+scatterDash.plot()
+pylab.savefig('scatterplotDashboard.png',dpi=100)
+
+import src.interaction.sparkLineDashboard as sparkDash
+sparkDash.plot()
+pylab.savefig('sparkLineDashboard.png',dpi=100)
+
+pylab.plt.show()
+
+
+
+
 ### analysis run on just one participant: ###
 
 settings = setup(dataset='USF') # use dataset='test' to select sample dataset
