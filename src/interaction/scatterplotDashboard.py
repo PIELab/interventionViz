@@ -28,7 +28,7 @@ def plot():
 		try:
 			pid = str(pNum)
 		
-			fName = settings.getFileName('fitbit')
+			fName = settings.getFileName('viewLog')
 			interact = (interactionData(fName))
 			
 			# TODO the rest...
