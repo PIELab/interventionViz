@@ -67,7 +67,7 @@ def plot():
 	num = 0
 	for pa in PA:
 		pylab.subplot(len(PA),1,num)
-		pylab.scatter(pa.time,pa.steps,color='b')
+		pylab.scatter(pa.time, pa.steps, marker='x', color='b')
 		num += 1
 
 		

@@ -3,7 +3,7 @@ from src.settings import setup
 
 ### analysis run on all data: ###
 
-# t-tests #
+# # t-tests #
 
 import src.interaction_x_PA.tTest_paired as tTest_dep
 tTest_dep.plot(dataset='USF',dataLoc='../subjects/') # use dataset='test' to select sample dataset
@@ -27,7 +27,9 @@ import src.interaction.sparkLineDashboard as sparkDash
 sparkDash.plot()
 pylab.savefig('interaction_sparkLineDashboard.png',dpi=100)
 
-
+import src.interaction_x_PA.scatterplotDashboard as masterDash
+masterDash.plot()
+pylab.savefig('masterDash.png',dpi=100)
 
 ### analysis run on just one participant: ###
 

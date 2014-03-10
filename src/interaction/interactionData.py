@@ -100,5 +100,5 @@ class interactionData:
 				if self.count % updateFreq == 0:
 					loadingDisplay+="|"
 					print loadingDisplay
-		print 'done. '+str(self.count)+' datapoints loaded from '+str(self.rowCount)+' rows.'
+		print str(self.count)+' datapoints loaded from '+str(self.rowCount)+' rows.'
 
