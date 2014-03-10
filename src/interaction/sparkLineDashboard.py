@@ -1,5 +1,5 @@
 import pylab
-from src.settings import setup, HIGHEST_P_NUMBER, setupUSFData
+from src.settings import setup, HIGHEST_P_NUMBER
 
 from src.interaction.interactionData import interactionData
 from src.interaction.score import segmentInteractionIntoDays
@@ -23,16 +23,14 @@ def plot():
 
 	for pNum in range(HIGHEST_P_NUMBER+1): #cycle through all participants
 
-		pid,interactFile,PAfile = setupUSFData(pNum) # use dataset='test' to select sample dataset
-		interactFile = DATA_LOC+pid+'/'+interactFile;
-		PAfile    = DATA_LOC+pid+'/'+PAfile;
-		settings = dict(interactionFileLoc=interactFile,
-					PAfileLoc=PAfile)
+		settings = setup(dataset='USF', dataLoc=DATA_LOC, subjectN=pNum)
 					
 		try:
-			interact = (interactionData(settings['interactionFileLoc']))
+			pid = str(pNum)
+		
+			fName = settings.getFileName('viewLog')
+			interact = (interactionData(fName))
 			
-			# TODO the rest...
 		except IOError:
 			print 'p '+pid+' interactions file not found'
 			continue
