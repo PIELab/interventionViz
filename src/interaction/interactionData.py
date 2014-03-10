@@ -78,7 +78,7 @@ class interactionData:
 		updateFreq = 2000	# how many items per display update?
 		div = 1000	# to reduce the amount of data (we don't really need millisecond-accurate readings)
 
-		print "loading", viewFileLoc
+#		print "loading", viewFileLoc
 		with open(viewFileLoc, 'rb') as csvfile:
 			spamreader = csv.reader(csvfile, delimiter=',')
 			for row in spamreader:
