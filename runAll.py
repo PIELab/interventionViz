@@ -13,6 +13,8 @@ import src.interaction_x_PA.tTest_indep as tTest_indep
 tTest_indep.plot(dataset='USF',dataLoc='../subjects/')
 pylab.plt.savefig('tTest_indep.png')
 
+pylab.show()
+
 # dashboards #
 
 import src.PA.scatterplotDashboard as PAscatterDash
@@ -30,6 +32,9 @@ pylab.savefig('interaction_sparkLineDashboard.png',dpi=100)
 import src.interaction_x_PA.scatterplotDashboard as masterDash
 masterDash.plot()
 pylab.savefig('masterDash.png',dpi=100)
+
+pylab.show()
+
 
 ### analysis run on just one participant: ###
 
