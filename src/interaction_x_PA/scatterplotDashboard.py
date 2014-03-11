@@ -95,10 +95,10 @@ def plot():
 	pylab.figure(figName)
 	num = 0
 	max_p = max(max(PA_participants),max(interact_participants))+1
-	pCount = max(len(PA_participants),len(interact_participants))
+	pCount = max(len(PA_participants),len(interact_participants))+1
 	actualCount = 1
 	for i in range(max_p):
-		pylab.subplot(pCount,1,actualCount)
+			pylab.subplot(pCount,1,actualCount)
 		try:
 			pa = PA[PA_participants.index(num)]
 		except ValueError as m:
