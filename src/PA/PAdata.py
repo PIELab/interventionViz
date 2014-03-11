@@ -4,6 +4,7 @@ import dateutil.parser	#for parsing datestrings
 from datetime import timedelta
 import csv		#for csv file reading
 from datetime import datetime
+from calendar import timegm
 
 DEFAULT_METHOD = 'mMonitor'
 DEFAULT_TIMESCALE = 'daily'
@@ -93,11 +94,8 @@ class PAdata:
 								
 				for min in range(0,59):
 					self.time.append( time+timedelta(seconds=1*60) )
-					try:
-						self.timestamp.append(int(self.time[-1].timestamp))
-					except AttributeError: # if python v < 3.3
-						# compute timestamp manually
-						self.timestamp.append((self.time[-1] - datetime(1970, 1, 1)).seconds)
+					self.timestamp.append(timegm(self.time[-1].utctimetuple()))
+
 					self.steps.append(int( row[1+min] ))
 					self.count += 1
 					
