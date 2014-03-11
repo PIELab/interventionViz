@@ -62,18 +62,21 @@ def plot():
 		
 	
 	#scale all the data
-		#TODO
+	PAscaler = 1.0/150.0
+	for pnum in range (0,len(PA)):
+		for i in range(0,len(PA[pnum])):
+			PA[pnum].steps[i] *= PAscaler
    
 	# shift to time since start...
-	for pnum in range(0,len(PA)):
-		start_t = min(PA[pnum].timestamp)
-		for i in range (0, len(PA[pnum])):
-			PA[pnum].timestamp[i] -= start_t
+	# for pnum in range(0,len(PA)):
+		# start_t = min(PA[pnum].timestamp)
+		# for i in range (0, len(PA[pnum])):
+			# PA[pnum].timestamp[i] -= start_t
 	
-	for pnum in range(0,len(interactions)):		
-		start_t = min(interactions[pnum].t)
-		for i in range (0, len(interactions[pnum])):
-			interactions[pnum].t[i] -= start_t
+	# for pnum in range(0,len(interactions)):		
+		# start_t = min(interactions[pnum].t)
+		# for i in range (0, len(interactions[pnum])):
+			# interactions[pnum].t[i] -= start_t
 
 	# # shift all to same daily cycle
 	# for pnum in range(0,len(PA)):
