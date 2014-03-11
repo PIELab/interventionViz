@@ -97,7 +97,11 @@ def plot():
 			
 	figName = "all_interactions_x_time_of_day_since_study_start"
 	pylab.figure(figName)
-	assert(len(interactions) == 12)
+	try:
+		assert(len(interactions) == 12)
+	except AssertionError as e:
+		print 'len(interactions)=',len(interactions)
+		raise
 	pylab.plot(interactions[0].t,interactions[0].v,
 			   interactions[1].t,interactions[1].v,
 			   interactions[2].t,interactions[2].v,

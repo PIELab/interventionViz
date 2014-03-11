@@ -1,10 +1,15 @@
 # this file defines a data object for avatar interaction data
 import datetime
+import csv
+
 
 class interactionData:
-	def __init__(self,fileName=None):
+	def __init__(self,fileName=None,timeScale='raw'):
 		self.rowCount = 0
 		self.count = 0
+		self.startTime = None
+		
+		self.dailyTotals = list()
 
 		self.t = list()		# raw time value
 		self.x = list()		# datetime value (x axis)
@@ -20,7 +25,9 @@ class interactionData:
 		self.b  = list()	# (boolean) +1 when shown 0 when not
 
 		if(fileName!=None):
-			self.getData(fileName)
+			self.getData(fileName, timeScale)
+#		else :
+#			raise ValueError('no filename provided, no data loaded.')
 
 	def logPoint(self,t,tag,value):
 		# t = time from start of study
@@ -71,8 +78,49 @@ class interactionData:
 		return self.count
 		
 		
-	def getData(self, viewFileLoc):
-		import csv
+	def getData(self, viewFileLoc, timeScale='raw'):
+		'''
+		return the interaction data in given format.
+		params:
+			> viewFileloc = interation ("viewTimes") file path
+			> timeScale   = granularity of data returned
+				>> raw   : points for each visibility changed event
+				>> daily : one point per day with total views for that day
+		'''
+		if timeScale == 'raw':
+			# return data points in default format
+			return self.getRawData(viewFileLoc)
+		elif timeScale == 'daily':
+			# return daily total interactions
+			return self.getDailyData(viewFileLoc)
+		else:
+			raise NotImplementedError('timeScale "'+str(timeScale)+'" not recognized')
+			
+	def getDailyData(self,viewFileLoc):
+		''' returns a time series list with f=1day, and value = sum of all seconds avatar is displayed '''
+		currentDay = None
+		div = 1000	# to reduce the amount of data (we don't really need millisecond-accurate readings)
+		with open(viewFileLoc, 'rb') as csvfile:
+			spamreader = csv.reader(csvfile, delimiter=',')
+			for row in spamreader:
+				if self.rowCount==0: #skip header row
+					self.rowCount+=1
+					continue
+				t0 = int(round(int(row[0])/div))
+				tf = int(round(int(row[1])/div))
+				
+				if datetime.datetime.fromtimestamp(tf).day != currentDay:
+					self.dailyTotals.append(0)
+					currentDay = datetime.datetime.fromtimestamp(tf).day
+				
+				self.dailyTotals[-1] += tf - t0
+
+				self.rowCount+=1
+		print sum(self.dailyTotals), 's of view time across ', len(self.dailyTotals), ' days loaded.' 
+		return self.dailyTotals
+			
+	def getRawData(self, viewFileLoc):
+		''' returns a data set with one point at each visibility changed event '''
 		# read in csv
 		loadingDisplay=""	# this is a simple string to print so you know it's working
 		updateFreq = 2000	# how many items per display update?
@@ -86,7 +134,7 @@ class interactionData:
 					self.rowCount+=1
 					continue
 				if self.rowCount==1:	# set startTime
-					startTime = int(round(int(row[0])/div))
+					self.startTime = int(round(int(row[0])/div))
 				self.rowCount+=1
 				# print ', '.join(row)	# print the raw data
 				# print row		# print raw data matrix
@@ -101,4 +149,5 @@ class interactionData:
 					loadingDisplay+="|"
 					print loadingDisplay
 		print str(self.count)+' datapoints loaded from '+str(self.rowCount)+' rows.'
+		return self
 
