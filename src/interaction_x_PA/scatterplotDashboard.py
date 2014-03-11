@@ -62,7 +62,7 @@ def plot():
 		
 	
 	#scale all the data
-	PAscaler = 1.0/150.0
+	PAscaler = 1.0/50.0
 	for pnum in range (0,len(PA)):
 		for i in range(0,len(PA[pnum])):
 			PA[pnum].steps[i] *= PAscaler
@@ -96,6 +96,7 @@ def plot():
 	# make the plots
 	figName = "scatterplot_masterdash"
 	pylab.figure(figName)
+	pylab.subplots_adjust(left=0,bottom=0,right=1,top=1,wspace=0,hspace=0)
 	num = 0
 	max_p = max(max(PA_participants),max(interact_participants))+1
 	pCount = max(len(PA_participants),len(interact_participants))+1
