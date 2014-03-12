@@ -69,7 +69,8 @@ def plot():
 	num = 0
 	for interaction in interactions:
 		pylab.subplot(len(interactions),1,num)
-		pylab.scatter(interaction.viewTimes,[0]*len(interaction.viewTimes),marker='+',color=interaction.viewMarkerColor)
+		pylab.scatter(interaction.viewTimes,[0]*len(interaction.viewTimes),marker='|',color=interaction.viewMarkerColor)
+		pylab.plt.gca().axes.get_xaxis().set_visible(False)
 		num += 1
 	fname = DATA_LOC+figName+'.png'
 	pylab.plt.savefig(fname, dpi = 1000)
