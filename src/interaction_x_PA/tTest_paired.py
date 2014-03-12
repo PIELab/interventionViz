@@ -3,14 +3,14 @@
 import pylab # for plotting commands & array
 from scipy import stats
 
-from src.PA.PAdata import PAdata
+from src.PA.PAdata import PAdata, DEFAULT_METHOD
 from src.interaction.timeSeries.multicolorBars import interactionData
 from src.interaction.score import segmentInteractionIntoDays
 from src.PA.score import segmentPAIntoDays,getPAscore_postiveOnly
 
 from src.settings import InputError, HIGHEST_P_NUMBER, setup
 
-def plot(dataset='test',dataLoc = "./data/"):
+def plot(dataset='test',dataLoc = "./data/", paMethod=DEFAULT_METHOD):
 	# change plot font
 #	font = {'family' : 'monospace',
 #	        'weight' : 'normal',
@@ -45,8 +45,14 @@ def plot(dataset='test',dataLoc = "./data/"):
 			interactScore,interactDate = segmentInteractionIntoDays(interact)
 
 			# load PA data
-			PA = PAdata(settings.getFileName('mMonitor'))
-			PAscore,PAdate = segmentPAIntoDays(PA,PAscoreFunction=getPAscore_postiveOnly)
+			PA = PAdata(PAfile=settings.getFileName(paMethod), method=paMethod, timeScale='daily')
+			if paMethod == 'mMonitor':
+				PAscore,PAdate = segmentPAIntoDays(PA,PAscoreFunction=getPAscore_postiveOnly)
+			elif paMethod == 'fitbit':
+				PAscore = PA.steps
+				PAdate  = PA.time
+			else : 
+				raise valueError('unknown PA method "'+str(paMethod)+'"')
 
 			while (interactDate[0].date() != PAdate[0].date()) or (interactDate[-1].date() != PAdate[-1].date()) or (len(interactScore) != len(PAscore)):
 				print 'day mismatch: '
@@ -155,8 +161,14 @@ def plot(dataset='test',dataLoc = "./data/"):
 		except Warning as w:
 			print w.message
 
-	pylab.plt.ylabel('physical activity score')
-	pylab.plt.xlabel('<-sedentary                   zero                   active->\navatar behavior')
+	if paMethod == 'mMonitor':
+		pylab.plt.ylabel('physical activity score')
+	elif paMethod == 'fitbit':
+		pylab.plt.ylabel('average step counts')
+		
+	pylab.plt.xlabel('<-sedentary                                      active->\navatar behavior')
+	
+	pylab.plt.gca().axes.get_xaxis().set_ticks([])
 
 	pylab.plt.draw()
 

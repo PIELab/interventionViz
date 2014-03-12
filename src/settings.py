@@ -51,10 +51,12 @@ class setup:
 				return prefix + "daily_totals.txt"
 			elif type == 'fitbit':
 				return prefix + "minuteSteps.csv"
+			else:
+				raise ValueError('unknown data type "'+str(type)+'"')
 		elif self.dataset == 'test':
-			raise NotImplementedError()
+			raise NotImplementedError("getFileName('test') not yet implemented")
 		else: 
-			raise ValueError()
+			raise ValueError('dataset type "'+str(self.dataset)+'" not recognized')
 			
 	# setup details for test dataset
 	def setupTestData(self,n):

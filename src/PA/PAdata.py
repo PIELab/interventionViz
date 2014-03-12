@@ -9,6 +9,19 @@ from calendar import timegm
 DEFAULT_METHOD = 'mMonitor'
 DEFAULT_TIMESCALE = 'daily'
 
+def getFitbitStrDate(timeString):
+	'''
+	returns a datetime given fitbit's wierd time string.
+	'''
+	date, time, ampm = timeString.split()
+	m,d,y = date.split('/')
+	time = time.zfill(8)
+	m = m.zfill(2)
+	d = d.zfill(2)
+	y = y.zfill(4)
+	newTimeStr = y+m+d+'T'+time+ampm
+	return datetime.strptime(newTimeStr, "%Y%m%dT%I:%M:%S%p")
+
 class PAdata:
 	def __init__(self,PAfile=None,method=DEFAULT_METHOD, timeScale=DEFAULT_TIMESCALE):
 		self.loaded = False
@@ -16,8 +29,9 @@ class PAdata:
 		self.time = list()
 		self.timestamp = list()
 		
-		self.steps = list()
+		self.steps = list() # time-series list of steps, frequency depends on time-scale passed to data getter
 
+		# daily intensity estimations
 		self.nonWear = list()
 		self.sedentary = list()
 		self.light = list()
@@ -43,8 +57,11 @@ class PAdata:
 		'''
 		self = PAdata(self.sourceFile)
 
-	# results in a list of values corresponding to days in the study. Dates of the days are included in 'self.time'.
 	def getData(self, PAfileLoc, method=DEFAULT_METHOD, timeScale=DEFAULT_TIMESCALE):
+		'''
+		results in a list of values corresponding to days in the study. 
+		Dates of the days are included in 'self.time'.
+		'''
 		if self.loaded == True:
 			self.reset()
 			
@@ -65,11 +82,33 @@ class PAdata:
 
 	def getDailyData(self, PAfileLoc, method=DEFAULT_METHOD):
 		if method=='fitbit':
-			raise noImplementedError('daily fitbit data getter not implemented')
+			self.getDailyLevelFitbitData(PAfileLoc)
 		elif method=='mMonitor':
 			self.getDailymMonitorData(PAfileLoc)
 		else:
 			raise valueError('data getter method "'+str(method)+'" not recognized')
+		
+	def getDailyLevelFitbitData(self, PAfileLoc):
+		with open(PAfileLoc, 'rb') as csvfile:
+			currentDay = None
+			spamreader = csv.reader(csvfile,delimiter=',')
+			for row in spamreader:
+				if self.rowCount==0: # skip header row
+					self.rowCount+=1
+					continue
+				self.rowCount+=1
+								
+				time = getFitbitStrDate(row[0])
+				
+				if currentDay != time.day:
+					# start accumulating on new day
+					currentDay = time.day
+					self.time.append(time)
+					self.steps.append(0)
+				for min in range(0,59):
+					self.steps[-1] += (int( row[1+min] ))
+					self.count += 1
+		return self.steps
 		
 	def getMinuteLevelFitbitData(self, PAfileLoc):
 		with open(PAfileLoc, 'rb') as csvfile:
@@ -98,6 +137,7 @@ class PAdata:
 
 					self.steps.append(int( row[1+min] ))
 					self.count += 1
+		return self
 					
 	def getDailymMonitorData(self, PAfileLoc):
 		print "loading", PAfileLoc
@@ -132,3 +172,4 @@ class PAdata:
 					loadingDisplay+="|"
 					print loadingDisplay
 		print 'done. '+str(self.count)+' datapoints loaded from '+str(self.rowCount)+' rows.'
+		return self
