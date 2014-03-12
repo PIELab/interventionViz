@@ -2,6 +2,8 @@
 import datetime
 import csv
 
+SECONDS_PER_VIEW_UNIT = 3 # num of sec of constant view time before adding another viewTime 
+# NOTE: only actually in seconds (if div=1000) between points
 
 class interactionData:
 	def __init__(self,fileName=None,timeScale='raw'):
@@ -9,8 +11,14 @@ class interactionData:
 		self.count = 0
 		self.startTime = None
 		
-		self.dailyTotals = list()
+		self.dailyTotals = list() # total amount of time viewed each day
+		
+		self.viewTimes = list() # time points when avatar is viewed
+		self.viewMarkerColor = list() # list of marker colors to show at self.viewTimes
 
+		# the folowing are all lists for storing the 'raw' data, 
+		# which has two points at each visibiltiyChanged event;
+		# one for previous state and one for new state.
 		self.t = list()		# raw time value
 		self.x = list()		# datetime value (x axis)
 		self.p1 = list()	# passives
@@ -22,12 +30,28 @@ class interactionData:
 		self.sl = list()	# sleep?
 		self.ER = list()	# error?
 		self.v  = list()	# +/- active/sedentary value
-		self.b  = list()	# (boolean) +1 when shown 0 when not
 
 		if(fileName!=None):
 			self.getData(fileName, timeScale)
 #		else :
 #			raise ValueError('no filename provided, no data loaded.')
+
+	def getColorFor(self,tag):
+		''' returns color marker 'r' for active, 'b' for sedentary, gray for sleeping or null. '''
+		if (tag == 'onComputer' 
+		  or tag == 'videoGames'
+		  or tag == 'watchingTV'):
+			return 'b'
+		elif (tag == 'bicycling'
+		  or tag == 'basketball'
+		  or  tag == 'running'):
+			return 'r'
+		elif tag == 'inBed':
+			return '0.5'
+		elif tag == 'null':
+			return '0.25'
+		else:
+			raise ValueError('unidentified activity tag "'+str(tag)+'"')
 
 	def logPoint(self,t,tag,value):
 		# t = time from start of study
@@ -48,7 +72,6 @@ class interactionData:
 
 		if value==0:
 			self.v.append(0)
-			self.b.append(0)
 			return
 		else:
 			# passives are negative
@@ -69,9 +92,7 @@ class interactionData:
 				self.sl[-1] = (-0.5)
 			else:	#ERROR
 				self.ER[-1] = (0.5)
-		#	y.append(float(activePassiveMap(row[3])))
 		
-		self.b.append(1)
 		self.v.append(self.p1[-1]+self.p2[-1]+self.p3[-1]+self.a1[-1]+self.a2[-1]+self.p3[-1]+self.sl[-1]+self.ER[-1])
 
 	def __len__(self):
@@ -142,6 +163,12 @@ class interactionData:
 				tf = int(round(int(row[1])/div))
 				self.logPoint(t0-1,0,0) # 0 before
 				self.logPoint(t0,row[3],1) #value @ start
+				# 1 value / n sec in middle for viewCount
+				t = t0
+				while t < tf:
+					self.viewTimes.append(t)
+					self.viewMarkerColor.append(self.getColorFor(row[3]))
+					t += SECONDS_PER_VIEW_UNIT
 				self.logPoint(tf,row[3],1) #value @ end
 				self.logPoint(tf+1,0,0) # 0 after
 

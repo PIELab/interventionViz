@@ -118,12 +118,12 @@ def plot():
 			
 		isData = False
 		try:
-			pylab.scatter(pa.timestamp, pa.steps, marker='x', color = 'b')
+			pylab.scatter(pa.timestamp, pa.steps, marker='x', color = 'g')
 			isData = True
 		except AttributeError as e:
 			pass
 		try:
-			pylab.scatter(interact.t, interact.v, marker='+', color='r')
+			pylab.scatter(interact.viewTimes, [0]*len(interact.viewTimes), marker='+', color=interact.viewMarkerColor)
 			isData = True
 		except AttributeError as e:
 			pass

@@ -65,10 +65,11 @@ def plot():
 	# make the plots
 	figName = "interaction_sparkScatterplot"
 	pylab.figure(figName)
+	pylab.subplots_adjust(left=0,bottom=0,right=1,top=1,wspace=0,hspace=0)
 	num = 0
 	for interaction in interactions:
 		pylab.subplot(len(interactions),1,num)
-		pylab.scatter(interaction.t,interaction.v,color='b')
+		pylab.scatter(interaction.viewTimes,[0]*len(interaction.viewTimes),marker='+',color=interaction.viewMarkerColor)
 		num += 1
 	fname = DATA_LOC+figName+'.png'
 	pylab.plt.savefig(fname, dpi = 1000)
