@@ -12,8 +12,6 @@ from src.interaction.score import getInfluenceEffect
 from src.util import spark
 import Image
 
-
-
 DATA_LOC = '../subjects/'
 
 def plot():

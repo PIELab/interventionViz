@@ -51,6 +51,8 @@ class setup:
 				return prefix + "daily_totals.txt"
 			elif type == 'fitbit':
 				return prefix + "minuteSteps.csv"
+			elif type == 'metaData':
+				return prefix + "metaData.csv"
 			else:
 				raise ValueError('unknown data type "'+str(type)+'"')
 		elif self.dataset == 'test':
