@@ -98,7 +98,7 @@ def plot():
 	figName = "all_interactions_x_time_of_day_since_study_start"
 	pylab.figure(figName)
 	try:
-		assert(len(interactions) == 12)
+		assert(len(interactions) == 14)
 	except AssertionError as e:
 		print 'len(interactions)=',len(interactions)
 		raise
@@ -113,7 +113,9 @@ def plot():
 			   interactions[8].t,interactions[8].v,
 			   interactions[9].t,interactions[9].v,
 			   interactions[10].t,interactions[10].v,
-			   interactions[11].t,interactions[11].v)	#TODO: add more if applicable
+			   interactions[11].t,interactions[11].v,
+			   interactions[12].t,interactions[12].v,
+			   interactions[13].t,interactions[13].v)	#TODO: add more if applicable
 	fname = DATA_LOC+figName+'.png'
 	pylab.plt.savefig(fname, dpi = 100)
 		
