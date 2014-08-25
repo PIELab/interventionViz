@@ -16,23 +16,23 @@ class setup:
 		DEFAULT_PARTICIPANT_NUM = 1
 		# load appropriate setup function for chosen dataset
 		if dataset == 'default':
-			pid,interactFile,PAfile = self.setupTestData(DEFAULT_PARTICIPANT_NUM)
+			self.pid,interactFile,PAfile = self.setupTestData(DEFAULT_PARTICIPANT_NUM)
 		elif dataset == 'test' or dataset == 'sample':
-			pid,interactFile,PAfile = self.setupTestData(self.getParticipantNum())
+			self.pid,interactFile,PAfile = self.setupTestData(self.getParticipantNum())
 		elif dataset == 'USF':
 			dataLoc = "../subjects/"
 			if subjectN==None:
-				pid,interactFile,PAfile = self.setupUSFData(self.getParticipantNum())
+				self.pid,interactFile,PAfile = self.setupUSFData(self.getParticipantNum())
 			else:
 				self.pid = str(subjectN)
-				pid,interactFile,PAfile = self.setupUSFData(subjectN)
+				self.pid,interactFile,PAfile = self.setupUSFData(subjectN)
 		else:
 			raise InputError('bad dataset name "'+str(dataset)+'" in settings')
 
 		self.dataLoc = dataLoc
 			
-		interactFile = dataLoc+pid+'/'+interactFile;
-		PAfile    = dataLoc+pid+'/'+PAfile;
+		interactFile = dataLoc+self.pid+'/'+interactFile;
+		PAfile    = dataLoc+self.pid+'/'+PAfile;
 		
 		self.dataset = dataset
 		self.settings = dict(interactionFileLoc=interactFile,

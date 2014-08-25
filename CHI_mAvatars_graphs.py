@@ -2,13 +2,12 @@ import pylab
 from src.settings import setup
 
 # TODO: load the data
-from src.fitbit.Data import Data as FitbitData
-set = setup(dataset='USF', dataLoc='../subjects/', subjectN=8)
-fitbit_data = FitbitData(set.getFileName('fitbit'))
-#import src.mMonitor.mMonitorData as mMonitorData
-#mMonitor_data = mMonitorData()
-#import src.mAvatar.ViewLogData as ViewLogData
-#view_log_data = ViewLogData()
+# from src.data_set.DataSet import DataSet
+# data = DataSet(settin)
+from src.subject.Subject import Subject
+settin = setup(dataset='USF', dataLoc='../subjects/', subjectN=8)
+sub = Subject(settin)
+
 
 # stacked bar chart & p-value
 import src.interaction_x_PA.tTest_paired as tTest_dep

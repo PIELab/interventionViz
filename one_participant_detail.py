@@ -1,9 +1,11 @@
+""" analysis run on just one participant: """
+
 import pylab
 from src.settings import setup
+from src.subject.Subject import Subject
 
-### analysis run on just one participant: ###
-
-settings = setup(dataset='USF') # use dataset='test' to select sample dataset
+settings = setup(dataset='USF', dataLoc='../subjects/')  # use dataset='test' to select sample dataset
+sub = Subject(settings)
 
 #this one isn't very impressive, and I don't think it is working right now anyway
 #import src.interaction.timeSeries.simple
