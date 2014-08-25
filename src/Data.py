@@ -1,19 +1,23 @@
 __author__ = 'tylarmurray'
 
-from pandas import Series
 
-class Data(Series):
+class Data(object):
     """
     abstract base data class for building new data on top of
     """
     def __init__(self, data_file):
         self.source_file = data_file
-        self.ts = self.load_data(self.source_file)
+        self.load_data(self.source_file)
+        try:
+            if self.ts.empty:
+                raise ValueError('loaded time series is empty!')
+        except AttributeError:
+            raise AttributeError('load_data failed to set self.ts!')
 
     def reset(self, frequency=None):
-        '''
+        """
         clears all data in the object and resets counters
-        '''
+        """
         freq = frequency or self.frequency
         self = self.__init__(self.source_file, frequency=freq)
 

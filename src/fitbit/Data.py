@@ -8,6 +8,7 @@ from calendar import timegm
 
 from src.Data import Data as base_data
 
+
 class Data(base_data):
     """
     fitbit data class for loading, processing, and accessing step counts for one participant in various ways.
@@ -33,7 +34,7 @@ class Data(base_data):
 
         self.frequency = frequency
 
-        super(Data, self).__init__(self.minute_file)
+        super(Data, self).__init__(minute_file)
 
     def __len__(self):
         """

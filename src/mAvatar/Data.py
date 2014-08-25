@@ -51,7 +51,7 @@ class Data(base_data):
         self.ER = list()    # error?
         self.v  = list()    # +/- active/sedentary value
 
-        super(Data, self).__init__(self.file_name)
+        super(Data, self).__init__(file_name)
         self.loaded = True
 
     def __len__(self):
