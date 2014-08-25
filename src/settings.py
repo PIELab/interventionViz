@@ -1,6 +1,6 @@
 # this file defines setup methods and configuration options 
 
-HIGHEST_P_NUMBER = 40
+HIGHEST_P_NUMBER = 50
 
 class setup:
 # performs needed setup for scripts & returns dictionary with settings
@@ -16,9 +16,9 @@ class setup:
 		DEFAULT_PARTICIPANT_NUM = 1
 		# load appropriate setup function for chosen dataset
 		if dataset == 'default':
-			pid,interactFile,PAfile = setupTestData(DEFAULT_PARTICIPANT_NUM)
+			pid,interactFile,PAfile = self.setupTestData(DEFAULT_PARTICIPANT_NUM)
 		elif dataset == 'test' or dataset == 'sample':
-			pid,interactFile,PAfile = setupTestData(self.getParticipantNum())
+			pid,interactFile,PAfile = self.setupTestData(self.getParticipantNum())
 		elif dataset == 'USF':
 			dataLoc = "../subjects/"
 			if subjectN==None:

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# this script reads in mMonitor's DAILY_TOTALS and viewLog data, creates a simple 'score' for each, and plots the scores. This function assumes that the data sets come from the EXACT same days (and number of days); no checking is done to verify this, but data with different numbers of days prints a 'arrays must be same size' error.
+# this script reads in mMonitor's DAILY_TOTALS and viewLog data, creates a simple 'score' for each, and plots the scores.
+#  This function assumes that the data sets come from the EXACT same days (and number of days);
+#  no checking is done to verify this, but data with different numbers of days prints a 'arrays must be same size' error.
 
 import pylab # for plotting commands & array
 
@@ -13,11 +15,11 @@ from src.PA.score import segmentPAIntoDays
 def plot(settings):
 	# load interaction data
 	interact = interactionData(settings['interactionFileLoc'])
-	interactScore,interactDate = segmentInteractionIntoDays(interact)
+	interactScore, interactDate = segmentInteractionIntoDays(interact)
 
 	# load PA data
 	PA = PAdata(settings['PAfileLoc'])
-	PAscore,PAdate = segmentPAIntoDays(PA)
+	PAscore, PAdate = segmentPAIntoDays(PA)
 
 	# data check
 	print 'data is ' + str(len(PAscore)) + 'x' + str(len(interactScore))
