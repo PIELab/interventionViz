@@ -2,11 +2,12 @@ import pylab
 from src.settings import setup
 
 # TODO: load the data
-#import src.data.fitbit.FitbitData as FitbitData
-#fitbit_data = FitbitData()
-#import src.data.mMonitor.mMonitorData as mMonitorData
+from src.fitbit.Data import Data as FitbitData
+set = setup(dataset='USF', dataLoc='../subjects/', subjectN=8)
+fitbit_data = FitbitData(set.getFileName('fitbit'))
+#import src.mMonitor.mMonitorData as mMonitorData
 #mMonitor_data = mMonitorData()
-#import src.data.view_log.ViewLogData as ViewLogData
+#import src.mAvatar.ViewLogData as ViewLogData
 #view_log_data = ViewLogData()
 
 # stacked bar chart & p-value
