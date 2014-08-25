@@ -7,6 +7,9 @@ from src.subject.Subject import Subject
 settings = setup(dataset='USF', dataLoc='../subjects/')  # use dataset='test' to select sample dataset
 sub = Subject(settings)
 
+sub.trim_data()
+sub.integrity_check()
+
 #this one isn't very impressive, and I don't think it is working right now anyway
 #import src.interaction.timeSeries.simple
 #src.interaction.timeSeries.simple.plot()

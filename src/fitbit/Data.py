@@ -6,7 +6,9 @@ import csv        #for csv file reading
 from datetime import datetime
 from calendar import timegm
 
-class Data(object):
+from src.Data import Data as base_data
+
+class Data(base_data):
     """
     fitbit data class for loading, processing, and accessing step counts for one participant in various ways.
     """
@@ -31,10 +33,7 @@ class Data(object):
 
         self.frequency = frequency
 
-        if minute_file != None:
-            self.minute_file = minute_file
-            self.getData(minute_file, self.frequency)
-            self.loaded = True
+        super(Data, self).__init__(self.minute_file)
 
     def __len__(self):
         """
@@ -45,14 +44,7 @@ class Data(object):
         else:
             raise IndexError('data not yet loaded, cannot get len.')
 
-    def reset(self, frequency=None):
-        '''
-        clears all data in the object and resets counters
-        '''
-        freq = frequency or self.frequency
-        self = Data(self.minute_file, frequency=freq)
-
-    def getData(self, PAfileLoc, timeScale=None):
+    def load_data(self, PAfileLoc, timeScale=None):
         '''
         builds the lists of values corresponding to data samples.
         '''
@@ -63,8 +55,10 @@ class Data(object):
 
         if time_scale == 'daily':
             self.getDailyData(PAfileLoc)
+            self.loaded = True
         elif time_scale == 'minute':
             self.getMinuteLevelData(PAfileLoc)
+            self.loaded = True
         else:
             raise ValueError('data timescale "' + str(time_scale) + '" not recognized')
 
@@ -153,6 +147,20 @@ class Data(object):
                     print loadingDisplay
         print 'done. '+str(self.count)+' datapoints loaded from '+str(self.rowCount)+' rows.'
         return self
+
+    def get_earliest_sample(self):
+        try:
+            return self._earliest
+        except AttributeError:
+            i = self.time.index(min(self.time))
+            return dict(t=self.time[i], v=self.steps[i])
+
+    def get_latest_sample(self):
+        try:
+            return self._latest
+        except AttributeError:
+            i = self.time.index(max(self.time))
+            return dict(t=self.time[i], v=self.steps[i])
 
 def getFitbitStrDate(timeString):
     '''
