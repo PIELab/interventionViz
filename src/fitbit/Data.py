@@ -132,29 +132,15 @@ class Data(base_data):
 
                 self.count+=1
                 if self.count % updateFreq == 0:
-                    loadingDisplay+="|"
+                    loadingDisplay += "|"
                     print loadingDisplay
-        print 'done. '+str(self.count)+' datapoints loaded from '+str(self.rowCount)+' rows.'
+        print 'done. ' + str(self.count) + ' datapoints loaded from ' + str(self.rowCount) + ' rows.'
         return self
 
-    def get_earliest_sample(self):
-        try:
-            return self._earliest
-        except AttributeError:
-            i = self.time.index(min(self.time))
-            return dict(t=self.time[i], v=self.steps[i])
-
-    def get_latest_sample(self):
-        try:
-            return self._latest
-        except AttributeError:
-            i = self.time.index(max(self.time))
-            return dict(t=self.time[i], v=self.steps[i])
-
 def getFitbitStrDate(timeString):
-    '''
+    """
     returns a datetime given fitbit's wierd time string.
-    '''
+    """
     date, time, ampm = timeString.split()
     m,d,y = date.split('/')
     time = time.zfill(8)

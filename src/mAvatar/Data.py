@@ -69,20 +69,6 @@ class Data(base_data):
         else:
             raise IndexError('data not yet loaded, cannot get len.')
 
-    def get_earliest_sample(self):
-        try:
-            return self._earliest
-        except AttributeError:
-            i = self.x.index(min(self.x))
-            return dict(t=self.x[i])
-
-    def get_latest_sample(self):
-        try:
-            return self._latest
-        except AttributeError:
-            i = self.x.index(max(self.x))
-            return dict(t=self.x[i])
-
     def reset(self, frequency=None):
         '''
         clears all data in the object and resets counters
@@ -238,7 +224,7 @@ class Data(base_data):
                         warnings.warn('point @ t=' + str(t0) + '-' + str(tf) + ' ignored (after study end)')
                         break
                     elif t0 > time_cursor + 60:  # if not yet to logged point
-                        tims.append(time_cursor)
+                        tims.append(datetime.fromtimestamp(time_cursor))
                         sed.append(0)
                         act.append(0)
                         sle.append(0)
@@ -255,7 +241,7 @@ class Data(base_data):
                                 warnings.warn(str(time_cursor - t0) + 's before study_start ignored')
                             elif tf > time_cursor + 60:  # if logged point extends beyond this minute
                                 # logged point encapsulates the entire minute
-                                tims.append(time_cursor)
+                                tims.append(datetime.fromtimestamp(time_cursor))
                                 sed.append(ss * 60)
                                 act.append(aa * 60)
                                 sle.append(sl * 60)
@@ -264,7 +250,7 @@ class Data(base_data):
                                 time_cursor += 60
                                 continue
                             else:  # previously entered logged point ends in this minute
-                                tims.append(time_cursor)
+                                tims.append(datetime.fromtimestamp(time_cursor))
                                 sec = tf - time_cursor
                                 sed.append(ss * sec)
                                 act.append(aa * sec)
@@ -274,7 +260,7 @@ class Data(base_data):
                                 time_cursor += 60
                                 break
                     elif tf > time_cursor + 60:  # if new logged point extends beyond this minute
-                        tims.append(time_cursor)
+                        tims.append(datetime.fromtimestamp(time_cursor))
                         sec = 60 - (t0 - time_cursor)
                         sed.append(ss * sec)
                         act.append(aa * sec)
@@ -284,7 +270,7 @@ class Data(base_data):
                         time_cursor += 60
                         continue
                     elif tf <= time_cursor + 60:  # if logged point is entirely encapsulated in this minute
-                        tims.append(time_cursor)
+                        tims.append(datetime.fromtimestamp(time_cursor))
                         sec = tf - t0
                         sed.append(ss * sec)
                         act.append(aa * sec)
@@ -298,7 +284,7 @@ class Data(base_data):
 
         # fill in zeros until the study end
         while time_cursor < end_time:
-            tims.append(time_cursor)
+            tims.append(datetime.fromtimestamp(time_cursor))
             sed.append(0)
             act.append(0)
             sle.append(0)

@@ -42,10 +42,17 @@ class Subject(object):
             > prior to study start
             > after study end
         """
-        if self._has_data_before_start():
-            raise NotImplementedError('TODO: trim before')
-        if self._has_data_after_end():
-            raise NotImplementedError('TODO: trim after')
+        if self.fitbit_data.has_data_before_start():
+            self.fitbit_data.trim_data()
+        if self.avatar_view_data.has_data_before_start():
+            self.avatar_view_data.trim_data()
+        # TODO: add mMonitor trim
+
+        if self.fitbit_data.has_data_after_end():
+            self.fitbit_data.trim_data()
+        if self.avatar_view_data.has_data_after_end():
+            self.avatar_view_data.trim_data()
+        # TODO: add mMonitor trim
 
         return
 
@@ -53,17 +60,18 @@ class Subject(object):
         """
         returns true if data exists before the meta-data study start
         """
-        if (self.fitbit_data.get_earliest_sample()['t'] < self.meta_data.start
-            or self.avatar_view_data.get_earliest_sample()['t'] < self.meta_data.start):  # TODO: add mMonitor data check
+        if (self.fitbit_data.has_data_before_start()
+                or self.avatar_view_data.has_data_before_start()):  # TODO: add mMonitor data check
             return True
         else:
             return False
+
     def _has_data_after_end(self):
         """
         returns true if data exists after the meta-data study end
         """
-        if (self.fitbit_data.get_latest_sample()['t'] > self.meta_data.end
-            or self.avatar_view_data.get_latest_sample()['t'] > self.meta_data.end):  # TODO: add mMonitor data check
+        if (self.fitbit_data.has_data_after_end()
+                or self.avatar_view_data.has_data_after_end()):  # TODO: add mMonitor data check
             return True
         else:
             return False
