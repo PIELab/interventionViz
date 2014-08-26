@@ -12,16 +12,17 @@ class Subject(object):
         """
         :param setup: settings setup object describing the subject to be set up
         """
+        # load meta data
+        self.meta_data = MetaData(setup.getFileName('metaData'))
+
         # load fitbit data
         print 'subject init'
-        self.fitbit_data = FitbitData(setup.getFileName('fitbit'))
+        self.fitbit_data = FitbitData(setup.getFileName('fitbit'), meta_data=self.meta_data)
         print self.fitbit_data
 
         # load viewLog data
-        self.avatar_view_data = AvatarViews(setup.getFileName('viewLog'))
+        self.avatar_view_data = AvatarViews(setup.getFileName('viewLog'), meta_data=self.meta_data)
 
-        # load meta data
-        self.meta_data = MetaData(setup.getFileName('metaData'))
 
         # TODO: load mMonitor data
 
@@ -43,11 +44,10 @@ class Subject(object):
         """
         if self._has_data_before_start():
             raise NotImplementedError('TODO: trim before')
-        elif self._has_data_after_end():
+        if self._has_data_after_end():
             raise NotImplementedError('TODO: trim after')
-        else:
-            return
 
+        return
 
     def _has_data_before_start(self):
         """

@@ -3,9 +3,15 @@ __author__ = 'tylarmurray'
 import dateutil.parser    #for parsing datestrings
 import csv        #for csv file reading
 from datetime import datetime
+import calendar
+import pandas
+import warnings
 
 from src.Data import Data as base_data
 
+SEDENTARY = ['watchingTV', 'onComputer', 'videoGames']
+ACTIVE = ['running', 'basketball', 'bicycling']
+SLEEP = ['inBed']
 SECONDS_PER_VIEW_UNIT = 3 # num of sec of constant view time before adding another viewTime
 # NOTE: only actually in seconds (if div=1000) between points
 
@@ -13,7 +19,7 @@ class Data(base_data):
     """
     fitbit data class for loading, processing, and accessing step counts for one participant in various ways.
     """
-    def __init__(self, file_name, frequency='raw'):
+    def __init__(self, file_name, frequency='raw', *args, **kwargs):
         """
         :param file_name: file to load data from
         :param frequency: string indicating desired frequency of samples. Can be:
@@ -51,7 +57,7 @@ class Data(base_data):
         self.ER = list()    # error?
         self.v  = list()    # +/- active/sedentary value
 
-        super(Data, self).__init__(file_name)
+        super(Data, self).__init__(file_name, *args, **kwargs)
         self.loaded = True
 
     def __len__(self):
@@ -76,7 +82,6 @@ class Data(base_data):
         except AttributeError:
             i = self.x.index(max(self.x))
             return dict(t=self.x[i])
-
 
     def reset(self, frequency=None):
         '''
@@ -144,7 +149,16 @@ class Data(base_data):
 
         self.v.append(self.p1[-1]+self.p2[-1]+self.p3[-1]+self.a1[-1]+self.a2[-1]+self.p3[-1]+self.sl[-1]+self.ER[-1])
 
-    def load_data(self, viewFileLoc, frequency=None):
+    def load_data(self, file_loc):
+        if self.meta_data is None:
+            raise ValueError('meta data is needed to load mAvatar view data')
+        else:
+            self.loaded = True
+            return self.load_minute_data(file_loc,
+                                         calendar.timegm(self.meta_data.start.timetuple()),
+                                         calendar.timegm(self.meta_data.end.timetuple()))
+
+    def get_data(self, viewFileLoc, frequency=None):
         '''
         return the interaction data in given format.
         params:
@@ -192,11 +206,117 @@ class Data(base_data):
         print sum(self.views), 's of view time across ', len(self.views), ' days loaded.'
         return self.views
 
+    def load_minute_data(self, view_file_loc, start_time, end_time):
+        """
+        loads minute-frequency time series
+        """
+        time_cursor = start_time  # time (minute) we are currently looking at (should be on the minute XX:00:00)
+        count = 0  # number of minutes
+        tims = list()  # times
+        view = list()  # total of all views, regardless of type
+        act = list()  # active interactions
+        sed = list()  # sedentary interactions
+        sle = list()  # sleeping interactions
+
+        div = 1000  # divsor on the timestamps (1000 converts ms to s)
+        with open(view_file_loc, 'rb') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=',')
+            for row in spamreader:
+                self.rowCount += 1
+                if self.rowCount == 1:    #skip header row
+                    continue
+                # print ', '.join(row)    # print the raw data
+                # print row        # print raw data matrix
+                t0 = int(round(int(row[0]) / div))
+                tf = int(round(int(row[1]) / div))
+                ss = int(row[3] in SEDENTARY)  # 1 if row is sedentary, else 0
+                aa = int(row[3] in ACTIVE)  # 1 if row is active, else 0
+                sl = int(row[3] in SLEEP)  # 1 if row is sleeping, else 0
+
+                while True:  # loop through this as long as needed to eat up this data row
+                    if time_cursor > end_time:  # if time cursor has passed end of study
+                        warnings.warn('point @ t=' + str(t0) + '-' + str(tf) + ' ignored (after study end)')
+                        break
+                    elif t0 > time_cursor + 60:  # if not yet to logged point
+                        tims.append(time_cursor)
+                        sed.append(0)
+                        act.append(0)
+                        sle.append(0)
+                        view.append(0)
+                        count += 1
+                        time_cursor += 60
+                        continue
+                    elif t0 < time_cursor:  # if in the middle of a logged point
+                        if tf < time_cursor:  # logged point is entirely before this minute, ignore it?
+                            warnings.warn('point @ t=' + str(t0) + '-' + str(tf) + 'ignored (before study start)')
+                            break
+                        else:
+                            if count == 0:  # if this is the first point (data from before study start)
+                                warnings.warn(str(time_cursor - t0) + 's before study_start ignored')
+                            elif tf > time_cursor + 60:  # if logged point extends beyond this minute
+                                # logged point encapsulates the entire minute
+                                tims.append(time_cursor)
+                                sed.append(ss * 60)
+                                act.append(aa * 60)
+                                sle.append(sl * 60)
+                                view.append(60)
+                                count += 1
+                                time_cursor += 60
+                                continue
+                            else:  # previously entered logged point ends in this minute
+                                tims.append(time_cursor)
+                                sec = tf - time_cursor
+                                sed.append(ss * sec)
+                                act.append(aa * sec)
+                                sle.append(sl * sec)
+                                view.append(sec)
+                                count += 1
+                                time_cursor += 60
+                                break
+                    elif tf > time_cursor + 60:  # if new logged point extends beyond this minute
+                        tims.append(time_cursor)
+                        sec = 60 - (t0 - time_cursor)
+                        sed.append(ss * sec)
+                        act.append(aa * sec)
+                        sle.append(sl * sec)
+                        view.append(sec)
+                        count += 1
+                        time_cursor += 60
+                        continue
+                    elif tf <= time_cursor + 60:  # if logged point is entirely encapsulated in this minute
+                        tims.append(time_cursor)
+                        sec = tf - t0
+                        sed.append(ss * sec)
+                        act.append(aa * sec)
+                        sle.append(sl * sec)
+                        view.append(sec)
+                        count += 1
+                        time_cursor += 60
+                        break
+                    else:
+                        raise AssertionError("I don't know how we got here...")
+
+        # fill in zeros until the study end
+        while time_cursor < end_time:
+            tims.append(time_cursor)
+            sed.append(0)
+            act.append(0)
+            sle.append(0)
+            view.append(0)
+            count += 1
+            time_cursor += 60
+
+        self.ts = pandas.Series(data=view, index=tims)
+        self.active_ts = pandas.Series(data=act, index=tims)
+        self.sedentary_ts = pandas.Series(data=sed, index=tims)
+        self.sleep_ts = pandas.Series(data=sle, index=tims)
+        print str(count) + ' minutes loaded'
+
     def getRawData(self, viewFileLoc):
         ''' returns a data set with one point at each visibility changed event '''
         # read in csv
         loadingDisplay=""    # this is a simple string to print so you know it's working
-        updateFreq = 2000    # how many items per display update?
+        updateFreq = 100    # how many items per display update?
         div = 1000    # to reduce the amount of data (we don't really need millisecond-accurate readings)
 
 #        print "loading", viewFileLoc

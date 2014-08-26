@@ -1,10 +1,11 @@
 __author__ = 'tylarmurray'
 
-import dateutil.parser    #for parsing datestrings
+import dateutil.parser    # for parsing datestrings
 from datetime import timedelta
-import csv        #for csv file reading
+import csv        # for csv file reading
 from datetime import datetime
 from calendar import timegm
+import pandas
 
 from src.Data import Data as base_data
 
@@ -13,14 +14,11 @@ class Data(base_data):
     """
     fitbit data class for loading, processing, and accessing step counts for one participant in various ways.
     """
-    def __init__(self, minute_file, day_file=None, frequency="minute"):
+    def __init__(self, minute_file, day_file=None, *args, **kwargs):
         """
-        :param settings: a dictionary (or settings class) with at least the following values:
-            * dataLoc
-            * pNum
-        :param frequency: string indicating desired frequency of samples. Can be:
-            * daily
-            * minute
+        :param minute_file: location of file containing minute level step counts.
+        :param day_file: location of file containing daily step counts (used only in data validation and (maybe) as a
+            shortcut to daily aggregation).
         """
         self.loaded = False
 
@@ -30,11 +28,9 @@ class Data(base_data):
         self.time = list()
         self.timestamp = list()
 
-        self.steps = list() # time-series list of steps, frequency depends on time-scale passed to data getter
+        self.steps = list()  # time-series list of steps, frequency depends on time-scale passed to data getter
 
-        self.frequency = frequency
-
-        super(Data, self).__init__(minute_file)
+        super(Data, self).__init__(minute_file, *args, **kwargs)
 
     def __len__(self):
         """
@@ -45,23 +41,12 @@ class Data(base_data):
         else:
             raise IndexError('data not yet loaded, cannot get len.')
 
-    def load_data(self, PAfileLoc, timeScale=None):
-        '''
+    def load_data(self, PAfileLoc):
+        """
         builds the lists of values corresponding to data samples.
-        '''
-        time_scale = timeScale or self.frequency
-
-        if self.loaded == True:
-            self.reset()
-
-        if time_scale == 'daily':
-            self.getDailyData(PAfileLoc)
-            self.loaded = True
-        elif time_scale == 'minute':
-            self.getMinuteLevelData(PAfileLoc)
-            self.loaded = True
-        else:
-            raise ValueError('data timescale "' + str(time_scale) + '" not recognized')
+        """
+        self.loaded = True
+        return self.getMinuteLevelData(PAfileLoc)
 
     def getDailyData(self, PAfileLoc):
         with open(PAfileLoc, 'rb') as csvfile:
@@ -106,12 +91,15 @@ class Data(base_data):
 
                 time = datetime.strptime(newTimeStr, "%Y%m%dT%I:%M:%S%p")
 
-                for min in range(0,59):
-                    self.time.append( time+timedelta(seconds=1*60) )
+                for minn in range(0, 59):
+                    self.time.append(time + timedelta(seconds=1 * 60))
                     self.timestamp.append(timegm(self.time[-1].utctimetuple()))
 
-                    self.steps.append(int( row[1+min] ))
+                    self.steps.append(int(row[1 + minn]))
                     self.count += 1
+
+        self.ts = pandas.Series(data=self.steps, index=self.time)
+
         return self
 
     def getDailymMonitorData(self, PAfileLoc):

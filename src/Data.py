@@ -5,7 +5,8 @@ class Data(object):
     """
     abstract base data class for building new data on top of
     """
-    def __init__(self, data_file):
+    def __init__(self, data_file, meta_data=None):
+        self.meta_data=meta_data
         self.source_file = data_file
         self.load_data(self.source_file)
         try:

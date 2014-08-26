@@ -41,12 +41,12 @@ class MetaData(object):
                             continue
                         rowCount+=1
                                         
-                        self.start = datetime.strptime(row[0],"%Y-%m-%dT%H:%M:%S")
-                        self.end   = datetime.strptime(row[1],"%Y-%m-%dT%H:%M:%S")
+                        self.start = datetime.strptime(row[0], "%Y-%m-%dT%H:%M:%S")
+                        self.end   = datetime.strptime(row[1], "%Y-%m-%dT%H:%M:%S")
                         
-        self.logInterval(self.start,self.end)
+        self.logInterval(self.start, self.end)
                         
-        self.addDays(self.start,self.end)
+        self.addDays(self.start, self.end)
             
         return self
         
