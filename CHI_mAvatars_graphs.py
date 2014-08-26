@@ -11,22 +11,19 @@ settings = setup(dataset='USF', dataLoc='../subjects/', subjectN=0)  # use datas
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     data = Dataset(settings, min_quality=QUALITY_LEVEL['acceptable'], trim=True, check=True)
-
 print len(data.subject_data), 'subjects loaded'
 
-print data.subject_data[0].fitbit_data.ts.head()
-print data.subject_data[0].avatar_view_data.ts.head()
-
+print 'plotting fitbit time series'
 pylab.plt.figure('fitbit time series')
 for sub in data.subject_data:
     sub.fitbit_data.ts.plot()
-pylab.plt.show()
 
+print 'plotting avatar views time series'
 pylab.plt.figure('avatar view time series')
 for sub in data.subject_data:
     sub.avatar_view_data.ts.plot()
-pylab.plt.show()
 
+pylab.plt.show()
 
 # stacked bar chart & p-value
 import src.interaction_x_PA.tTest_paired as tTest_dep
