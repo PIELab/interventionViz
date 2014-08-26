@@ -1,10 +1,13 @@
 import pylab
+
+from src.data.subject import Subject
 from src.settings import setup
+
+
 
 # TODO: load the data
 # from src.data_set.DataSet import DataSet
 # data = DataSet(settin)
-from src.subject.Subject import Subject
 settin = setup(dataset='USF', dataLoc='../subjects/', subjectN=8)
 sub = Subject(settin)
 
@@ -41,5 +44,5 @@ dailyInteracts.plot()
 
 pylab.show()
 
-import src.metaData.compareAllLengths as studyLen
+import src.data.metaData.compareAllLengths as studyLen
 studyLen.show()

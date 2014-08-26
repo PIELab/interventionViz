@@ -7,7 +7,7 @@ from datetime import datetime
 from calendar import timegm
 import pandas
 
-from src.Data import Data as base_data
+from src.data.Data import Data as base_data
 
 
 class Data(base_data):

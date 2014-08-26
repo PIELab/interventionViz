@@ -1,9 +1,12 @@
 """ analysis run on just one participant: """
 
-import pylab
-from src.settings import setup
-from src.subject.Subject import Subject
 import warnings
+
+import pylab
+
+from src.settings import setup
+from src.data.subject.Subject import Subject
+
 
 settings = setup(dataset='USF', dataLoc='../subjects/')  # use dataset='test' to select sample dataset
 

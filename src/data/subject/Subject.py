@@ -1,8 +1,9 @@
+from src.data.fitbit.Data import Data as FitbitData
+from src.data.mAvatar.Data import Data as AvatarViews
+from src.data.subject.MetaData import MetaData
+
 __author__ = 'tylarmurray'
 
-from src.fitbit.Data import Data as FitbitData
-from src.mAvatar.Data import Data as AvatarViews
-from src.subject.MetaData import MetaData
 
 class Subject(object):
     """

@@ -7,7 +7,7 @@ import calendar
 import pandas
 import warnings
 
-from src.Data import Data as base_data
+from src.data.Data import Data as base_data
 
 SEDENTARY = ['watchingTV', 'onComputer', 'videoGames']
 ACTIVE = ['running', 'basketball', 'bicycling']
@@ -205,6 +205,8 @@ class Data(base_data):
         sle = list()  # sleeping interactions
 
         div = 1000  # divsor on the timestamps (1000 converts ms to s)
+
+        print 'reading', start_time, 'thru', end_time
         with open(view_file_loc, 'rb') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=',')
             for row in spamreader:
@@ -220,6 +222,9 @@ class Data(base_data):
                 sl = int(row[3] in SLEEP)  # 1 if row is sleeping, else 0
 
                 while True:  # loop through this as long as needed to eat up this data row
+                    if (time_cursor-start_time)%600 == 0:
+                        print time_cursor, '\r',
+
                     if time_cursor > end_time:  # if time cursor has passed end of study
                         warnings.warn('point @ t=' + str(t0) + '-' + str(tf) + ' ignored (after study end)')
                         break
@@ -239,7 +244,8 @@ class Data(base_data):
                         else:
                             if count == 0:  # if this is the first point (data from before study start)
                                 warnings.warn(str(time_cursor - t0) + 's before study_start ignored')
-                            elif tf > time_cursor + 60:  # if logged point extends beyond this minute
+
+                            if tf > time_cursor + 60:  # if logged point extends beyond this minute
                                 # logged point encapsulates the entire minute
                                 tims.append(datetime.fromtimestamp(time_cursor))
                                 sed.append(ss * 60)

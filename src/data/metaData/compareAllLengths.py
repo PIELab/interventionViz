@@ -1,9 +1,9 @@
 '''
 show() method loads data for all (USF) participants and summarizes study lengths
 '''
+from src.data.metaData import studyLength
 
 from src.settings import setup, HIGHEST_P_NUMBER
-from src.metaData.studyLength import studyLength
 
 DATA_LOC = '../subjects/'
 
