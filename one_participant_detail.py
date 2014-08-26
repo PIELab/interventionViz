@@ -3,9 +3,13 @@
 import pylab
 from src.settings import setup
 from src.subject.Subject import Subject
+import warnings
 
 settings = setup(dataset='USF', dataLoc='../subjects/')  # use dataset='test' to select sample dataset
-sub = Subject(settings)
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    sub = Subject(settings)
 
 sub.trim_data()
 sub.integrity_check()
@@ -15,25 +19,25 @@ sub.integrity_check()
 #src.interaction.timeSeries.simple.plot()
 #pylab.plt.show()
 
-import src.interaction.timeSeries.multicolorBars
-src.interaction.timeSeries.multicolorBars.plot(settings)
-
-import src.interaction.score
-src.interaction.score.plot(settings)
-
-import src.PA.timeSeries.dailyMinutes
-src.PA.timeSeries.dailyMinutes.plot(settings)
-
-import src.PA.score
-src.PA.score.plot(settings)
-
-import src.interaction_x_PA.timeseries
-src.interaction_x_PA.timeseries.plot(settings)
-
-import src.interaction_x_PA.scatterPlot
-src.interaction_x_PA.scatterPlot.plot(settings)
-
-import src.interaction_x_PA.stackedBars
-src.interaction_x_PA.stackedBars.plot(settings)
-
-pylab.plt.show()
+#import src.interaction.timeSeries.multicolorBars
+#src.interaction.timeSeries.multicolorBars.plot(settings)
+#
+#import src.interaction.score
+#src.interaction.score.plot(settings)
+#
+#import src.PA.timeSeries.dailyMinutes
+#src.PA.timeSeries.dailyMinutes.plot(settings)
+#
+#import src.PA.score
+#src.PA.score.plot(settings)
+#
+#import src.interaction_x_PA.timeseries
+#src.interaction_x_PA.timeseries.plot(settings)
+#
+#import src.interaction_x_PA.scatterPlot
+#src.interaction_x_PA.scatterPlot.plot(settings)
+#
+#import src.interaction_x_PA.stackedBars
+#src.interaction_x_PA.stackedBars.plot(settings)
+#
+#pylab.plt.show()
