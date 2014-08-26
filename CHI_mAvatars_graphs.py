@@ -26,13 +26,13 @@ for sub in data.subject_data:
 pylab.plt.show()
 
 # stacked bar chart & p-value
-import src.interaction_x_PA.tTest_paired as tTest_dep
+import src.dep.interaction_x_PA.tTest_paired as tTest_dep
 tTest_dep.plot(dataset='USF',dataLoc='../subjects/', paMethod='fitbit', bypass_data_check=True) # use dataset='test' to select sample dataset
 pylab.plt.savefig('tTest_paired.png')
 pylab.show()
 
 # correlation scatterplot
-import src.interaction_x_PA.scatterPlot as scatterPlot
+import src.dep.interaction_x_PA.scatterPlot as scatterPlot
 scatterPlot.plot( setup(dataset='USF', dataLoc='../subjects/', subjectN=8) )
 pylab.plt.savefig('scatterPlot.png')
 pylab.show()
@@ -49,10 +49,10 @@ pylab.show()
 
 
 # additional (non-published) diagnostics:
-import src.interaction.allOnOne as multiInteract
+import src.dep.interaction.allOnOne as multiInteract
 multiInteract.plot()
 
-import src.interaction.dailyTotalBarDash as dailyInteracts
+import src.dep.interaction.dailyTotalBarDash as dailyInteracts
 dailyInteracts.plot()
 
 pylab.show()

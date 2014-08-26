@@ -1,16 +1,8 @@
 import pylab
+
 from src.settings import setup, HIGHEST_P_NUMBER
-
 from src.interaction.interactionData import interactionData
-from src.interaction.score import segmentInteractionIntoDays
-from src.PA.PAdata import PAdata
-from src.PA.score import segmentPAIntoDays,getPAscore_postiveOnly
 
-import src.interaction.timeSeries.multicolorBars
-
-from src.interaction.score import getInfluenceEffect
-from src.util import spark
-import Image
 
 DATA_LOC = '../subjects/'
 
