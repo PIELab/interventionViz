@@ -14,6 +14,12 @@ with warnings.catch_warnings():
 sub.trim_data()
 sub.integrity_check()
 
+pylab.plt.figure('fitbit time series')
+sub.fitbit_data.ts.plot()
+pylab.plt.figure('avatar view time series')
+sub.avatar_view_data.ts.plot()
+pylab.plt.show()
+
 #this one isn't very impressive, and I don't think it is working right now anyway
 #import src.interaction.timeSeries.simple
 #src.interaction.timeSeries.simple.plot()
