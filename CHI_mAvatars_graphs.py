@@ -1,15 +1,31 @@
+import warnings
+
 import pylab
 
-from src.data.subject import Subject
-from src.settings import setup
+from src.settings import setup, QUALITY_LEVEL
+from src.data.Dataset import Dataset
 
 
+settings = setup(dataset='USF', dataLoc='../subjects/', subjectN=0)  # use dataset='test' to select sample dataset
 
-# TODO: load the data
-# from src.data_set.DataSet import DataSet
-# data = DataSet(settin)
-settin = setup(dataset='USF', dataLoc='../subjects/', subjectN=8)
-sub = Subject(settin)
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    data = Dataset(settings, min_quality=QUALITY_LEVEL['acceptable'], trim=True, check=True)
+
+print len(data.subject_data), 'subjects loaded'
+
+print data.subject_data[0].fitbit_data.ts.head()
+print data.subject_data[0].avatar_view_data.ts.head()
+
+pylab.plt.figure('fitbit time series')
+for sub in data.subject_data:
+    sub.fitbit_data.ts.plot()
+pylab.plt.show()
+
+pylab.plt.figure('avatar view time series')
+for sub in data.subject_data:
+    sub.avatar_view_data.ts.plot()
+pylab.plt.show()
 
 
 # stacked bar chart & p-value

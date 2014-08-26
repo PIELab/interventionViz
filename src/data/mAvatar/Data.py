@@ -192,7 +192,7 @@ class Data(base_data):
         print sum(self.views), 's of view time across ', len(self.views), ' days loaded.'
         return self.views
 
-    def load_minute_data(self, view_file_loc, start_time, end_time):
+    def load_minute_data(self, view_file_loc, start_time, end_time, verbose=False):
         """
         loads minute-frequency time series
         """
@@ -206,14 +206,14 @@ class Data(base_data):
 
         div = 1000  # divsor on the timestamps (1000 converts ms to s)
 
-        print 'reading', start_time, 'thru', end_time
+        if verbose: print 'reading', start_time, 'thru', end_time
         with open(view_file_loc, 'rb') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=',')
             for row in spamreader:
                 self.rowCount += 1
                 if self.rowCount == 1:    #skip header row
                     continue
-                # print ', '.join(row)    # print the raw data
+                if verbose: print ', '.join(row)    # print the raw data
                 # print row        # print raw data matrix
                 t0 = int(round(int(row[0]) / div))
                 tf = int(round(int(row[1]) / div))
@@ -223,7 +223,7 @@ class Data(base_data):
 
                 while True:  # loop through this as long as needed to eat up this data row
                     if (time_cursor-start_time)%600 == 0:
-                        print time_cursor, '\r',
+                        if verbose: print time_cursor, '\r',
 
                     if time_cursor > end_time:  # if time cursor has passed end of study
                         warnings.warn('point @ t=' + str(t0) + '-' + str(tf) + ' ignored (after study end)')
@@ -307,8 +307,8 @@ class Data(base_data):
     def getRawData(self, viewFileLoc):
         ''' returns a data set with one point at each visibility changed event '''
         # read in csv
-        loadingDisplay=""    # this is a simple string to print so you know it's working
-        updateFreq = 100    # how many items per display update?
+        #loadingDisplay=""    # this is a simple string to print so you know it's working
+        #updateFreq = 100    # how many items per display update?
         div = 1000    # to reduce the amount of data (we don't really need millisecond-accurate readings)
 
 #        print "loading", viewFileLoc
@@ -336,9 +336,9 @@ class Data(base_data):
                 self.logPoint(tf,row[3],1) #value @ end
                 self.logPoint(tf+1,0,0) # 0 after
 
-                if self.count % updateFreq == 0:
-                    loadingDisplay+="|"
-                    print loadingDisplay
+                #if self.count % updateFreq == 0:
+                #    loadingDisplay+="|"
+                #    print loadingDisplay
         print str(self.count)+' datapoints loaded from '+str(self.rowCount)+' rows.'
         return self
 

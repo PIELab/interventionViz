@@ -17,9 +17,7 @@ class Subject(object):
         self.meta_data = MetaData(setup.getFileName('metaData'))
 
         # load fitbit data
-        print 'subject init'
         self.fitbit_data = FitbitData(setup.getFileName('fitbit'), meta_data=self.meta_data)
-        print self.fitbit_data
 
         # load viewLog data
         self.avatar_view_data = AvatarViews(setup.getFileName('viewLog'), meta_data=self.meta_data)

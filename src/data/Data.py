@@ -9,7 +9,7 @@ class Data(object):
         self.source_file = data_file
         self.load_data(self.source_file)
         try:
-            print self.ts.head()
+            self.ts.head()  # can also print this if you want...
         # NOTE: this breaks on pandas v 0.11:
         #    if self.ts.empty:
         #        raise ValueError('loaded time series is empty!')
