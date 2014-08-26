@@ -100,7 +100,7 @@ class Data(base_data):
 
         self.ts = pandas.Series(data=self.steps, index=self.time)
 
-        return self
+        return self.ts
 
     def getDailymMonitorData(self, PAfileLoc):
         print "loading", PAfileLoc

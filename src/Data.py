@@ -1,21 +1,20 @@
 __author__ = 'tylarmurray'
 
-
 class Data(object):
     """
     abstract base data class for building new data on top of
     """
     def __init__(self, data_file, meta_data=None):
-
         self.meta_data=meta_data
         self.source_file = data_file
         self.load_data(self.source_file)
         try:
-            if self.ts.empty:
-                raise ValueError('loaded time series is empty!')
+            print self.ts.head()
+        # NOTE: this breaks on pandas v 0.11:
+        #    if self.ts.empty:
+        #        raise ValueError('loaded time series is empty!')
         except AttributeError:
             raise AttributeError('overridden load_data failed to set self.ts!')
-        print self.ts.head()
 
     def reset(self, frequency=None):
         """
