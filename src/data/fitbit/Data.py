@@ -92,8 +92,9 @@ class Data(base_data):
                 time = datetime.strptime(newTimeStr, "%Y%m%dT%I:%M:%S%p")
 
                 for minn in range(0, 59):
-                    self.time.append(time + timedelta(seconds=1 * 60))
-                    self.timestamp.append(timegm(self.time[-1].utctimetuple()))
+                    time += timedelta(seconds=1 * 60)
+                    self.time.append(time)
+                    self.timestamp.append(timegm(time.utctimetuple()))
 
                     self.steps.append(int(row[1 + minn]))
                     self.count += 1
@@ -101,41 +102,6 @@ class Data(base_data):
         self.ts = pandas.Series(data=self.steps, index=self.time)
 
         return self.ts
-
-    def getDailymMonitorData(self, PAfileLoc):
-        print "loading", PAfileLoc
-        # read in csv
-        loadingDisplay=""    # this is a simple string to print so you know it's working
-        updateFreq = 10    # how many items per display update?
-
-        with open(PAfileLoc, 'rb') as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=',')
-
-            for row in spamreader:
-                if self.rowCount==0:    #skip header row
-                    self.rowCount+=1
-                    continue
-                self.rowCount+=1
-                # print ', '.join(row)    # print the raw data
-                # print row        # print raw data matrix
-
-                self.time.append(dateutil.parser.parse(row[1]))
-                self.nonWear.append(float(row[3]))
-                self.sedentary.append(float(row[4]))
-                self.light.append(float(row[5]))
-                self.mod.append(float(row[6]))
-                self.vig.append(float(row[7]))
-                self.mod_vig.append(float(row[8]))
-                # 9 total min
-                # 10 total hour
-                self.unknown.append(float(row[11])*60)    # hrs->min
-
-                self.count+=1
-                if self.count % updateFreq == 0:
-                    loadingDisplay += "|"
-                    print loadingDisplay
-        print 'done. ' + str(self.count) + ' datapoints loaded from ' + str(self.rowCount) + ' rows.'
-        return self
 
 def getFitbitStrDate(timeString):
     """
