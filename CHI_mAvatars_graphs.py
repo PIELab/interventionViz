@@ -6,7 +6,7 @@ from src.settings import setup, QUALITY_LEVEL
 from src.data.Dataset import Dataset
 
 
-settings = setup(dataset='USF', dataLoc='../subjects/', subjectN=0)  # use dataset='test' to select sample dataset
+settings = setup(dataset='USF', dataLoc='../subjects/', subjectN=0)
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -23,13 +23,17 @@ pylab.plt.figure('avatar view time series')
 for sub in data.subject_data:
     sub.avatar_view_data.ts.plot()
 
-pylab.plt.show()
+#pylab.plt.show()
 
 # stacked bar chart & p-value
-import src.dep.interaction_x_PA.tTest_paired as tTest_dep
-tTest_dep.plot(dataset='USF',dataLoc='../subjects/', paMethod='fitbit', bypass_data_check=True) # use dataset='test' to select sample dataset
-pylab.plt.savefig('tTest_paired.png')
-pylab.show()
+import src.paired_t_test as paired_t_test
+paired_t_test.plot(data)
+pylab.plt.show()
+
+#import src.dep.interaction_x_PA.tTest_paired as tTest_dep
+#tTest_dep.plot(dataset='USF',dataLoc='../subjects/', paMethod='fitbit', bypass_data_check=True) # use dataset='test' to select sample dataset
+#pylab.plt.savefig('tTest_paired.png')
+#pylab.show()
 
 # correlation scatterplot
 import src.dep.interaction_x_PA.scatterPlot as scatterPlot

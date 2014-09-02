@@ -15,6 +15,13 @@ SLEEP = ['inBed']
 SECONDS_PER_VIEW_UNIT = 3 # num of sec of constant view time before adding another viewTime
 # NOTE: only actually in seconds (if div=1000) between points
 
+
+class DAY_TYPE(object):
+    active = 1
+    sedentary = -1
+    neutral = 0
+
+
 class Data(base_data):
     """
     fitbit data class for loading, processing, and accessing step counts for one participant in various ways.
@@ -168,29 +175,61 @@ class Data(base_data):
         else:
             raise NotImplementedError('timeScale "'+str(timeScale)+'" not recognized')
 
+    def get_day_type(self, date):
+        """
+        returns type for given day
+            :param date: ISO 8601 date str of day in question (ie 2014-09-30)
+            :returns: one of the values in DAY_TYPE
+        """
+        try:
+            if sum(self.active_ts[date]) > 0:
+                return DAY_TYPE.active
+            elif sum(self.sedentary_ts[date]) > 0:
+                return DAY_TYPE.sedentary
+            else:
+                warnings.warn(date + ' has no active nor sed values')
+                return DAY_TYPE.neutral
+        except TypeError as e:
+            print 'ERROR getting day type for ', date
+            print self.active_ts
+            print self.active_ts[date]
+            print self.sedentary_ts
+            print self.sedentary_ts[date]
+            raise e
+    def get_day_type_ts(self, start=None, end=None):
+        """
+        returns a pandas time series with f=1day, and value as one of DAY_TYPE values
+            :param start: datetime obj of first day to include in ts
+            :param end: datetime obj of last day to include in ts
+        """
+        day_ts = self.get_day_ts(start,end)
+        types = list()
+        for day in day_ts.index:
+            daystr = str(day.year) + '-' + str(day.month) + '-' + str(day.day)
+            types.append(self.get_day_type(daystr))
+        print types
 
-    def getDailyData(self,viewFileLoc):
-        ''' returns a time series list with f=1day, and value = sum of all seconds avatar is displayed '''
-        currentDay = None
-        div = 1000    # to reduce the amount of data (we don't really need millisecond-accurate readings)
-        with open(viewFileLoc, 'rb') as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=',')
-            for row in spamreader:
-                if self.rowCount==0: #skip header row
-                    self.rowCount+=1
-                    continue
-                t0 = int(round(int(row[0])/div))
-                tf = int(round(int(row[1])/div))
+        return pandas.Series(data=types, index=day_ts.index)
 
-                if datetime.datetime.fromtimestamp(tf).day != currentDay:
-                    self.views.append(0)
-                    currentDay = datetime.datetime.fromtimestamp(tf).day
+    def get_day_ts(self, start=None, end=None):
+        """
+        returns a pandas time series with f=1day, and value = sum of all seconds avatar is displayed
+            :param start: datetime obj of first day to include in ts
+            :param end: datetime obj of last day to include in ts
+        """
+        ts = self.ts.resample('D', how='sum')
+        if start is not None:
+            for i in ts.index:
+                if i.to_datetime() < start:
+                    ts.pop(i)
 
-                self.views[-1] += tf - t0
+        if end is not None:
+            for i in ts.index:
+                if i > end:
+                    ts.pop()
+        # print ts
+        return ts
 
-                self.rowCount+=1
-        print sum(self.views), 's of view time across ', len(self.views), ' days loaded.'
-        return self.views
 
     def load_minute_data(self, view_file_loc, start_time, end_time, verbose=False):
         """

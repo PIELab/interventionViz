@@ -8,7 +8,8 @@ QUALITY_LEVEL = dict(good=3, acceptable=2, partial=1, bad=0)
 # partial    : some data may be usable, but special analysis may be required
 # bad        : there isn't even enough here to use some of it.
 
-DATA_TYPES = dict(avatar_views='viewLog', mMonitor='mMonitor', fitbit='fitbit')
+DATA_TYPES = dict(avatar_views='viewLog', mMonitor='mMonitor', fitbit='fitbit', metaData='metaData')
+
 
 class setup:
 # performs needed setup for scripts & returns dictionary with settings
@@ -26,7 +27,7 @@ class setup:
         if dataset == 'default':
             self.pid,interactFile,PAfile = self.setupTestData(DEFAULT_PARTICIPANT_NUM)
         elif dataset == 'test' or dataset == 'sample':
-            self.pid,interactFile,PAfile = self.setupTestData(self.getParticipantNum())
+            self.pid,interactFile,PAfile = self.setupTestData(subjectN)
         elif dataset == 'USF':
             dataLoc = "../subjects/"
             if subjectN==None:
@@ -51,8 +52,8 @@ class setup:
         return self.settings[item]
         
     def getFileName(self,type):
-        prefix = self.dataLoc+self.pid+'/'
         if self.dataset == 'USF':
+            prefix = self.dataLoc+self.pid+'/'
             if type == 'viewLog':
                 return prefix + "viewTimes.txt"
             elif type == 'mMonitor':
@@ -64,8 +65,9 @@ class setup:
             else:
                 raise ValueError('unknown data type "'+str(type)+'"')
         elif self.dataset == 'test':
+            prefix = self.dataLoc + self.pid+'/'
             raise NotImplementedError("getFileName('test') not yet implemented")
-        else: 
+        else:
             raise ValueError('dataset type "'+str(self.dataset)+'" not recognized')
 
     def get_pid_list(self, dataset=None):
@@ -113,7 +115,6 @@ class setup:
                 for pnum in range(len(excludes)):  # should be len-1?
                     if qual[pnum] >= min_level:
                         excludes[pnum] = True
-
         else:
             raise NotImplementedError("cannot get exclusions for unknown set " + str(set))
 

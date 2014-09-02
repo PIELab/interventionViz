@@ -70,6 +70,32 @@ class Data(base_data):
                     self.count += 1
         return self.steps
 
+    def get_day_sum(self, date):
+        """
+        returns a sum of all minute level samples for a given day, specified by ISO 8601 date string
+        :param data: ISO 8601 date string (ie: '2014-09-30')
+        """
+        return sum(self.ts[date])
+
+    def get_day_ts(self, start=None, end=None):
+        """
+        returns pandas time series of value sums over each day
+        :param start: datetime obj of first day to include in ts
+        :param end: datetime obj of last day to include in ts
+        """
+        ts = self.ts.resample('D', how='sum')
+        if start is not None:
+            for i in ts.index:
+                if i.to_datetime() < start:
+                    ts.pop(i)
+
+        if end is not None:
+            for i in ts.index:
+                if i > end:
+                    ts.pop()
+        # print ts
+        return ts
+
     def getMinuteLevelData(self, PAfileLoc):
         with open(PAfileLoc, 'rb') as csvfile:
             spamreader = csv.reader(csvfile,delimiter=',')

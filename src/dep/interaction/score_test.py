@@ -1,6 +1,6 @@
 import unittest
 
-from src.dep.interaction import interactionData
+from src.dep.interaction.interactionData import interactionData
 
 import src.dep.interaction.score as score
 

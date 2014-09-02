@@ -23,3 +23,15 @@ class Dataset(object):
                 self.subject_data[-1].trim_data()
             if check:
                 self.subject_data[-1].integrity_check()
+
+    def __len__(self):
+        return len(self.subject_data)
+
+    def __iter__(self):
+        i = 0
+        while True:
+            try:
+                yield self.subject_data[i]
+                i += 1
+            except IndexError:
+                return
