@@ -133,38 +133,38 @@ class setup(object):
 
         if set == 'USF':
             if DATA_TYPES.fitbit in used_data:
-                print 'checking for fitbit quality'
+                #print 'checking for fitbit quality'
                 qual = [b,b,g,a,g,g,a,g,b,g,a,g,g,a,g,a]  # TODO: add more... <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 for pnum in range(len(excludes)):  # should be len-1?
                     if qual[pnum] < min_level:
                         excludes[pnum] = True
-                        print "-" + str(subs[pnum]) + '|',
+                        # print "-" + str(subs[pnum]) + '|',
                     else:
-                        print str(subs[pnum]) + '|',
-                print '\n'
+                        pass # print str(subs[pnum]) + '|',
+                #print '\n'
 
             if DATA_TYPES.mMonitor in used_data:
-                print 'checking for mMonitor quality'
+                #print 'checking for mMonitor quality'
                 qual = [b,b,p,a,p,p,p,p,b,a,b,a,b,b,b,b]  # TODO: add more... <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 for pnum in range(len(excludes)):  # should be len-1?
                     if qual[pnum] < min_level:
                         excludes[pnum] = True
-                        print "-" + str(subs[pnum]) + '|',
+                        #print "-" + str(subs[pnum]) + '|',
                     else:
-                        print str(subs[pnum]) + '|',
-                print '\n'
+                        pass  # print str(subs[pnum]) + '|',
+                #print '\n'
 
 
             if DATA_TYPES.avatar_views in used_data:
-                print 'checking avatar view quality'
+                #print 'checking avatar view quality'
                 qual = [a,b,b,a,g,g,g,a,b,g,p,a,a,a,a,g]  # TODO: add more... <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 for pnum in range(len(excludes)):  # should be len-1?
                     if qual[pnum] < min_level:
                         excludes[pnum] = True
-                        print "-" + str(subs[pnum]) + '|',
+                        #print "-" + str(subs[pnum]) + '|',
                     else:
-                        print str(subs[pnum]) + '|',
-                print '\n'
+                        pass  # print str(subs[pnum]) + '|',
+                #print '\n'
 
         else:
             raise NotImplementedError("cannot get exclusions for unknown set " + str(set))
@@ -173,7 +173,7 @@ class setup(object):
         for pnum in range(len(excludes)):
             if excludes[pnum]:
                 ex.append(subs[pnum])
-        print 'excluded: ', ex
+        #print 'excluded: ', ex
         return ex
 
 

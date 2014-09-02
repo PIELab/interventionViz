@@ -20,7 +20,7 @@ class Dataset(object):
         for pid in list(self.pids):  # note: need to use copy b/c we are modifying as we go
             if pid in self.excluded:
                 self.pids.remove(pid)
-                print 'removing ', pid
+                #print 'removing ', pid
 
         self.subject_data = list()
 

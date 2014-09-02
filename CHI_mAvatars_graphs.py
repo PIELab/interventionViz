@@ -13,27 +13,22 @@ with warnings.catch_warnings():
     data = Dataset(settings, min_quality=QUALITY_LEVEL.acceptable, trim=True, check=True,
                    used_data_types=[DATA_TYPES.fitbit, DATA_TYPES.avatar_views])
 
-print 'plotting fitbit time series'
-pylab.plt.figure('fitbit time series')
-for sub in data.subject_data:
-    sub.fitbit_data.ts.plot()
-
-print 'plotting avatar views time series'
-pylab.plt.figure('avatar view time series')
-for sub in data.subject_data:
-    sub.avatar_view_data.ts.plot()
-
+#print 'plotting fitbit time series'
+#pylab.plt.figure('fitbit time series')
+#for sub in data.subject_data:
+#    sub.fitbit_data.ts.plot()
+#
+#print 'plotting avatar views time series'
+#pylab.plt.figure('avatar view time series')
+#for sub in data.subject_data:
+#    sub.avatar_view_data.ts.plot()
+#
 #pylab.plt.show()
 
 # stacked bar chart & p-value
 import src.paired_t_test as paired_t_test
 paired_t_test.plot(data)
 pylab.plt.show()
-
-#import src.dep.interaction_x_PA.tTest_paired as tTest_dep
-#tTest_dep.plot(dataset='USF',dataLoc='../subjects/', paMethod='fitbit', bypass_data_check=True) # use dataset='test' to select sample dataset
-#pylab.plt.savefig('tTest_paired.png')
-#pylab.show()
 
 # correlation scatterplot
 import src.dep.interaction_x_PA.scatterPlot as scatterPlot
