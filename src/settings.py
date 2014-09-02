@@ -2,16 +2,30 @@
 
 HIGHEST_P_NUMBER = 50
 
-QUALITY_LEVEL = dict(good=3, acceptable=2, partial=1, bad=0)
-# good         : no issue observed with data
-# acceptable : some issues observed, but data should still be okay in normal analysis
-# partial    : some data may be usable, but special analysis may be required
-# bad        : there isn't even enough here to use some of it.
 
-DATA_TYPES = dict(avatar_views='viewLog', mMonitor='mMonitor', fitbit='fitbit', metaData='metaData')
+class QUALITY_LEVEL(object):
+    """
+    good         : no issue observed with data
+    acceptable : some issues observed, but data should still be okay in normal analysis
+    partial    : some data may be usable, but special analysis may be required
+    bad        : there isn't even enough here to use some of it.
+    """
+    good = 3
+    acceptable = 2
+    partial = 1
+    bad = 0
 
 
-class setup:
+class DATA_TYPES(object):
+    avatar_views = 0  # 'viewLog'
+    mMonitor = 1  # 'mMonitor'
+    fitbit = 2  # 'fitbit'
+    metaData = 3  # 'metaData'
+
+    all = [0, 1, 2, 3]
+
+
+class setup(object):
 # performs needed setup for scripts & returns dictionary with settings
 #     paramters:
 #        dataset - name of dataset to use
@@ -47,20 +61,35 @@ class setup:
         self.settings = dict(interactionFileLoc=interactFile,
                     PAfileLoc=PAfile)
                     
-    def __getitem__(self,item):
+    def __getitem__(self, item):
         ''' this is to maintain backwards compatibility '''
         return self.settings[item]
         
-    def getFileName(self,type):
+    def getFileName(self, type):
+        """
+        depreciated version of get_file_name which takes raw strings to specify data type
+        """
+        if type == 'viewLog':
+            return self.get_file_name(DATA_TYPES.avatar_views)
+        elif type == 'mMonitor':
+            return self.get_file_name(DATA_TYPES.mMonitor)
+        elif type == 'fitbit':
+            return self.get_file_name(DATA_TYPES.fitbit)
+        elif type == 'metaData':
+            return self.get_file_name(DATA_TYPES.metaData)
+        else:
+            raise ValueError('unknown data type "'+str(type)+'"')
+
+    def get_file_name(self, type):
         if self.dataset == 'USF':
             prefix = self.dataLoc+self.pid+'/'
-            if type == 'viewLog':
+            if type == DATA_TYPES.avatar_views:
                 return prefix + "viewTimes.txt"
-            elif type == 'mMonitor':
+            elif type == DATA_TYPES.mMonitor:
                 return prefix + "daily_totals.txt"
-            elif type == 'fitbit':
+            elif type == DATA_TYPES.fitbit:
                 return prefix + "minuteSteps.csv"
-            elif type == 'metaData':
+            elif type == DATA_TYPES.metaData:
                 return prefix + "metaData.csv"
             else:
                 raise ValueError('unknown data type "'+str(type)+'"')
@@ -78,10 +107,10 @@ class setup:
             raise NotImplementedError("cannot get pid list for unknown set " + str(set))
 
     def get_num_of_participants(self, dataset=None):
-        set - dataset or self.dataset
+        set = dataset or self.dataset
         return len(self.get_pid_list(set))
 
-    def get_exluded_list(self, used_data, min_level=QUALITY_LEVEL['acceptable'], dataset=None):
+    def get_exluded_list(self, used_data=DATA_TYPES.all, min_level=QUALITY_LEVEL.acceptable, dataset=None):
         """
         returns a list of participants to exclude for analysis based on hard-coded manual quality assessment data
 
@@ -89,40 +118,62 @@ class setup:
             exclude subjects with bad data for those fields), use constants defined in DATA_TYPES.
         :param min_level: minimum quality level to include in analysis
         """
+        # make given list of data a list if you forgot to
+        if not hasattr(used_data, "__iter__"):
+            used_data = [used_data]
+
         set = dataset or self.dataset
+        subs = self.get_pid_list(set)
         excludes = [False]*int(self.get_num_of_participants(set))
         # shorthand defs:
-        g = QUALITY_LEVEL['good']
-        a = QUALITY_LEVEL['acceptable']
-        p = QUALITY_LEVEL['partial']
-        b = QUALITY_LEVEL['bad']
+        g = QUALITY_LEVEL.good
+        a = QUALITY_LEVEL.acceptable
+        p = QUALITY_LEVEL.partial
+        b = QUALITY_LEVEL.bad
 
         if set == 'USF':
-            if DATA_TYPES['fitbit'] in used_data:
+            if DATA_TYPES.fitbit in used_data:
+                print 'checking for fitbit quality'
                 qual = [b,b,g,a,g,g,a,g,b,g,a,g,g,a,g,a]  # TODO: add more... <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 for pnum in range(len(excludes)):  # should be len-1?
-                    if qual[pnum] >= min_level:
+                    if qual[pnum] < min_level:
                         excludes[pnum] = True
+                        print "-" + str(subs[pnum]) + '|',
+                    else:
+                        print str(subs[pnum]) + '|',
+                print '\n'
 
-            if DATA_TYPES['mMonitor'] in used_data:
+            if DATA_TYPES.mMonitor in used_data:
+                print 'checking for mMonitor quality'
                 qual = [b,b,p,a,p,p,p,p,b,a,b,a,b,b,b,b]  # TODO: add more... <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 for pnum in range(len(excludes)):  # should be len-1?
-                    if qual[pnum] >= min_level:
+                    if qual[pnum] < min_level:
                         excludes[pnum] = True
+                        print "-" + str(subs[pnum]) + '|',
+                    else:
+                        print str(subs[pnum]) + '|',
+                print '\n'
 
-            if DATA_TYPES['avatar_views'] in used_data:
-                qual = [b,b,g,a,g,g,a,g,b,g,a,g,g,a,g,a]  # TODO: add more... <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            if DATA_TYPES.avatar_views in used_data:
+                print 'checking avatar view quality'
+                qual = [a,b,b,a,g,g,g,a,b,g,p,a,a,a,a,g]  # TODO: add more... <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 for pnum in range(len(excludes)):  # should be len-1?
-                    if qual[pnum] >= min_level:
+                    if qual[pnum] < min_level:
                         excludes[pnum] = True
+                        print "-" + str(subs[pnum]) + '|',
+                    else:
+                        print str(subs[pnum]) + '|',
+                print '\n'
+
         else:
             raise NotImplementedError("cannot get exclusions for unknown set " + str(set))
 
         ex = list()
-        subs = self.get_pid_list(set)
-        for pnum in range(len(excludes)): # should be len-1?
+        for pnum in range(len(excludes)):
             if excludes[pnum]:
                 ex.append(subs[pnum])
+        print 'excluded: ', ex
         return ex
 
 

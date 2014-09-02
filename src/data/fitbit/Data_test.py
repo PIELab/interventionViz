@@ -10,7 +10,7 @@ from src.data.fitbit.Data import Data as FitbitData
 class basic_fitbit_data_tester(unittest.TestCase):
     def setUp(self):
         sett = settin(dataset='USF', dataLoc='../subjects/', subjectN=15)  # TODO: use dataset='test'
-        self.dat = FitbitData(sett.getFileName(type=DATA_TYPES['fitbit']))
+        self.dat = FitbitData(sett.get_file_name(type=DATA_TYPES.fitbit))
         self.days = ['2013-11-21',
                      '2013-11-22',
                      '2013-11-23',

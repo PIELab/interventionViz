@@ -2,7 +2,7 @@ import warnings
 
 import pylab
 
-from src.settings import setup, QUALITY_LEVEL
+from src.settings import setup, QUALITY_LEVEL, DATA_TYPES
 from src.data.Dataset import Dataset
 
 
@@ -10,8 +10,8 @@ settings = setup(dataset='USF', dataLoc='../subjects/', subjectN=0)
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
-    data = Dataset(settings, min_quality=QUALITY_LEVEL['acceptable'], trim=True, check=True)
-print len(data.subject_data), 'subjects loaded'
+    data = Dataset(settings, min_quality=QUALITY_LEVEL.acceptable, trim=True, check=True,
+                   used_data_types=[DATA_TYPES.fitbit, DATA_TYPES.avatar_views])
 
 print 'plotting fitbit time series'
 pylab.plt.figure('fitbit time series')
