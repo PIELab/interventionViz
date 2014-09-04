@@ -9,7 +9,7 @@ class Subject(object):
     """
     subject class for holding/accessing all data related to a study participant.
     """
-    def __init__(self, setup):
+    def __init__(self, setup, avatar_view_freq=60):
         """
         :param setup: settings setup object describing the subject to be set up
         """
@@ -20,8 +20,8 @@ class Subject(object):
         self.fitbit_data = FitbitData(setup.getFileName('fitbit'), meta_data=self.meta_data)
 
         # load viewLog data
-        self.avatar_view_data = AvatarViews(setup.getFileName('viewLog'), meta_data=self.meta_data)
-
+        self.avatar_view_data = AvatarViews(setup.getFileName('viewLog'), meta_data=self.meta_data,
+                                            frequency=avatar_view_freq)
 
         # TODO: load mMonitor data
 

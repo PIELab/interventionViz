@@ -21,12 +21,11 @@ class DAY_TYPE(object):
     sedentary = -1
     neutral = 0
 
-
 class Data(base_data):
     """
     fitbit data class for loading, processing, and accessing step counts for one participant in various ways.
     """
-    def __init__(self, file_name, frequency='raw', *args, **kwargs):
+    def __init__(self, file_name, frequency=60, *args, **kwargs):
         """
         :param file_name: file to load data from
         :param frequency: string indicating desired frequency of samples. Can be:
@@ -39,6 +38,8 @@ class Data(base_data):
         self.rowCount = 0
         self.count = 0
         self.startTime = None
+
+        self.log_points = list()  # a list of the lengths of each point in the log file
 
         # time-series style data:
         self.frequency = frequency
@@ -147,7 +148,8 @@ class Data(base_data):
             raise ValueError('meta data is needed to load mAvatar view data')
         else:
             self.loaded = True
-            return self.load_minute_data(file_loc,
+
+            return self.load_data_interval(self.frequency, file_loc,
                                          calendar.timegm(self.meta_data.start.timetuple()),
                                          calendar.timegm(self.meta_data.end.timetuple()))
 
@@ -196,6 +198,7 @@ class Data(base_data):
             print self.sedentary_ts
             print self.sedentary_ts[date]
             raise e
+
     def get_day_type_ts(self, start=None, end=None):
         """
         returns a pandas time series with f=1day, and value as one of DAY_TYPE values
@@ -257,10 +260,11 @@ class Data(base_data):
         # print t
         return pandas.Series(data=ts, index=act.index)  # assuming indices are the same...
 
-    def load_minute_data(self, view_file_loc, start_time, end_time, verbose=False):
+    def load_data_interval(self, interval, view_file_loc, start_time, end_time, verbose=False):
         """
-        loads minute-frequency time series
+        loads time series at given frequency interval in seconds.
         """
+        assert interval >= 1
         time_cursor = start_time  # time (minute) we are currently looking at (should be on the minute XX:00:00)
         count = 0  # number of minutes
         tims = list()  # times
@@ -276,31 +280,31 @@ class Data(base_data):
             spamreader = csv.reader(csvfile, delimiter=',')
             for row in spamreader:
                 self.rowCount += 1
-                if self.rowCount == 1:    #skip header row
-                    continue
                 if verbose: print ', '.join(row)    # print the raw data
                 # print row        # print raw data matrix
                 t0 = int(round(int(row[0]) / div))
                 tf = int(round(int(row[1]) / div))
+                self.log_points.append(int(row[2]))
                 ss = int(row[3] in SEDENTARY)  # 1 if row is sedentary, else 0
                 aa = int(row[3] in ACTIVE)  # 1 if row is active, else 0
                 sl = int(row[3] in SLEEP)  # 1 if row is sleeping, else 0
 
                 while True:  # loop through this as long as needed to eat up this data row
-                    if (time_cursor-start_time)%600 == 0:
-                        if verbose: print time_cursor, '\r',
+                    if verbose:
+                        if (time_cursor-start_time) % (interval * 10) == 0:
+                            print time_cursor, '\r',
 
                     if time_cursor > end_time:  # if time cursor has passed end of study
                         warnings.warn('point @ t=' + str(t0) + '-' + str(tf) + ' ignored (after study end)')
                         break
-                    elif t0 > time_cursor + 60:  # if not yet to logged point
+                    elif t0 > time_cursor + interval:  # if not yet to logged point
                         tims.append(datetime.fromtimestamp(time_cursor))
                         sed.append(0)
                         act.append(0)
                         sle.append(0)
                         view.append(0)
                         count += 1
-                        time_cursor += 60
+                        time_cursor += interval
                         continue
                     elif t0 < time_cursor:  # if in the middle of a logged point
                         if tf < time_cursor:  # logged point is entirely before this minute, ignore it?
@@ -310,15 +314,15 @@ class Data(base_data):
                             if count == 0:  # if this is the first point (data from before study start)
                                 warnings.warn(str(time_cursor - t0) + 's before study_start ignored')
 
-                            if tf > time_cursor + 60:  # if logged point extends beyond this minute
+                            if tf > time_cursor + interval:  # if logged point extends beyond this interval
                                 # logged point encapsulates the entire minute
                                 tims.append(datetime.fromtimestamp(time_cursor))
-                                sed.append(ss * 60)
-                                act.append(aa * 60)
-                                sle.append(sl * 60)
-                                view.append(60)
+                                sed.append(ss * interval)
+                                act.append(aa * interval)
+                                sle.append(sl * interval)
+                                view.append(interval)
                                 count += 1
-                                time_cursor += 60
+                                time_cursor += interval
                                 continue
                             else:  # previously entered logged point ends in this minute
                                 tims.append(datetime.fromtimestamp(time_cursor))
@@ -328,19 +332,19 @@ class Data(base_data):
                                 sle.append(sl * sec)
                                 view.append(sec)
                                 count += 1
-                                time_cursor += 60
+                                time_cursor += interval
                                 break
-                    elif tf > time_cursor + 60:  # if new logged point extends beyond this minute
+                    elif tf > time_cursor + interval:  # if new logged point extends beyond this minute
                         tims.append(datetime.fromtimestamp(time_cursor))
-                        sec = 60 - (t0 - time_cursor)
+                        sec = interval - (t0 - time_cursor)
                         sed.append(ss * sec)
                         act.append(aa * sec)
                         sle.append(sl * sec)
                         view.append(sec)
                         count += 1
-                        time_cursor += 60
+                        time_cursor += interval
                         continue
-                    elif tf <= time_cursor + 60:  # if logged point is entirely encapsulated in this minute
+                    elif tf <= time_cursor + interval:  # if logged point is entirely encapsulated in this minute
                         tims.append(datetime.fromtimestamp(time_cursor))
                         sec = tf - t0
                         sed.append(ss * sec)
@@ -348,7 +352,7 @@ class Data(base_data):
                         sle.append(sl * sec)
                         view.append(sec)
                         count += 1
-                        time_cursor += 60
+                        time_cursor += interval
                         break
                     else:
                         raise AssertionError("I don't know how we got here...")
@@ -361,13 +365,13 @@ class Data(base_data):
             sle.append(0)
             view.append(0)
             count += 1
-            time_cursor += 60
+            time_cursor += interval
 
         self.ts = pandas.Series(data=view, index=tims)
         self.active_ts = pandas.Series(data=act, index=tims)
         self.sedentary_ts = pandas.Series(data=sed, index=tims)
         self.sleep_ts = pandas.Series(data=sle, index=tims)
-        print str(count) + ' minutes loaded'
+        print str(count) + 'x' + str(interval) +'s loaded'
 
     def getRawData(self, viewFileLoc):
         ''' returns a data set with one point at each visibility changed event '''
