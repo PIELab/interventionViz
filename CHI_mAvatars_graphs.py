@@ -14,18 +14,22 @@ with warnings.catch_warnings():
 
                    used_data_types=[DATA_TYPES.fitbit, DATA_TYPES.avatar_views], avatar_view_freq=60)
 
+# avatar view "score"
+data.get_aggregated_avatar_view_scores().hist(bins=20, histtype='stepfilled')
+pylab.plt.show()
+
 #'daily step counts'
-data.get_aggregated_fitbit_days_ts().hist()
+data.get_aggregated_fitbit_days_ts().hist(bins=20, histtype='stepfilled')
 pylab.plt.show()
 
-data.get_aggregated_fitbit_min_ts().hist()#'minute step counts')
+data.get_aggregated_fitbit_min_ts().hist(bins=50, histtype='stepfilled')#'minute step counts')
 pylab.plt.show()
 
-data.get_aggregated_avatar_view_days().hist()#'daily avatar view s')
+data.get_aggregated_avatar_view_days().hist(bins=20, histtype='stepfilled')#'daily avatar view s')
 pylab.plt.show()
 
 avatar_view_log_points = data.get_aggregated_avatar_view_log_points()#'avatar log points')
-pylab.hist(avatar_view_log_points, 100, normed=1, histtype='stepfilled')
+pylab.hist(avatar_view_log_points, 100, histtype='stepfilled')
 pylab.plt.show()
 
 

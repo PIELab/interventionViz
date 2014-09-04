@@ -39,6 +39,22 @@ class Dataset(object):
         print len(self), 'subjects loaded. pids = ', self.pids
         print 'excluding pids ', self.excluded
 
+    def get_aggregated_avatar_view_scores(self):
+        """
+        :returns: list with data from all subjects
+        """
+        ls = list()
+        tm = list()
+        for sub in self.subject_data:
+
+            ts = sub.avatar_view_data.get_day_ts_score(start=sub.meta_data.start, end=sub.meta_data.end)
+
+            for i in range(len(ts)):  # for each data point (1 day)
+                ls.append(ts[i])
+                tm.append(ts.index[i])
+
+        return pandas.Series(data=ls, index=tm)
+
     def get_aggregated_avatar_view_log_points(self):
         """
         :returns: list with data from all subjects
