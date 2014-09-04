@@ -28,13 +28,16 @@ with warnings.catch_warnings():
 # stacked bar chart & p-value
 import src.paired_t_test as paired_t_test
 paired_t_test.plot(data)
-pylab.plt.show()
+# pylab.plt.show()
 
 # correlation scatterplot
-import src.dep.interaction_x_PA.scatterPlot as scatterPlot
-scatterPlot.plot( setup(dataset='USF', dataLoc='../subjects/', subjectN=8) )
-pylab.plt.savefig('scatterPlot.png')
+import src.scatterplot as scatterplot
+scatterplot.plot(data)
 pylab.show()
+
+# import src.dep.interaction_x_PA.scatterPlot as scatterPlot
+# scatterPlot.plot( setup(dataset='USF', dataLoc='../subjects/', subjectN=8) )
+# pylab.plt.savefig('scatterPlot.png')
 
 # bar graph with active-day sedentary-day average difference in subject PA, separating subjects into 3 groups as explained
 

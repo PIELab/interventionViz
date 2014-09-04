@@ -11,7 +11,7 @@ def plot(data):
 #            'weight' : 'normal',
 #            'size'   : 16}
 #    pylab.plt.rc('font', **font)
-    cmap       = pylab.cm.get_cmap(name='brg')
+    cmap = pylab.cm.get_cmap(name='spectral')
     pltName = 'participants\' PA for all sedentary & active avatar days'
     print 'making plot "' + pltName + '"'
     pylab.figure(pltName)
@@ -23,7 +23,7 @@ def plot(data):
     activePAs = list()
     sedentPAs = list()
     zeroPAs = list()
-    pNum = 0
+    pNum = 1
     base = [0, 0, 0]  # base of graph indexed by view_ts values [0, 1, -1]... like base[0], base[1], base[-1]... get it?
     for sub in data:
         active = sed = zer = 0
@@ -76,17 +76,20 @@ def plot(data):
     pylab.plt.xlabel('<-sedentary                                      active->\navatar behavior')
     pylab.plt.gca().axes.get_xaxis().set_ticks([])
     pylab.plt.draw()
-    base = count = 0
+    base = 0
+    count = 1
     for PA in activePAs:
         pylab.plt.bar(1, PA, bottom=base, linewidth=1, width=.9, color=cmap(float(count)/float(len(data))))
         base += PA
         count += 1
-    base = count = 0
+    base = 0
+    count = 1
     for PA in sedentPAs:
         pylab.plt.bar(-1, PA, bottom=base, linewidth=1, width=.9, color=cmap(float(count)/float(len(data))))
         base += PA
         count += 1
-    base = count = 0
+    base = 0
+    count = 1
     for PA in zeroPAs:
         pylab.plt.bar(0, PA, bottom=base, linewidth=1, width=.9, color=cmap(float(count)/float(len(data))))
         base += PA

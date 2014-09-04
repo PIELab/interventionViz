@@ -230,6 +230,32 @@ class Data(base_data):
         # print ts
         return ts
 
+    def get_day_ts_score(self, start=None, end=None):
+        """
+        returns a pandas time series with f=1day, and value = sum of active-avatar display - sum sedentary avatar time
+            :param start: datetime obj of first day to include in ts
+            :param end: datetime obj of last day to include in ts
+        """
+        act = self.active_ts.resample('D', how='sum')
+        sed = self.sedentary_ts.resample('D', how='sum')
+
+        assert len(act.index) == len(sed.index)  # else we need to modify below
+
+        ts = list()
+        if start is not None or end is not None:
+            for i in act.index:  # indicies of act & sed should be the same so we only need to iterate once
+                if i.to_datetime() < start:
+                    act.pop(i)
+                    sed.pop(i)
+
+                if i > end:
+                    act.pop(i)
+                    sed.pop(i)
+
+            for i in act.index:  # loop again (so we're not modifying as we loop
+                ts.append(act[i]-sed[i])
+        # print t
+        return pandas.Series(data=ts, index=act.index)  # assuming indices are the same...
 
     def load_minute_data(self, view_file_loc, start_time, end_time, verbose=False):
         """
