@@ -4,6 +4,11 @@ import pandas
 
 from src.settings import QUALITY_LEVEL, DATA_TYPES, setup
 from src.data.subject.Subject import Subject
+from src.util.timestuff import unix_time_to_nearest_minute_iso8601_string, add_min_to_iso8601_str
+import datetime
+
+class TimeWindowError(Exception):
+    pass
 
 
 class Dataset(object):
@@ -39,6 +44,15 @@ class Dataset(object):
         print len(self), 'subjects loaded. pids = ', self.pids
         print 'excluding pids ', self.excluded
 
+    def get_view_event_list(self):
+        """
+        :returns: list of view event information across all participants
+        """
+        ls = list()
+        for sub in self.subject_data:
+            ls += sub.avatar_view_data.get_view_event_list()
+        return ls
+
     def get_aggregated_avatar_view_scores(self):
         """
         :returns: list with data from all subjects
@@ -55,6 +69,53 @@ class Dataset(object):
 
         return pandas.Series(data=ls, index=tm)
 
+
+    def get_steps_after_event(self, event, mins):
+        """
+        :param event: ViewEvent I'm looking up
+        :param mins: number of minutes after event you want
+        :return: list of step counts for <mins> minutes after event (len=mins)
+        """
+        if not event.has_next_event:
+            raise TimeWindowError('event has no following event, not sure if enough time. exclude?')
+        elif event.time_until_next_event < mins*60:  # if not enough time before next event to get full set of steps
+            raise TimeWindowError("insufficient time between events, might want to exclude this one.")
+        # implied else:
+
+        # TODO: assert that subject step data is in minute-ts format...
+
+        # get the numerical index of the date in the fitbit data (for easier and faster iteration)
+        ind = unix_time_to_nearest_minute_iso8601_string(event.tf)
+
+        steps = list()
+        for i in range(mins):
+            try:
+                steps.append(self.subject_data[event.pnum].fitbit_data.ts[ind])
+            except KeyError as e:
+                raise TimeWindowError(e)
+
+            ind += datetime.timedelta(minutes=1)
+
+        return steps
+
+
+    def get_aggregated_avatar_view_events(self, verbose=True):
+        """
+        :returns: list with data from all subjects
+        """
+        ls = list()
+        pnum = 0
+        for sub in self.subject_data:
+            events = sub.avatar_view_data.get_view_event_list(recovery_period=120, min_view_time=0, max_view_time=60)
+
+            for evt in events:
+                evt.pnum = pnum
+
+            ls += (events)
+            pnum += 1
+        if verbose: print len(events), 'events loaded from dataset'
+        return ls
+
     def get_aggregated_avatar_view_log_points(self):
         """
         :returns: list with data from all subjects
@@ -62,7 +123,7 @@ class Dataset(object):
         ls = list()
         for sub in self.subject_data:
             for point in sub.avatar_view_data.log_points:
-                ls.append(point)
+                ls.append(point.len)
         return ls
 
     def get_aggregated_avatar_view_days(self):

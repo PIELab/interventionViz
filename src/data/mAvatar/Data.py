@@ -8,6 +8,7 @@ import pandas
 import warnings
 
 from src.data.Data import Data as base_data
+from src.data.mAvatar.ViewEvent import ViewEvent
 
 SEDENTARY = ['watchingTV', 'onComputer', 'videoGames']
 ACTIVE = ['running', 'basketball', 'bicycling']
@@ -20,6 +21,13 @@ class DAY_TYPE(object):
     active = 1
     sedentary = -1
     neutral = 0
+
+class LogPoint(object):
+    def __init__(self, t0, tf, len, activity):
+        self.t0 = t0
+        self.tf = tf
+        self.len = len
+        self.activity = activity
 
 class Data(base_data):
     """
@@ -39,7 +47,7 @@ class Data(base_data):
         self.count = 0
         self.startTime = None
 
-        self.log_points = list()  # a list of the lengths of each point in the log file
+        self.log_points = list()  # a list of the log points from the log file
 
         # time-series style data:
         self.frequency = frequency
@@ -233,6 +241,53 @@ class Data(base_data):
         # print ts
         return ts
 
+    def get_view_event_list(self, recovery_period=120, min_view_time=0, max_view_time=60, verbose=True):
+        """
+        :param recovery_period: [s] time which must have no avatar viewing before a new view event is created.
+                The min length of the 'gap' in between view events.
+        :param min_view_time: [s] minimum amount of time viewed to count as a view event.
+        :return: list of View Events
+        """
+        # convert params to ms:
+        recovery_period *= 1
+        min_view_time *= 1000
+        max_view_time *= 1000
+
+        events = list()
+        long_faults = short_faults = new_points = continued_points = 0
+        for i in range(len(self.log_points)):
+            pt = self.log_points[i]
+            if pt.len > max_view_time:
+                # complain, but don't do anything... (this should be fixed beforehand)
+                long_faults += 1
+                warnings.warn("logged view point is too long!!! OH GOD WHY?!?")
+
+            if pt.len < min_view_time:  # logged point isn't long enough
+                short_faults += 1
+                continue  # skip it
+            elif i == 0:  # no previous point
+                # go to next point, create a new event
+                events.append(ViewEvent(pt))
+                new_points += 1
+            elif pt.t0 - self.log_points[i-1].tf < recovery_period:  # if point is close to last point
+                # continue this event
+                events[-1].extend_event(pt)
+                continued_points += 1
+
+            else:  # this point is far from last point
+                # end this event, start new event
+                events[-1].end_event(pt)
+                events.append(ViewEvent(pt))
+                new_points += 1
+
+        # close off and add that last ViewEvent
+        events[-1].end_event()
+
+        if verbose:
+            print len(events), 'view events created.', new_points, 'initialized and', \
+                   continued_points, 'extended. longfaults='+str(long_faults), 'shortfaults='+str(short_faults)
+        return events
+
     def get_day_ts_score(self, start=None, end=None):
         """
         returns a pandas time series with f=1day, and value = sum of active-avatar display - sum sedentary avatar time
@@ -284,7 +339,7 @@ class Data(base_data):
                 # print row        # print raw data matrix
                 t0 = int(round(int(row[0]) / div))
                 tf = int(round(int(row[1]) / div))
-                self.log_points.append(int(row[2]))
+                self.log_points.append(LogPoint(t0, tf, int(row[2]), row[3]))
                 ss = int(row[3] in SEDENTARY)  # 1 if row is sedentary, else 0
                 aa = int(row[3] in ACTIVE)  # 1 if row is active, else 0
                 sl = int(row[3] in SLEEP)  # 1 if row is sleeping, else 0
