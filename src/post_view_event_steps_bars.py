@@ -1,12 +1,13 @@
 __author__ = 'tylar'
 
 from src.data.Dataset import TimeWindowError
+#from src.util.debug import open_console()
 import pylab
 
 
-def plot_minutes(data, MINS=10, verbose=True):
+def plot_minutes(data, MINS=10, verbose=True, overap_okay=False):
     """
-    :param data:
+    :param data: dataset object
     :param MINS: number of minutes after event which we are looking at
     :param verbose:
     :return:
@@ -18,15 +19,24 @@ def plot_minutes(data, MINS=10, verbose=True):
     steps = list()  # list of lists of steps
     pnums = list()
     skipped = 0
+    errors = {}
     for evt in events:  # lookup each event and get steps following event
         try:
-            steps.append(data.get_steps_after_event(evt, MINS))
+            steps.append(data.get_steps_after_event(evt, MINS, overlap_okay=overap_okay))
             pnums.append(evt.pnum)
-        except TimeWindowError:  # if not enough time between events error
+        except TimeWindowError as e:  # if not enough time between events error
             skipped += 1
+            try:  # keep a count of errors encountered
+                errors[e.message[:14]+'...'] += 1  # only use first part of error message (because of keys)
+            except KeyError:  # if this error has not yet been encountered
+                errors[e.message[:14]+'...'] = 1  # add an entry to the dict
             pass
 
-    if verbose: print len(pnums), 'event step lists loaded,', skipped, 'skipped'
+    if verbose: print len(pnums), 'event step lists loaded,', skipped, 'skipped. Error summary:'
+    print errors
+
+    # util.debug.open_console()
+
 
     ttt = range(MINS)  # sequential time indicies
     bases = [0]*len(ttt)  # keeps track of where the next bar should go
@@ -39,4 +49,3 @@ def plot_minutes(data, MINS=10, verbose=True):
 
 #post_event_steps.plot_hours()
 # Figure ###: Sum of Step Counts Following An Avatar Viewing (hour-level)
-

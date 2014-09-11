@@ -117,12 +117,12 @@ class Data(base_data):
 
                 time = datetime.strptime(newTimeStr, "%Y%m%dT%I:%M:%S%p")
 
-                for minn in range(0, 59):
-                    time += timedelta(seconds=1 * 60)
+                for minn in range(0, 60):
                     self.time.append(time)
                     self.timestamp.append(timegm(time.utctimetuple()))
 
                     self.steps.append(int(row[1 + minn]))
+                    time += timedelta(seconds=60)
                     self.count += 1
 
         self.ts = pandas.Series(data=self.steps, index=self.time)

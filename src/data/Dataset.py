@@ -70,15 +70,16 @@ class Dataset(object):
         return pandas.Series(data=ls, index=tm)
 
 
-    def get_steps_after_event(self, event, mins):
+    def get_steps_after_event(self, event, mins, overlap_okay=False, verbose=False):
         """
         :param event: ViewEvent I'm looking up
         :param mins: number of minutes after event you want
+        :param overlap_okay: bool; throw TimeWindowError if number of minutes
         :return: list of step counts for <mins> minutes after event (len=mins)
         """
         if not event.has_next_event:
             raise TimeWindowError('event has no following event, not sure if enough time. exclude?')
-        elif event.time_until_next_event < mins*60:  # if not enough time before next event to get full set of steps
+        elif (not overlap_okay) and event.time_until_next_event < mins*60:  # if not enough time b4 next event
             raise TimeWindowError("insufficient time between events, might want to exclude this one.")
         # implied else:
 
@@ -92,7 +93,8 @@ class Dataset(object):
             try:
                 steps.append(self.subject_data[event.pnum].fitbit_data.ts[ind])
             except KeyError as e:
-                raise TimeWindowError(e)
+                if verbose: print e.message,
+                raise TimeWindowError("key not found '"+str(e.message)+"'")
 
             ind += datetime.timedelta(minutes=1)
 
@@ -113,7 +115,7 @@ class Dataset(object):
 
             ls += (events)
             pnum += 1
-        if verbose: print len(events), 'events loaded from dataset'
+        if verbose: print len(ls), 'events loaded from dataset'
         return ls
 
     def get_aggregated_avatar_view_log_points(self):
