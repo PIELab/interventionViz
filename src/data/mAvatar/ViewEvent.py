@@ -13,6 +13,16 @@ class EventTypes(object):
     # these two aren't actually used...
     fault_short, fault_long = -1, -2
 
+    @staticmethod
+    def is_valid(val):
+        """
+        returns true if valid value is given
+        """
+        if val in [-2, -1, 1, 2]:
+            return True
+        else:
+            return False
+
 
 class ViewEvent(object):
     def __init__(self, first_point):
@@ -26,6 +36,8 @@ class ViewEvent(object):
     #    self.has_next_event
     #    self.next_event_point
     #    self.time_until_next_event
+        self.activity_type = first_point.type
+        self.activities = [first_point.activity]
 
         # === info for looking up the view event in the data later ===
     #    self.pnum
@@ -38,7 +50,11 @@ class ViewEvent(object):
         :param next_point: next log point to be included in this one
         :return:
         """
+        if next_point.type != self.activity_type:
+            raise AssertionError('logpoint type ' + str(next_point.type) + ' does not match ViewEvent type ' + str(self.activity_type))
+
         self.points.append(next_point)
+        self.activities += next_point.activity
         self.length = self.points[0].t0 - next_point.tf
         self.density += next_point.len
         self.type = EventTypes.usage

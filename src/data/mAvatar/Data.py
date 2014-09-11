@@ -22,12 +22,31 @@ class DAY_TYPE(object):
     sedentary = -1
     neutral = 0
 
+    @staticmethod
+    def is_valid(val):
+        """
+        returns true if valid value is given
+        """
+        if val in [-1, 0, 1]:
+            return True
+        else:
+            return False
+
 class LogPoint(object):
     def __init__(self, t0, tf, len, activity):
         self.t0 = t0
         self.tf = tf
         self.len = len
         self.activity = activity
+        if activity in ACTIVE:
+            self.type = DAY_TYPE.active
+        elif activity in SEDENTARY:
+            self.type = DAY_TYPE.sedentary
+        elif activity in SLEEP:
+            self.type = DAY_TYPE.neutral
+        else:
+            # raise AssertionError("activity of log point unknown:" + str(activity))
+            self.type = None
 
 class Data(base_data):
     """
@@ -265,11 +284,16 @@ class Data(base_data):
             if pt.len < min_view_time:  # logged point isn't long enough
                 short_faults += 1
                 continue  # skip it
+
             elif i == 0:  # no previous point
                 # go to next point, create a new event
                 events.append(ViewEvent(pt))
                 new_points += 1
-            elif pt.t0 - self.log_points[i-1].tf < recovery_period:  # if point is close to last point
+
+            elif (pt.t0 - self.log_points[i-1].tf < recovery_period   # if point is close to last point
+                and self._check_type_or_fail(pt.type, events[-1].activity_type)):  # and type matches
+                # verify that the type is good...
+                events[-1].activity_type = self._check_type_or_fail(pt.type, events[-1].activity_type)
                 # continue this event
                 events[-1].extend_event(pt)
                 continued_points += 1
@@ -287,6 +311,20 @@ class Data(base_data):
             print len(events), 'view events created.', new_points, 'initialized and', \
                    continued_points, 'extended. longfaults='+str(long_faults), 'shortfaults='+str(short_faults)
         return events
+
+    def _check_type_or_fail(self, type1, type2):
+        """
+        :returns: valid type if there is a possible match, else returns None (aka False)
+        """
+        if type1 == type2:
+            return type1
+        elif type1 is None:
+            return type2
+        elif type2 is None:
+            return type1
+        else:
+            return False
+            # raise AssertionError('logpoint type ' + str(type1) + ' does not match ViewEvent type ' + str(type2))
 
     def get_day_ts_score(self, start=None, end=None):
         """
