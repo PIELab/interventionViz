@@ -160,6 +160,37 @@ class Dataset(object):
 
         return pandas.Series(data=ls, index=tm)
 
+    def select_events(self, mins, events, day_type, overlap_okay, verbose=False):
+        """
+        returns subselection of events based on given criteria
+        :param events: list of ViewEvents to search
+        :param day_type: mAvatar.Data.DAY_TYPE to select
+        :return: list of ViewEvents which are of given day_type
+        """
+        steps = list()  # list of lists of steps
+        pnums = list()
+        skipped = 0  # number of data points skipped
+        undata = 0  # number of data points excluded due to selection criteria
+        errors = {}
+        for evt in events:  # lookup each event and get steps following event
+            if evt.activity_type == day_type:
+                try:
+                    steps.append(self.get_steps_after_event(evt, mins, overlap_okay=overlap_okay))
+                    pnums.append(evt.pnum)
+                except TimeWindowError as e:  # if not enough time between events error
+                    skipped += 1
+                    try:  # keep a count of errors encountered
+                        errors[e.message[:14]+'...'] += 1  # only use first part of error message (because of keys)
+                    except KeyError:  # if this error has not yet been encountered
+                        errors[e.message[:14]+'...'] = 1  # add an entry to the dict
+                    pass
+            else:
+                undata += 1
+
+        if verbose: print len(pnums), 'active step lists loaded,', skipped, 'skipped,',undata,'unselected. Error summary:'
+        print errors
+        return steps, pnums
+
     def get_aggregated_fitbit_min_ts(self):
         """
         :returns: pandas ts with data from all subjects
