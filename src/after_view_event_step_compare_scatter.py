@@ -4,6 +4,7 @@ from src.data.Dataset import TimeWindowError
 from src.data.mAvatar.Data import DAY_TYPE
 #from src.util.debug import open_console()
 import pylab
+from src.after_view_event_evaluation import average_steps_after_events
 
 def plot_individuals(data, MINS=10, verbose=False, overlap_okay=False, show_dots=True):
     figName = "step counts following active vs sedentary view events"
@@ -37,9 +38,25 @@ def plot_individuals_together(data, MINS=10, verbose=False, overlap_okay=False):
         sedentary_steps, sedentary_pnums = data.select_events(MINS, events, DAY_TYPE.sedentary, overlap_okay, verbose=verbose)
         ttt = range(MINS)
 
-        plot_steps_and_average(active_steps, ttt, '', '-', show_dots=False, color=cmap(float(pnum) / float(len(data))))
-        plot_steps_and_average(sedentary_steps, ttt, '', '--', show_dots=False, color=cmap(float(pnum) / float(len(data))))
-        #pylab.plt.show()
+        # plot_steps_and_average(active_steps, ttt, '', '-', show_dots=False, color=cmap(float(pnum) / float(len(data))))
+        # plot_steps_and_average(sedentary_steps, ttt, '', '--', show_dots=False, color=cmap(float(pnum) / float(len(data))))
+        # #pylab.plt.show()
+
+        act_avg = average_steps_after_events(active_steps, MINS)
+        sed_avg = average_steps_after_events(sedentary_steps, MINS)
+
+        assert len(act_avg) == len(sed_avg)
+        diff = [0]*len(act_avg)
+        for i in range(len(act_avg)):
+            diff[i] = act_avg[i] - sed_avg[i]
+
+        # smooth
+        win = 3 # smoothing window size -2 (eg win_size=3, then win=1)
+        for i in range(win, len(diff)-win):
+            diff[i] = sum(diff[i-win:i+win])/float(win*2+1)
+
+        pylab.plot(ttt, diff, color=cmap(float(pnum) / float(len(data))))
+
         pnum += 1
 
 def plot(data, MINS=10, verbose=True, overlap_okay=False, selected_event_type=None):
