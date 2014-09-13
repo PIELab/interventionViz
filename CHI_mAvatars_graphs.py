@@ -23,6 +23,8 @@ if pandas.version.version < '0.12.0':
 
 
 import src.after_view_event_step_compare_scatter as after_event_scatter
+after_event_scatter.plot_individuals(data, MINS=180, overlap_okay=True)
+pylab.show()
 after_event_scatter.plot(data, MINS=60, overlap_okay=True, selected_event_type=None)
 pylab.show()
 
