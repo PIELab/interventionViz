@@ -5,8 +5,45 @@ from src.data.mAvatar.Data import DAY_TYPE
 #from src.util.debug import open_console()
 import pylab
 
+def plot_individuals(data, MINS=10, verbose=False, overlap_okay=False):
+    N = len(data.pids)
+    cmap = pylab.cm.get_cmap(name='spectral')
 
-def plot(data, MINS=10, verbose=True, overap_okay=False, selected_event_type=None):
+    for sub in data.subject_data:
+        events = sub.avatar_view_data.get_view_event_list()
+
+def select_events(data, mins, events, day_type, overlap_okay, verbose=False):
+    """
+    returns subselection of events based on given criteria
+    :param events: list of ViewEvents to search
+    :param day_type: mAvatar.Data.DAY_TYPE to select
+    :return: list of ViewEvents which are of given day_type
+    """
+    steps = list()  # list of lists of steps
+    pnums = list()
+    skipped = 0  # number of data points skipped
+    undata = 0  # number of data points excluded due to selection criteria
+    errors = {}
+    for evt in events:  # lookup each event and get steps following event
+        if evt.activity_type == day_type:
+            try:
+                steps.append(data.get_steps_after_event(evt, mins, overlap_okay=overlap_okay))
+                pnums.append(evt.pnum)
+            except TimeWindowError as e:  # if not enough time between events error
+                skipped += 1
+                try:  # keep a count of errors encountered
+                    errors[e.message[:14]+'...'] += 1  # only use first part of error message (because of keys)
+                except KeyError:  # if this error has not yet been encountered
+                    errors[e.message[:14]+'...'] = 1  # add an entry to the dict
+                pass
+        else:
+            undata += 1
+
+    if verbose: print len(pnums), 'active step lists loaded,', skipped, 'skipped,',undata,'unselected. Error summary:'
+    print errors
+    return steps, pnums
+
+def plot(data, MINS=10, verbose=True, overlap_okay=False, selected_event_type=None):
     """
     :param data: dataset object
     :param MINS: number of minutes after event which we are looking at
@@ -17,60 +54,11 @@ def plot(data, MINS=10, verbose=True, overap_okay=False, selected_event_type=Non
     """
     if selected_event_type is not None:
         raise NotImplementedError("event type selection not yet implemented")  # TODO: implement!
-    N = len(data.pids)
-    cmap = pylab.cm.get_cmap(name='spectral')
 
     events = data.get_aggregated_avatar_view_events()
 
-    ### ACTIVE EVENTS ###
-    active_steps = list()  # list of lists of steps
-    active_pnums = list()
-    skipped = 0  # number of data points skipped
-    undata = 0  # number of data points excluded due to selection criteria
-    errors = {}
-    for evt in events:  # lookup each event and get steps following event
-        if evt.activity_type == DAY_TYPE.active:
-            try:
-                active_steps.append(data.get_steps_after_event(evt, MINS, overlap_okay=overap_okay))
-                active_pnums.append(evt.pnum)
-            except TimeWindowError as e:  # if not enough time between events error
-                skipped += 1
-                try:  # keep a count of errors encountered
-                    errors[e.message[:14]+'...'] += 1  # only use first part of error message (because of keys)
-                except KeyError:  # if this error has not yet been encountered
-                    errors[e.message[:14]+'...'] = 1  # add an entry to the dict
-                pass
-        else:
-            undata += 1
-
-    if verbose: print len(active_pnums), 'active step lists loaded,', skipped, 'skipped,',undata,'unselected. Error summary:'
-    print errors
-    ########################
-    ### SEDENTARY EVENTS ###
-    sedentary_steps = list()  # list of lists of steps
-    sedentary_pnums = list()
-    skipped = 0  # number of data points skipped
-    undata = 0  # number of data points excluded due to selection criteria
-    errors = {}
-    for evt in events:  # lookup each event and get steps following event
-        if evt.activity_type == DAY_TYPE.sedentary:
-            try:
-                sedentary_steps.append(data.get_steps_after_event(evt, MINS, overlap_okay=overap_okay))
-                sedentary_pnums.append(evt.pnum)
-            except TimeWindowError as e:  # if not enough time between events error
-                skipped += 1
-                try:  # keep a count of errors encountered
-                    errors[e.message[:14]+'...'] += 1  # only use first part of error message (because of keys)
-                except KeyError:  # if this error has not yet been encountered
-                    errors[e.message[:14]+'...'] = 1  # add an entry to the dict
-                pass
-        else:
-            undata += 1
-
-    if verbose: print len(sedentary_pnums), 'sedentary step lists loaded,', skipped, 'skipped,',undata,'unselected. Error summary:'
-    print errors
-    ########################
-
+    active_steps, active_pnums = select_events(data, MINS, events, DAY_TYPE.active, overlap_okay, verbose=verbose)
+    sedentary_steps, sedentary_pnums = select_events(data, MINS, events, DAY_TYPE.sedentary, overlap_okay, verbose=verbose)
     ttt = range(MINS)  # sequential time indicies
 
     print len(active_steps)

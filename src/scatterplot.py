@@ -22,6 +22,12 @@ def plot(data):
     fitbits = list()
     views = list()
 
+    pos_view = list()  # list of positively sloped avatar view points
+    neg_view = list()
+    pos_fb = list()  # fitbit
+    neg_fb = list()
+    pos_line = list()  # list of lines to accompany points
+    neg_line = list()
     pNum = 0
     for sub in data:  # graph & fit individually
         pNum += 1
@@ -38,7 +44,41 @@ def plot(data):
         yp = pylab.polyval([m, b], view_ts)
         pylab.plt.plot(view_ts, yp, color=cmap(float(pNum) / float(len(data))))
 
+        # make lists of postive & negative points and lines so they can be graphed separately:
+        if m >= 0:
+            pos_view.append(view_ts)
+            pos_fb.append(fb_ts)
+            pos_line.append(yp)
+        else:
+            neg_view.append(view_ts)
+            neg_fb.append(fb_ts)
+            neg_line.append(yp)
 
+    ### Make plots with +/- separate ###
+    pylab.figure('+ slope PA versus interaction')
+    pylab.plt.ylabel('step count')
+    pylab.plt.xlabel('(s active avatar exposure) - (s sedentary avatar exposure)')
+    pylab.plt.draw()
+    for p_num in range(len(pos_view)):
+        # plot the points
+        for i in range(len(pos_view[p_num])):  # for each data point (1 day)
+            pylab.plt.scatter(pos_view[p_num][i], pos_fb[p_num][i], color=cmap(float(p_num) / float(len(data))))
+        # plot the line
+        pylab.plt.plot(pos_view[p_num], pos_line[p_num], color=cmap(float(p_num) / float(len(data))))
+
+    n_pos = len(pos_line)  # count of positive participants already plotted (for shifting the color)
+    pylab.figure('- slope PA versus interaction')
+    pylab.plt.ylabel('step count')
+    pylab.plt.xlabel('(s active avatar exposure) - (s sedentary avatar exposure)')
+    pylab.plt.draw()
+    for p_num in range(len(neg_view)):
+        # plot the points
+        for i in range(len(neg_view[p_num])):  # for each data point (1 day)
+            pylab.plt.scatter(neg_view[p_num][i], neg_fb[p_num][i], color=cmap(float(p_num+n_pos) / float(len(data))))
+        # plot the line
+        pylab.plt.plot(neg_view[p_num], neg_line[p_num], color=cmap(float(p_num+n_pos) / float(len(data))))
+
+    ### Make graph with one line fit to all:
     pylab.figure('PA versus interaction')
     pylab.plt.ylabel('step count')
     pylab.plt.xlabel('(s active avatar exposure) - (s sedentary avatar exposure)')

@@ -19,15 +19,24 @@ with warnings.catch_warnings():
 UP_TO_DATE = True  # true if software versions are good
 if pandas.version.version < '0.12.0':
     UP_TO_DATE = False
-else:
     print '\n\nWARN: Some analysis cannot be completed due to outdated pandas version ' + pandas.version.version + '\n\n'
 
 
+import src.after_view_event_step_compare_scatter as after_event_scatter
+after_event_scatter.plot(data, MINS=60, overlap_okay=True, selected_event_type=None)
+pylab.show()
 
 ### BEGIN plots ###
-import src.after_view_event_step_compare_scatter as after_event_scatter
-after_event_scatter.plot(data, MINS=60, overap_okay=True, selected_event_type=None)
-pylab.show()
+if UP_TO_DATE:
+    # correlation scatterplot
+    import src.scatterplot as scatterplot
+    scatterplot.plot(data)
+    pylab.show()
+
+    # stacked bar chart & p-value
+    import src.paired_t_test as paired_t_test
+    paired_t_test.plot(data)
+    pylab.plt.show()
 
 # plot histogram of view event lengths
 events = data.get_aggregated_avatar_view_events()
@@ -75,16 +84,6 @@ if UP_TO_DATE:
 #
 # pylab.plt.show()
 
-if UP_TO_DATE:
-    # stacked bar chart & p-value
-    import src.paired_t_test as paired_t_test
-    paired_t_test.plot(data)
-    pylab.plt.show()
-
-    # correlation scatterplot
-    import src.scatterplot as scatterplot
-    scatterplot.plot(data)
-    pylab.show()
 
 
 # plot histogram of time between view events
