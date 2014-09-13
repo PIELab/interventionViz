@@ -6,7 +6,7 @@ from src.data.mAvatar.Data import DAY_TYPE
 import pylab
 
 def plot_all_participant_scores(data, MINS=10, overlap_okay=True, verbose=False):
-
+    cmap = pylab.cm.get_cmap(name='spectral')
     scores = list()
     pnum = 0
     for sub in data.subject_data:
@@ -26,13 +26,13 @@ def plot_all_participant_scores(data, MINS=10, overlap_okay=True, verbose=False)
         for i in range(len(act_avg)):
             diff[i] = act_avg[i] - sed_avg[i]
 
-        scores.append(sum(diff))
+        score = sum(diff)
+        scores.append(score)
+
+        pylab.plot([score, score], [0, 1], linewidth=5, color=cmap(float(pnum) / float(len(data))))
         pnum+=1
 
-    # TODO: show each as a bar or dot on the histogram, split into 3 manually specified areas no, neutral, and yes
-    #pylab.hist(scores, 10)#, histtype='stepfilled')
-
-    pylab.plot(scores, 'b_', markersize=200)
+    return scores
 
 def average_steps_after_events(steps, MINS):
     avg = [0]*MINS
