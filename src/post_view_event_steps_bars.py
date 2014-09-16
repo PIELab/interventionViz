@@ -45,7 +45,7 @@ def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activi
         else:
             undata += 1
 
-    if verbose: print len(pnums), 'event step lists loaded,', skipped, 'skipped,',undata,'unselected. Error summary:'
+    if verbose: print len(pnums), 'event step lists loaded,', skipped, 'skipped,', undata, 'unselected. Error summary:'
     print errors
 
     # util.debug.open_console()

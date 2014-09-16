@@ -26,7 +26,19 @@ def plot_individuals(data, MINS=10, verbose=False, overlap_okay=False, show_dots
         pnum += 1
 
 
-def plot_individuals_together(data, MINS=10, verbose=False, overlap_okay=False):
+def plot_individuals_together(data, MINS=10, verbose=False, overlap_okay=False, smoothing_window=3, shift=0):
+    """
+    :param data:
+    :param MINS:
+    :param verbose:
+    :param overlap_okay:
+    :param smoothing_window: smoothing window size -2 (eg win_size=3, then win=1)
+    :param shift: # mins to shift the area of interest relative to the view event
+        (eg: -10 means look from t-10 to t+MINS-10,
+             +20 menas look from t+20 to t+MINS+20)
+
+    :return:
+    """
     cmap = pylab.cm.get_cmap(name='spectral')
     pnum = 0
     for sub in data.subject_data:
@@ -34,8 +46,8 @@ def plot_individuals_together(data, MINS=10, verbose=False, overlap_okay=False):
         for evt in events:
             evt.pnum = pnum
 
-        active_steps, active_pnums = data.select_events(MINS, events, DAY_TYPE.active, overlap_okay, verbose=verbose)
-        sedentary_steps, sedentary_pnums = data.select_events(MINS, events, DAY_TYPE.sedentary, overlap_okay, verbose=verbose)
+        active_steps, active_pnums = data.select_events(MINS, events, DAY_TYPE.active, overlap_okay, shift=shift, verbose=verbose)
+        sedentary_steps, sedentary_pnums = data.select_events(MINS, events, DAY_TYPE.sedentary, overlap_okay, shift=shift, verbose=verbose)
         ttt = range(MINS)
 
         # plot_steps_and_average(active_steps, ttt, '', '-', show_dots=False, color=cmap(float(pnum) / float(len(data))))
@@ -51,9 +63,14 @@ def plot_individuals_together(data, MINS=10, verbose=False, overlap_okay=False):
             diff[i] = act_avg[i] - sed_avg[i]
 
         # smooth
-        win = 3 # smoothing window size -2 (eg win_size=3, then win=1)
-        for i in range(win, len(diff)-win):
-            diff[i] = sum(diff[i-win:i+win])/float(win*2+1)
+        if smoothing_window > 0:
+            for i in range(len(diff)):
+                # if at edges of data:
+                if (i < smoothing_window
+                 or i > len(diff)-smoothing_window):
+                    diff[i] = 0
+                else: # if in middle of data:
+                    diff[i] = sum(diff[i-smoothing_window:i+smoothing_window])/float(smoothing_window*2+1)
 
         pylab.plot(ttt, diff, color=cmap(float(pnum) / float(len(data))))
 

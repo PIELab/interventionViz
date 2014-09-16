@@ -69,8 +69,24 @@ class Dataset(object):
 
         return pandas.Series(data=ls, index=tm)
 
+    def get_steps_after_time(self, time, mins, pnum, verbose=False):
+        """
+        :param mins: number of minutes after event you want
+        :return: list of step counts for <mins> minutes after event (len=mins)
+        """
+        steps = list()
+        for i in range(mins):
+            try:
+                steps.append(self.subject_data[pnum].fitbit_data.ts[time])
+            except KeyError as e:
+                if verbose: print e.message,
+                raise TimeWindowError("key not found '"+str(e.message)+"'")
 
-    def get_steps_after_event(self, event, mins, overlap_okay=False, verbose=False):
+            time += datetime.timedelta(minutes=1)
+
+        return steps
+
+    def get_steps_after_event(self, event, mins, overlap_okay=False, shift=0, verbose=False):
         """
         :param event: ViewEvent I'm looking up
         :param mins: number of minutes after event you want
@@ -79,26 +95,21 @@ class Dataset(object):
         """
         if not event.has_next_event:
             raise TimeWindowError('event has no following event, not sure if enough time. exclude?')
-        elif (not overlap_okay) and event.time_until_next_event < mins*60:  # if not enough time b4 next event
+        elif (not overlap_okay) and event.time_until_next_event < (mins+shift)*60:  # if not enough time b4 next event
             raise TimeWindowError("insufficient time between events, might want to exclude this one.")
         # implied else:
 
         # TODO: assert that subject step data is in minute-ts format...
 
         # get the numerical index of the date in the fitbit data (for easier and faster iteration)
-        ind = unix_time_to_nearest_minute_iso8601_string(event.tf)
 
-        steps = list()
-        for i in range(mins):
-            try:
-                steps.append(self.subject_data[event.pnum].fitbit_data.ts[ind])
-            except KeyError as e:
-                if verbose: print e.message,
-                raise TimeWindowError("key not found '"+str(e.message)+"'")
+        #print event.tf
+        #print unix_time_to_nearest_minute_iso8601_string(event.tf)
+        #print event.tf + 60*shift*1000
+        ind = unix_time_to_nearest_minute_iso8601_string(event.tf + 60*shift)
+        #print ind
 
-            ind += datetime.timedelta(minutes=1)
-
-        return steps
+        return self.get_steps_after_time(ind, mins, event.pnum, verbose=verbose)
 
 
     def get_aggregated_avatar_view_events(self, verbose=True):
@@ -160,7 +171,7 @@ class Dataset(object):
 
         return pandas.Series(data=ls, index=tm)
 
-    def select_events(self, mins, events, day_type, overlap_okay, verbose=False):
+    def select_events(self, mins, events, day_type, overlap_okay, verbose=False, shift=0):
         """
         returns subselection of events based on given criteria
         :param events: list of ViewEvents to search
@@ -175,7 +186,7 @@ class Dataset(object):
         for evt in events:  # lookup each event and get steps following event
             if evt.activity_type == day_type:
                 try:
-                    steps.append(self.get_steps_after_event(evt, mins, overlap_okay=overlap_okay))
+                    steps.append(self.get_steps_after_event(evt, mins, shift=shift, overlap_okay=overlap_okay))
                     pnums.append(evt.pnum)
                 except TimeWindowError as e:  # if not enough time between events error
                     skipped += 1

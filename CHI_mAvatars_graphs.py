@@ -26,19 +26,27 @@ if pandas.version.version < '0.12.0':
 ### BEGIN plots ###
 ###################
 
+#[8, 10, 11, 12, 13, 15, 26, 28, 32, 44, 49]
+import src.day_step_compare as day_step_compare
+day_step_compare.plot_all_avg_diffs(data)
+pylab.show()
+day_step_compare.plot_individual_mirrors_together(data)
+pylab.show()
 
 import src.after_view_event_step_compare_scatter as after_event_scatter
-after_event_scatter.plot_individuals_together(data, MINS=60, overlap_okay=True)
+MMM = 20  # number of minutes to look at in next graph (so i don't have to change smoothing & shift individually)
+after_event_scatter.plot_individuals_together(data, MINS=MMM, overlap_okay=False, smoothing_window=MMM/10, shift=-MMM/2)
 pylab.show()
 after_event_scatter.plot_individuals(data, MINS=360, overlap_okay=True, show_dots=False)
 pylab.show()
-after_event_scatter.plot_individuals(data, MINS=60, overlap_okay=True, show_dots=True)
+after_event_scatter.plot_individuals(data, MINS=60, overlap_okay=False, show_dots=True)
 pylab.show()
 after_event_scatter.plot(data, MINS=60, overlap_okay=True, selected_event_type=None)
 pylab.show()
 
 import src.after_view_event_evaluation as step_x_view_score
-step_x_view_score.plot_all_participant_scores(data, MINS=180, overlap_okay=True)
+print 'pids', data.pids
+print step_x_view_score.plot_all_participant_scores(data, MINS=180, overlap_okay=False)
 pylab.show()
 
 if UP_TO_DATE:
