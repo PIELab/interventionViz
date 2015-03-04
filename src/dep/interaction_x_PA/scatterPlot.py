@@ -103,7 +103,7 @@ def plot(settings):
     # lineGraph = p.add_subplot(211)
     # lineGraph.plot(x,y)
     #barGraph = p.add_subplot(111)
-    pylab.plt.scatter(PAscore,interactScore,color='b')
+    pylab.plt.scatter(PAscore, interactScore, color='b')
 
     pylab.plt.ylabel('physical activity score')
     pylab.plt.xlabel('proteus PA influence')

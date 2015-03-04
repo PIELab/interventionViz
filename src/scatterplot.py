@@ -102,6 +102,8 @@ def plot(data):
     deg = 1  # degree of the polynomial
     m, b = pylab.polyfit(views, fitbits, deg)
     yp = pylab.polyval([m, b], views)
+    slope, intercept, r_value, p_value, std_err = stats.linregress(views, fitbits)
+    print 'linear fit | m:', slope, ' b:', intercept, ' r2:', r_value*r_value, ' p:', p_value, ' stdErr:', std_err
     pylab.plt.plot(views, yp, color='grey')
 
 

@@ -26,6 +26,17 @@ if pandas.version.version < '0.12.0':
 ### BEGIN plots ###
 ###################
 
+if UP_TO_DATE:
+    # correlation scatterplot
+    import src.scatterplot as scatterplot
+    scatterplot.plot(data)
+    pylab.show()
+
+    # stacked bar chart & p-value
+    import src.paired_t_test as paired_t_test
+    paired_t_test.plot(data)
+    pylab.plt.show()
+
 #[8, 10, 11, 12, 13, 15, 26, 28, 32, 44, 49]
 import src.day_step_compare as day_step_compare
 day_step_compare.plot_all_avg_diffs(data)
@@ -49,16 +60,6 @@ print 'pids', data.pids
 print step_x_view_score.plot_all_participant_scores(data, MINS=180, overlap_okay=False)
 pylab.show()
 
-if UP_TO_DATE:
-    # correlation scatterplot
-    import src.scatterplot as scatterplot
-    scatterplot.plot(data)
-    pylab.show()
-
-    # stacked bar chart & p-value
-    import src.paired_t_test as paired_t_test
-    paired_t_test.plot(data)
-    pylab.plt.show()
 
 # plot histogram of view event lengths
 events = data.get_aggregated_avatar_view_events()

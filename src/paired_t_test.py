@@ -5,7 +5,7 @@ from scipy import stats
 import warnings
 
 
-def plot(data):
+def plot(data, show_neutral=False):
     # change plot font
 #    font = {'family' : 'monospace',
 #            'weight' : 'normal',
@@ -19,6 +19,10 @@ def plot(data):
     pylab.plt.xlabel('<-sedentary                                      active->\navatar behavior')
     pylab.plt.gca().axes.get_xaxis().set_ticks([])
     pylab.plt.draw()
+    if show_neutral:
+        wid = .9
+    else:
+        wid = 1.5
 
     activePAs = list()
     sedentPAs = list()
@@ -33,9 +37,10 @@ def plot(data):
         view_ts = sub.avatar_view_data.get_day_type_ts(start=sub.meta_data.start, end=sub.meta_data.end)
 
         for i in range(len(fb_ts)):
-            pylab.plt.bar(view_ts[i], fb_ts[i], bottom=base[view_ts[i]], linewidth=1, width=.9,
-                          color=cmap(float(pNum) / float(len(data))))
-            base[view_ts[i]] += fb_ts[i]
+            if show_neutral or view_ts[i] != 0:
+                pylab.plt.bar(view_ts[i], fb_ts[i], bottom=base[view_ts[i]], linewidth=1, width=wid,
+                              color=cmap(float(pNum) / float(len(data))))
+                base[view_ts[i]] += fb_ts[i]
 
             if view_ts[i] > 0:
                 active += fb_ts[i]
@@ -79,26 +84,32 @@ def plot(data):
     base = 0
     count = 1
     for PA in activePAs:
-        pylab.plt.bar(1, PA, bottom=base, linewidth=1, width=.9, color=cmap(float(count)/float(len(data))))
+        pylab.plt.bar(1, PA, bottom=base, linewidth=1, width=wid, color=cmap(float(count)/float(len(data))))
         base += PA
         count += 1
     base = 0
     count = 1
     for PA in sedentPAs:
-        pylab.plt.bar(-1, PA, bottom=base, linewidth=1, width=.9, color=cmap(float(count)/float(len(data))))
+        pylab.plt.bar(-1, PA, bottom=base, linewidth=1, width=wid, color=cmap(float(count)/float(len(data))))
         base += PA
         count += 1
-    base = 0
-    count = 1
-    for PA in zeroPAs:
-        pylab.plt.bar(0, PA, bottom=base, linewidth=1, width=.9, color=cmap(float(count)/float(len(data))))
-        base += PA
-        count += 1
+    if show_neutral:
+        base = 0
+        count = 1
+        for PA in zeroPAs:
+            pylab.plt.bar(0, PA, bottom=base, linewidth=1, width=wid, color=cmap(float(count)/float(len(data))))
+            base += PA
+            count += 1
 
     paired_sample = stats.ttest_rel(sedentPAs, activePAs)
     print "================================================"
     print str(len(data)) + " subjects analyzed using fitbit data."
     print "The t-statistic is %.3f and the p-value is %.3f." % paired_sample
     print "================================================"
-    
-    print 'done.'
+
+    diffs = list()
+    for i in range(len(activePAs)):
+        diffs.append(activePAs[i] - sedentPAs[i])
+
+    print diffs
+    print data.pids
