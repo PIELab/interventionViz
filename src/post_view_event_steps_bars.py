@@ -5,6 +5,19 @@ from src.data.mAvatar.Data import DAY_TYPE
 #from src.util.debug import open_console()
 import pylab
 
+def makeTheActualPlot(MINS, pnums, yValues, N):
+    print 'plotting', len(yValues), 'ranges'
+    cmap = pylab.cm.get_cmap(name='spectral')
+    ttt = range(MINS)  # sequential time indicies
+    bases = [0]*len(ttt)  # keeps track of where the next bar should go
+    for i in range(len(pnums)):  # for each list of steps
+        steps = yValues
+        #print len(steps[i]), len(ttt)
+        #print steps[i]
+        #print ttt
+        pylab.plt.bar(ttt, steps[i], bottom=bases, linewidth=1, width=1, color=cmap(float(pnums[i]) / N))
+        bases = [bases[ii] + steps[i][ii] for ii in range(len(bases))]
+
 
 def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activity_type=None, selected_event_type=None):
     """
@@ -20,9 +33,6 @@ def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activi
 
     if selected_activity_type is not None and not DAY_TYPE.is_valid(selected_activity_type):
         raise ValueError('unknown event type selection: ' + str(selected_activity_type))
-
-    N = len(data.pids)
-    cmap = pylab.cm.get_cmap(name='spectral')
 
     events = data.get_aggregated_avatar_view_events()
     steps = list()  # list of lists of steps
@@ -49,13 +59,8 @@ def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activi
     print errors
 
     # util.debug.open_console()
+    makeTheActualPlot(MINS, pnums, steps, len(data.pids))
 
-
-    ttt = range(MINS)  # sequential time indicies
-    bases = [0]*len(ttt)  # keeps track of where the next bar should go
-    for i in range(len(pnums)):  # for each list of steps
-        pylab.plt.bar(ttt, steps[i], bottom=bases, linewidth=1, width=1, color=cmap(float(pnums[i]) / N))
-        bases = [bases[ii] + steps[i][ii] for ii in range(len(bases))]
 
 #post_event_steps.plot_decaminutes()
 # Figure ###: Sum of Step Counts Following An Avatar Viewing (10m-level)
