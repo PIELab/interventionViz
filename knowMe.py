@@ -13,6 +13,7 @@ INDEXES_TAGGED_REINFORCEMENT = [0, 16, 19, 55, 71, 98, 111, 112, 130, 136, 143, 
                  # also 157 (but praise is for previous day so not included above)
 
 FILE_END = 41970
+HIGHEST_PNUM = 36
 
 
 class DataStream(object):
@@ -31,17 +32,14 @@ class MessageData(object):
     """
     a message and the context associated with it
     """
-    def __init__(self, data=[], data_start_index=None, data_len=0, message_text=''):
-        self.data = data
-        self.data_start_index = data_start_index
-        self.message_text = message_text
-        self.data_len = data_len
-
-    def add_data_point(self):
+    def __init__(self, data_section, index):
         """
-        adds the next row of data
+        :param data_section: the section of data containing the message
+        :param index: the index of the message
         """
-        self.data_len += 1
+        self.data_section = data_section
+        self.index = index
+        self.data = data_section[index]
 
 
 class MessageSet(object):
@@ -90,9 +88,10 @@ def get_data_dict(line, index):
         "KM_BrskWlk_Min": line[25],
         "KM_Run_Min": line[26],
         "KM_HR": line[27],
-        "index": index,
-        "intervention": (index in INDEXES_TAGGED_INTERVENTION),
-        "reinforcement": (index in INDEXES_TAGGED_REINFORCEMENT)
+        "index": index
+        # NOTE: the indexes in consts are relative to the index of outgoing sms, not all rows, so this doesn't work:
+        #"intervention": (index in INDEXES_TAGGED_INTERVENTION),
+        #"reinforcement": (index in INDEXES_TAGGED_REINFORCEMENT)
     }
 
 
@@ -214,11 +213,7 @@ def _load_n_plot_dep(savFileName):
     print len(filteredMessages), ' intervention-type messages'
 
     MINS = 20
-    HIGHEST_PNUM = 36
-
-    # trim if too long
-    for i in range(len(filteredHRs)):  # TODO: rename to filteredHRs...
-        filteredHRs[i] = filteredHRs[i][:MINS]
+    trim_to(filteredHRs, MINS)
 
     tooShort = 0
     # remove if too short
@@ -241,8 +236,63 @@ def _load_n_plot_dep(savFileName):
     pylab.show()
 
 
+def trim_to(filteredHRs, leng):
+    # trim if too long
+    for i in range(len(filteredHRs)):  # TODO: rename to filteredHRs...
+        filteredHRs[i] = filteredHRs[i][:leng]
+
 if __name__ == "__main__":
     save_file = "./../knowMeData/knowMeData.sav"
     sections = get_data_sections(save_file)
-    print sections[0][0]
-    print "len of section 0:", len(sections[0])
+
+    # make event list
+    msg_send_events = list()
+    for sec_i, section in enumerate(sections):
+        event_n = 0
+        for row_i, row in enumerate(section):
+            #print row['sms_sent']
+            if len(row['sent_txt']) > 0:
+                msg_send_events.append(MessageData(section, row_i))
+                event_n += 1
+        #print "section ", sec_i, "\tlen:", len(section), "\tevents:", event_n
+
+    print "\t===\ntotal messages:", len(msg_send_events)
+
+    # select intervention events from event list
+    intervention_events = list()
+    for e_i, event in enumerate(msg_send_events):
+        if e_i in INDEXES_TAGGED_INTERVENTION:
+            intervention_events.append(event)
+            #print event.data['sent_txt']
+
+    # get everything into arrays for plotting
+    pids = list()
+    bars = list()
+    pre_win = 20  # window size before event
+    post_win = 40  # window size after event
+    exclude_n = 0
+    for event in intervention_events:
+        data = list()
+        event_pid = None
+        for data_point in event.data_section:
+            if event_pid != data_point['pid'] or event_pid is None:
+                event_pid = data_point['pid']
+            data.append(data_point['KM_HR'])
+        start = event.index - pre_win
+        end = event.index + post_win
+        dat = data[start:end]
+        if len(dat) == pre_win+post_win:
+            bars.append(dat)
+            pids.append(event_pid)
+        else:
+            print "event excluded due to insufficient data, only", len(dat), 'points'
+            exclude_n += 1
+
+    print 'plotting ', len(bars), 'events;', exclude_n, 'excluded'
+
+    print pids
+
+    makeTheActualPlot(pre_win+post_win, pids, bars, HIGHEST_PNUM)
+    pylab.axvline(x=pre_win, linewidth=5, linestyle='--', color='gray', label='event')
+    #pylab.plot(pre_win, 0, marker='*', color='black', markersize=20, fillstyle="full")
+    pylab.show()
