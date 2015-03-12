@@ -120,7 +120,7 @@ class setup(object):
         if set == 'USF':
             return [1,2,3,8,10,11,12,13,14,15,21,26,28,32,44,49]  # TODO: add more... <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         if set == 'test':
-            return [1,2,3]
+            return [1]
         else:
             raise NotImplementedError("cannot get pid list for unknown set " + str(set))
 

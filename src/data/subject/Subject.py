@@ -27,8 +27,9 @@ class Subject(object):
         # load meta data
         self.meta_data = MetaData(setup.getFileName('metaData'))
 
+        self.data_types = uses
+
         if DATA_TYPES.fitbit in uses and uses[DATA_TYPES.fitbit]:
-            print 'FITBIT SETUP'
             # load fitbit data
             self.fitbit_data = FitbitData(setup.getFileName('fitbit'), meta_data=self.meta_data)
 
@@ -57,16 +58,19 @@ class Subject(object):
             > prior to study start
             > after study end
         """
-        if self.fitbit_data.has_data_before_start():
-            self.fitbit_data.trim_data()
-        if self.avatar_view_data.has_data_before_start():
-            self.avatar_view_data.trim_data()
-        # TODO: add mMonitor trim
 
-        if self.fitbit_data.has_data_after_end():
-            self.fitbit_data.trim_data()
-        if self.avatar_view_data.has_data_after_end():
-            self.avatar_view_data.trim_data()
+        if DATA_TYPES.fitbit in self.data_types and self.data_types[DATA_TYPES.fitbit]:
+            if self.fitbit_data.has_data_before_start():
+                self.fitbit_data.trim_data()
+            if self.fitbit_data.has_data_after_end():
+                self.fitbit_data.trim_data()
+
+        if DATA_TYPES.avatar_views in self.data_types and self.data_types[DATA_TYPES.fitbit]:
+            if self.avatar_view_data.has_data_before_start():
+                self.avatar_view_data.trim_data()
+            if self.avatar_view_data.has_data_after_end():
+                self.avatar_view_data.trim_data()
+
         # TODO: add mMonitor trim
 
         return
