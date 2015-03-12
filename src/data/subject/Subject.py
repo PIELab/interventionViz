@@ -1,6 +1,8 @@
 from src.data.fitbit.Data import Data as FitbitData
 from src.data.mAvatar.Data import Data as AvatarViews
 from src.data.subject.MetaData import MetaData
+from src.data.event.Data import Data as EventData
+from src.settings import DATA_TYPES
 
 __author__ = 'tylarmurray'
 
@@ -9,19 +11,33 @@ class Subject(object):
     """
     subject class for holding/accessing all data related to a study participant.
     """
-    def __init__(self, setup, avatar_view_freq=60):
+    def __init__(self,
+                 setup,
+                 avatar_view_freq=60,
+                 uses={
+                     DATA_TYPES.fitbit: True,
+                     DATA_TYPES.avatar_views: True,
+                     DATA_TYPES.event: False
+                 }
+    ):
         """
         :param setup: settings setup object describing the subject to be set up
+        :param uses: dict of used data
         """
         # load meta data
         self.meta_data = MetaData(setup.getFileName('metaData'))
 
-        # load fitbit data
-        self.fitbit_data = FitbitData(setup.getFileName('fitbit'), meta_data=self.meta_data)
+        if DATA_TYPES.fitbit in uses and uses[DATA_TYPES.fitbit]:
+            print 'FITBIT SETUP'
+            # load fitbit data
+            self.fitbit_data = FitbitData(setup.getFileName('fitbit'), meta_data=self.meta_data)
 
-        # load viewLog data
-        self.avatar_view_data = AvatarViews(setup.getFileName('viewLog'), meta_data=self.meta_data,
+        if DATA_TYPES.avatar_views in uses and uses[DATA_TYPES.avatar_views]:
+            # load viewLog data
+            self.avatar_view_data = AvatarViews(setup.getFileName('viewLog'), meta_data=self.meta_data,
                                             frequency=avatar_view_freq)
+        if DATA_TYPES.event in uses and uses[DATA_TYPES.event]:
+            self.event_data = EventData(setup.get_file_name(DATA_TYPES.event), meta_data=self.meta_data)
 
         # TODO: load mMonitor data
 

@@ -21,8 +21,16 @@ class DATA_TYPES(object):
     mMonitor = 1  # 'mMonitor'
     fitbit = 2  # 'fitbit'
     metaData = 3  # 'metaData'
+    event = 4
 
-    all = [0, 1, 2, 3]
+    all = [0, 1, 2, 3, 4]
+
+
+class FILE_TYPES(object):
+    interaction = "interactionFileLoc"  # viewLog interactions
+    pa = "PAfileLoc"  # physical activity log
+    event = 3  # target event log
+    meta = 4
 
 
 class setup(object):
@@ -47,18 +55,16 @@ class setup(object):
         if dataset == 'default':
             DEFAULT_PARTICIPANT_NUM = 1
             self.pid, interact_file, pa_file = self.setupTestData(DEFAULT_PARTICIPANT_NUM)
-            self.settings["interactionFileLoc"] = data_loc+self.pid+'/'+interact_file
-            self.settings["PAfileLoc"] = data_loc+self.pid+'/'+pa_file
+            self.settings[FILE_TYPES.interaction] = data_loc+self.pid+'/'+interact_file
+            self.settings[FILE_TYPES.pa] = data_loc+self.pid+'/'+pa_file
         elif dataset == 'test' or dataset == 'sample':
-            self.pid, interact_file, pa_file = self.setupTestData(str(subject_n))
+            self.setupTestData(str(subject_n))
 
-            self.settings["interactionFileLoc"] = data_loc+self.pid+'/'+interact_file
-            self.settings["PAfileLoc"] = data_loc+self.pid+'/'+pa_file
         elif dataset == 'USF':
             self.pid, interact_file, pa_file = self.setupUSFData(str(subject_n))
 
-            self.settings["interactionFileLoc"] = data_loc+self.pid+'/'+interact_file
-            self.settings["PAfileLoc"] = data_loc+self.pid+'/'+pa_file
+            self.settings[FILE_TYPES.interaction] = data_loc+self.pid+'/'+interact_file
+            self.settings[FILE_TYPES.pa] = data_loc+self.pid+'/'+pa_file
         else:
             raise InputError('bad dataset name "'+str(dataset)+'" in settings')
 
@@ -95,8 +101,17 @@ class setup(object):
             else:
                 raise ValueError('unknown data type "'+str(type)+'"')
         elif self.dataset == 'test':
-            prefix = self.dataLoc + self.pid+'/'
-            raise NotImplementedError("getFileName('test') not yet implemented")
+            prefix = self.dataLoc+self.pid+'/'
+            if type == DATA_TYPES.avatar_views:
+                return prefix + "viewTimes.txt"
+            elif type == DATA_TYPES.event:
+                return prefix + "eventLog.txt"
+            elif type == DATA_TYPES.fitbit:
+                return prefix + "minuteSteps.csv"
+            elif type == DATA_TYPES.metaData:
+                return prefix + "metaData.csv"
+            else:
+                raise ValueError('unknown data type "'+str(type)+'"')
         else:
             raise ValueError('dataset type "'+str(self.dataset)+'" not recognized')
 
@@ -104,6 +119,8 @@ class setup(object):
         set = dataset or self.dataset
         if set == 'USF':
             return [1,2,3,8,10,11,12,13,14,15,21,26,28,32,44,49]  # TODO: add more... <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        if set == 'test':
+            return [1,2,3]
         else:
             raise NotImplementedError("cannot get pid list for unknown set " + str(set))
 
@@ -155,7 +172,6 @@ class setup(object):
                         pass  # print str(subs[pnum]) + '|',
                 #print '\n'
 
-
             if DATA_TYPES.avatar_views in used_data:
                 #print 'checking avatar view quality'
                 qual = [a,b,b,a,g,g,g,a,b,g,p,a,a,a,a,g]  # TODO: add more... <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -167,6 +183,8 @@ class setup(object):
                         pass  # print str(subs[pnum]) + '|',
                 #print '\n'
 
+        elif set == "test":
+            return []
         else:
             raise NotImplementedError("cannot get exclusions for unknown set " + str(set))
 
@@ -177,27 +195,32 @@ class setup(object):
         #print 'excluded: ', ex
         return ex
 
-
     ### PRIVATE METHODS ###
-
-    # setup details for test dataset
     def setupTestData(self, n):
+        """
+        setup details for test dataset
+        :param n: subject number
+        :return: None
+        """
         if int(n) == 1:
-            pid = "test1"
+            self.pid = "test1"
             view_log_file = "dataLog.txt"
             pa_file = 'miles_DAILY_TOTALS.txt'
-            return [pid, view_log_file, pa_file]
+            self.settings[FILE_TYPES.event] = self.dataLoc+self.pid+'/'+view_log_file
+            self.settings[FILE_TYPES.pa] = self.dataLoc+self.pid+'/'+pa_file
         elif int(n) == 2:
-            pid = "test2"
+            self.pid = "test2"
             view_log_file = "mirrorMe/dataLog3.txt"
             pa_file = 'miles_DAILY_TOTALS_fixed.txt'
-            return [pid, view_log_file, pa_file]
-
+            self.settings[FILE_TYPES.event] = self.dataLoc+self.pid+'/'+view_log_file
+            self.settings[FILE_TYPES.pa] = self.dataLoc+self.pid+'/'+pa_file
         elif int(n) == 3:
-            pid = "controlIntervention"
+            self.pid = "test1"
             event_file = 'log.txt'
             pa_file = 'minuteSteps.csv'
-            return [pid, event_file, pa_file]
+            self.settings[FILE_TYPES.event] = self.dataLoc+self.pid+'/'+event_file
+            self.settings[FILE_TYPES.pa] = self.dataLoc+self.pid+'/'+pa_file
+            self.settings[FILE_TYPES.meta] = self.dataLoc+self.pid+'/'+'metaData.csv'
         else:
             raise InputError('test PID in settings not recognized for particpant #'+str(n))
 

@@ -31,11 +31,17 @@ class Dataset(object):
                 self.pids.remove(pid)
                 #print 'removing ', pid
 
-        self.subject_data = list()
+        set_uses = dict()
+        for type in used_data_types:
+            set_uses[type] = True
 
+        self.subject_data = list()
         for pid in self.pids:
-            self.subject_data.append(Subject(setup(dataset=settings.dataset, data_loc=settings.dataLoc, subject_n=pid),
-                                             avatar_view_freq=avatar_view_freq))
+            self.subject_data.append(Subject(
+                setup(dataset=settings.dataset, data_loc=settings.dataLoc, subject_n=pid),
+                avatar_view_freq=avatar_view_freq,
+                uses=set_uses
+            ))
             if trim:
                 self.subject_data[-1].trim_data()
             if check:
