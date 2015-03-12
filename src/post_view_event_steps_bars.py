@@ -5,7 +5,7 @@ from src.data.mAvatar.Data import DAY_TYPE
 #from src.util.debug import open_console()
 import pylab
 
-def makeTheActualPlot(MINS, pnums, yValues, N):
+def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None):
     print 'plotting', len(yValues), 'ranges'
     cmap = pylab.cm.get_cmap(name='spectral')
     ttt = range(MINS)  # sequential time indicies
@@ -17,6 +17,10 @@ def makeTheActualPlot(MINS, pnums, yValues, N):
         #print ttt
         pylab.plt.bar(ttt, steps[i], bottom=bases, linewidth=1, width=1, color=cmap(float(pnums[i]) / N))
         bases = [bases[ii] + steps[i][ii] for ii in range(len(bases))]
+
+    if event_time is not None:  # draw the event line
+        pylab.axvline(x=event_time, linewidth=5, linestyle='--', color='gray', label='event')
+        #pylab.plot(pre_win, 0, marker='*', color='black', markersize=20, fillstyle="full")
 
 
 def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activity_type=None, selected_event_type=None):

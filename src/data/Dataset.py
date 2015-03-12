@@ -75,8 +75,10 @@ class Dataset(object):
 
         return pandas.Series(data=ls, index=tm)
 
-    def get_steps_after_time(self, time, mins, pnum, verbose=False):
+    def get_steps_after_time(self, time, mins, pnum, verbose=True):
         """
+        :param time: time desired (units? format?)
+        :param pnum: participant number
         :param mins: number of minutes after event you want
         :return: list of step counts for <mins> minutes after event (len=mins)
         """
@@ -85,7 +87,11 @@ class Dataset(object):
             try:
                 steps.append(self.subject_data[pnum].fitbit_data.ts[time])
             except KeyError as e:
-                if verbose: print e.message,
+                if verbose:
+                    print 'ERR:', e.message
+                    print self.subject_data[pnum].fitbit_data.ts[:3]
+                    print '...'
+                    print self.subject_data[pnum].fitbit_data.ts[-3:]
                 raise TimeWindowError("key not found '"+str(e.message)+"'")
 
             time += datetime.timedelta(minutes=1)

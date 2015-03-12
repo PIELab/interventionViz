@@ -144,7 +144,5 @@ if __name__ == "__main__":
 
     print 'plotting ', len(bars), 'events;', exclude_n, 'excluded'
 
-    makeTheActualPlot(pre_win+post_win, pids, bars, HIGHEST_PNUM)
-    pylab.axvline(x=pre_win, linewidth=5, linestyle='--', color='gray', label='event')
-    #pylab.plot(pre_win, 0, marker='*', color='black', markersize=20, fillstyle="full")
+    makeTheActualPlot(pre_win+post_win, pids, bars, HIGHEST_PNUM, event_time=pre_win)
     pylab.show()
