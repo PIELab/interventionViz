@@ -34,7 +34,7 @@ class Dataset(object):
         self.subject_data = list()
 
         for pid in self.pids:
-            self.subject_data.append(Subject(setup(dataset=settings.dataset, dataLoc=settings.dataLoc, subjectN=pid),
+            self.subject_data.append(Subject(setup(dataset=settings.dataset, data_loc=settings.dataLoc, subject_n=pid),
                                              avatar_view_freq=avatar_view_freq))
             if trim:
                 self.subject_data[-1].trim_data()

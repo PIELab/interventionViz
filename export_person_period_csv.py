@@ -11,7 +11,7 @@ from src.data.Dataset import Dataset
 EXPORTED_FILE_LOC = '../subjects/person_period_days_halves.csv'
 DESIRED_QUALITY = QUALITY_LEVEL.partial
 
-settings = setup(dataset='USF', dataLoc='../subjects/', subjectN=0)
+settings = setup(dataset='USF', data_loc='../subjects/', subject_n=0)
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")

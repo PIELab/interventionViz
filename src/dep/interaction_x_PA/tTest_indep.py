@@ -40,7 +40,7 @@ def plot(dataset='test',dataLoc = "./data/"):
 			continue
 
 		try :
-			settings = setup(dataset=dataset, dataLoc=dataLoc, subjectN=pNum)
+			settings = setup(dataset=dataset, data_loc=dataLoc, subject_n=pNum)
 
 			# load interaction data
 			interact = interactionData(settings.getFileName('viewLog'))

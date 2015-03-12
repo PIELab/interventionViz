@@ -8,7 +8,7 @@ from src.data.mAvatar.Data import DAY_TYPE
 from src.data.Dataset import Dataset
 
 
-settings = setup(dataset='USF', dataLoc='../subjects/', subjectN=0)
+settings = setup(dataset='USF', data_loc='../subjects/', subject_n=0)
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")

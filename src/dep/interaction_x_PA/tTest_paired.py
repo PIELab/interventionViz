@@ -46,7 +46,7 @@ def plot(dataset='test',dataLoc = "./data/", paMethod=DEFAULT_METHOD, bypass_dat
             activePAcount = sedentPAcount = zeroPAcount = 0
 
             try :
-                settings = setup(dataset=dataset, dataLoc=dataLoc, subjectN=pNum)
+                settings = setup(dataset=dataset, data_loc=dataLoc, subject_n=pNum)
 
                 # load interaction data
                 interact = interactionData(settings.getFileName('viewLog'))

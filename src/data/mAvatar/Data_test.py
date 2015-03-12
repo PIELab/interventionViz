@@ -12,7 +12,7 @@ class basic_avatar_view_data_tester(unittest.TestCase):
     def setUp(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            sett = settin(dataset='USF', dataLoc='../subjects/', subjectN=10)  # TODO: use test data
+            sett = settin(dataset='USF', data_loc='../subjects/', subject_n=10)  # TODO: use test data
             self.dat = Data(sett.get_file_name(type=DATA_TYPES.avatar_views),
                             meta_data=MetaData(sett.get_file_name(type=DATA_TYPES.metaData)))
 

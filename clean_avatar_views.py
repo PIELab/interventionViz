@@ -8,13 +8,13 @@ MIN_LEN = 10 # min legitimate view time in ms
 MAX_LEN = 60*1000  # max legitimate view time in ms
 REPLACE_TIME = 10*1000  # length of time placed at start and end of illegitimate times
 
-settings = setup(dataset='USF', dataLoc='../subjects/', subjectN=0)
+settings = setup(dataset='USF', data_loc='../subjects/', subject_n=0)
 
 old_total = new_total = replaced = removed = kept = 0  # various counters
 
 pids = settings.get_pid_list()
 for pid in pids:
-    view_file_loc = setup(dataset=settings.dataset, dataLoc=settings.dataLoc, subjectN=pid).get_file_name(DATA_TYPES.avatar_views)
+    view_file_loc = setup(dataset=settings.dataset, data_loc=settings.dataLoc, subject_n=pid).get_file_name(DATA_TYPES.avatar_views)
 
     # read all the rows in
     cols = list()

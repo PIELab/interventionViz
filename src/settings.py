@@ -35,32 +35,33 @@ class setup(object):
 #        interactionFileLoc - relative location of interaction data file
 #        PAfileLoc          - relative location of physical activity data file
 
-    def __init__(self,dataset='test',dataLoc="./data/",subjectN=None):
-        DEFAULT_PARTICIPANT_NUM = 1
+    def __init__(self,dataset='test', data_loc="./data/", subject_n=None):
         # load appropriate setup function for chosen dataset
+        self.dataset = dataset
+        self.dataLoc = data_loc
+        self.settings = dict()
+
+        if subject_n is None:
+            subject_n = self.getParicipantNum()
+
         if dataset == 'default':
-            self.pid,interactFile,PAfile = self.setupTestData(DEFAULT_PARTICIPANT_NUM)
+            DEFAULT_PARTICIPANT_NUM = 1
+            self.pid, interact_file, pa_file = self.setupTestData(DEFAULT_PARTICIPANT_NUM)
+            self.settings["interactionFileLoc"] = data_loc+self.pid+'/'+interact_file
+            self.settings["PAfileLoc"] = data_loc+self.pid+'/'+pa_file
         elif dataset == 'test' or dataset == 'sample':
-            self.pid,interactFile,PAfile = self.setupTestData(subjectN)
+            self.pid, interact_file, pa_file = self.setupTestData(str(subject_n))
+
+            self.settings["interactionFileLoc"] = data_loc+self.pid+'/'+interact_file
+            self.settings["PAfileLoc"] = data_loc+self.pid+'/'+pa_file
         elif dataset == 'USF':
-            dataLoc = "../subjects/"
-            if subjectN==None:
-                self.pid,interactFile,PAfile = self.setupUSFData(self.getParticipantNum())
-            else:
-                self.pid = str(subjectN)
-                self.pid,interactFile,PAfile = self.setupUSFData(subjectN)
+            self.pid, interact_file, pa_file = self.setupUSFData(str(subject_n))
+
+            self.settings["interactionFileLoc"] = data_loc+self.pid+'/'+interact_file
+            self.settings["PAfileLoc"] = data_loc+self.pid+'/'+pa_file
         else:
             raise InputError('bad dataset name "'+str(dataset)+'" in settings')
 
-        self.dataLoc = dataLoc
-            
-        interactFile = dataLoc+self.pid+'/'+interactFile;
-        PAfile    = dataLoc+self.pid+'/'+PAfile;
-        
-        self.dataset = dataset
-        self.settings = dict(interactionFileLoc=interactFile,
-                    PAfileLoc=PAfile)
-                    
     def __getitem__(self, item):
         ''' this is to maintain backwards compatibility '''
         return self.settings[item]
@@ -180,19 +181,26 @@ class setup(object):
     ### PRIVATE METHODS ###
 
     # setup details for test dataset
-    def setupTestData(self,n):
+    def setupTestData(self, n):
         if int(n) == 1:
             pid = "test1"
-            viewLogFile = "dataLog.txt"
-            PAfile = 'miles_DAILY_TOTALS.txt'
+            view_log_file = "dataLog.txt"
+            pa_file = 'miles_DAILY_TOTALS.txt'
+            return [pid, view_log_file, pa_file]
         elif int(n) == 2:
             pid = "test2"
-            viewLogFile = "mirrorMe/dataLog3.txt"
-            PAfile = 'miles_DAILY_TOTALS_fixed.txt'
+            view_log_file = "mirrorMe/dataLog3.txt"
+            pa_file = 'miles_DAILY_TOTALS_fixed.txt'
+            return [pid, view_log_file, pa_file]
+
+        elif int(n) == 3:
+            pid = "controlIntervention"
+            event_file = 'log.txt'
+            pa_file = 'minuteSteps.csv'
+            return [pid, event_file, pa_file]
         else:
             raise InputError('test PID in settings not recognized for particpant #'+str(n))
-        return [pid,viewLogFile,PAfile]
-        
+
     # detailed setup information for USF dataset
     def setupUSFData(self,n):
         '''

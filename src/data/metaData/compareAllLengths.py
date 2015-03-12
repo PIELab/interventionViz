@@ -14,7 +14,7 @@ def show():
 
 	for pNum in range(HIGHEST_P_NUMBER+1): #cycle through all participants
 
-		settings = setup(dataset='USF', dataLoc=DATA_LOC, subjectN=pNum)
+		settings = setup(dataset='USF', data_loc=DATA_LOC, subject_n=pNum)
 
 		pid = str(pNum)
 					

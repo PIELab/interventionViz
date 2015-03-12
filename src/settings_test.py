@@ -10,7 +10,7 @@ class basic_settings_tester(unittest.TestCase):
     def setUp(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.sett = settin(dataset='USF', dataLoc='../subjects/', subjectN=0)  # TODO: use test data
+            self.sett = settin(dataset='USF', data_loc='../subjects/', subject_n=0)  # TODO: use test data
 
     def test_exclude_on_usf_data(self):
 

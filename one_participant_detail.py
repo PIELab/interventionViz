@@ -8,7 +8,7 @@ from src.settings import setup
 from src.data.subject.Subject import Subject
 
 
-settings = setup(dataset='USF', dataLoc='../subjects/')  # use dataset='test' to select sample dataset
+settings = setup(dataset='USF', data_loc='../subjects/')  # use dataset='test' to select sample dataset
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
