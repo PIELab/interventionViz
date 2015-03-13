@@ -16,8 +16,8 @@ data = Dataset(
     used_data_types=[DATA_TYPES.event, DATA_TYPES.fitbit]
 )
 
-pre_win = 20   # window size before event
-post_win = 60  # window size after event
+pre_win = 60*5   # window size before event
+post_win = 60*5  # window size after event
 
 minutes = post_win+pre_win
 PNUM = 0

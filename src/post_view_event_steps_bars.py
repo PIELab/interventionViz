@@ -36,12 +36,21 @@ def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_d
         mean = numpy.mean(numpy_h, axis=0)
         std_dev = numpy.std(numpy_h, axis=0)
         print "WARN: using stats computed from window only. mu=", mean, "sigma=", std_dev
-    pylab.yticks([mean-3*std_dev, mean-2*std_dev, mean-std_dev, mean, mean+std_dev, mean+2*std_dev, mean+3*std_dev],
-                 [r'-3$\sigma$', r'-2$\sigma$', r'-1$\sigma$', 'mean', r'1$\sigma$', r'+2$\sigma$', r'+3$\sigma$'])
+    pylab.yticks([mean-5*std_dev, mean-4*std_dev, mean-3*std_dev, mean-2*std_dev, mean-std_dev,
+                  mean,
+                  mean+std_dev, mean+2*std_dev, mean+3*std_dev, mean+4*std_dev, mean+5*std_dev],
+                 [r'-5$\sigma$', r'-4$\sigma$', r'-3$\sigma$', r'-2$\sigma$', r'-1$\sigma$',
+                  'mean',
+                  r'1$\sigma$', r'+2$\sigma$', r'+3$\sigma$', r'+4$\sigma$', r'+5$\sigma$']
+    )
     pylab.grid(True)
 
     cmap = pylab.cm.get_cmap(name='spectral')
-    ttt = range(MINS)  # sequential time indicies
+
+    if event_time is not None:  # adjust minutes so that event is at t=0
+        ttt = range(-event_time, MINS-event_time)
+    else:
+        ttt = range(MINS)  # sequential time indicies
     bases = [0]*len(ttt)  # keeps track of where the next bar should go
     for i in range(len(pnums)):  # for each list of steps
         steps = yValues
@@ -52,7 +61,7 @@ def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_d
         bases = [bases[ii] + steps[i][ii] for ii in range(len(bases))]
 
     if event_time is not None:  # draw the event line
-        pylab.axvline(x=event_time, linewidth=5, linestyle='--', color='gray', label='event')
+        pylab.axvline(x=0, linewidth=5, linestyle='--', color='gray', label='event')
         #pylab.plot(pre_win, 0, marker='*', color='black', markersize=20, fillstyle="full")
 
 
