@@ -4,9 +4,42 @@ from src.data.Dataset import TimeWindowError
 from src.data.mAvatar.Data import DAY_TYPE
 #from src.util.debug import open_console()
 import pylab
+import numpy
 
-def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None):
+
+def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_dev=None ):
+    """
+    :param MINS: number of minutes
+    :param pnums: list of participant id numbers (for coloring the bars)
+    :param yValues: list of lists of bar heights
+    :param N: highest participant id number (for coloring the bars)
+
+    :param event_time: if given, a vertical line is drawn at the given x value to mark the event
+
+    ideally these values should be passed to represent the mean & std_dev of the full dataset, not just the window
+    but if they are not set, then the mean & std_dev of the window will be computed
+    :param mean: mean of the sum of all event series
+    :param std_dev: standard deviation of the sum of all event series
+
+    :return: None. after running plot should be viewable using pylab.show()
+    """
     print 'plotting', len(yValues), 'ranges'
+
+    # set the y-axis to show # of 'sigmas' from mean
+    if mean is None and std_dev is None:
+        # compute mean & std dev using just the given samples
+        bar_total_heights = [0]*len(yValues[0])
+        for t in range(len(yValues[0])):
+            for event in yValues:
+                bar_total_heights[t] += event[t]
+        numpy_h = numpy.array(bar_total_heights)
+        mean = numpy.mean(numpy_h, axis=0)
+        std_dev = numpy.std(numpy_h, axis=0)
+        print "WARN: using stats computed from window only. mu=", mean, "sigma=", std_dev
+    pylab.yticks([mean-3*std_dev, mean-2*std_dev, mean-std_dev, mean, mean+std_dev, mean+2*std_dev, mean+3*std_dev],
+                 [r'-3$\sigma$', r'-2$\sigma$', r'-1$\sigma$', 'mean', r'1$\sigma$', r'+2$\sigma$', r'+3$\sigma$'])
+    pylab.grid(True)
+
     cmap = pylab.cm.get_cmap(name='spectral')
     ttt = range(MINS)  # sequential time indicies
     bases = [0]*len(ttt)  # keeps track of where the next bar should go

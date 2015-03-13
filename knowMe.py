@@ -1,4 +1,3 @@
-
 import pylab
 import savReaderWriter
 from src.post_view_event_steps_bars import makeTheActualPlot
@@ -14,6 +13,13 @@ INDEXES_TAGGED_REINFORCEMENT = [0, 16, 19, 55, 71, 98, 111, 112, 130, 136, 143, 
 
 FILE_END = 41970
 HIGHEST_PNUM = 36
+
+"""
+NOTES:
+
+
+
+"""
 
 
 class MessageData(object):
@@ -130,7 +136,7 @@ if __name__ == "__main__":
         for data_point in event.data_section:
             if event_pid != data_point['pid']:
                 raise Error('pid changed without change in sensor section!')
-            data.append(data_point['KM_HR'])
+            data.append(data_point['km_hr'])
         start = event.index - pre_win
         end = event.index + post_win
         dat = data[start:end]
@@ -144,5 +150,6 @@ if __name__ == "__main__":
 
     print 'plotting ', len(bars), 'events;', exclude_n, 'excluded'
 
-    makeTheActualPlot(pre_win+post_win, pids, bars, HIGHEST_PNUM, event_time=pre_win)
+    makeTheActualPlot(pre_win+post_win, pids, bars, HIGHEST_PNUM,
+                      event_time=pre_win)
     pylab.show()
