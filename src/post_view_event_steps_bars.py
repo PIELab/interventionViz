@@ -6,8 +6,10 @@ from src.data.mAvatar.Data import DAY_TYPE
 import pylab
 import numpy
 
+PLOT_TYPES = {bars:1, line:2}
 
-def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_dev=None ):
+
+def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_dev=None, type=PLOT_TYPES.bars):
     """
     :param MINS: number of minutes
     :param pnums: list of participant id numbers (for coloring the bars)
