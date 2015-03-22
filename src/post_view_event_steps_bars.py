@@ -6,11 +6,56 @@ from src.data.mAvatar.Data import DAY_TYPE
 import pylab
 import numpy
 
+
 class PLOT_TYPES(object):
     """
     """
     bars = 0
     lines = 1
+
+
+def get_avg_list(yValues):
+    """
+
+    :param yValues:
+    :return: list of values averaged across all given lists
+    """
+    #print 'yValues len:', len(yValues)
+    n_times = len(yValues[0])
+    n_events = len(yValues)
+    avgs = [0]*n_times
+    for i in range(n_times):  # for each time index
+        sum = 0
+        for ev in range(n_events):  # for each event series at time i
+            event_value = yValues[ev][i]
+            sum += event_value
+        avgs[i] = sum / len(yValues)  # TODO: I think this gets number of events...
+    return avgs
+
+
+def get_stats(type, yValues):
+    """
+    returns mean, std_dev
+    :param type:
+    :return:
+    """
+    # compute mean & std dev using just the given samples
+    if type == PLOT_TYPES.bars:
+        bar_total_heights = [0]*len(yValues[0])
+        for t in range(len(yValues[0])):
+            for event in yValues:
+                bar_total_heights[t] += event[t]
+        numpy_h = numpy.array(bar_total_heights)
+        mean = numpy.mean(numpy_h, axis=0)
+        std_dev = numpy.std(numpy_h, axis=0)
+    elif type == PLOT_TYPES.lines:
+        numpy_h = numpy.array(get_avg_list(yValues))
+        mean = numpy.mean(numpy_h, axis=0)
+        std_dev = numpy.std(numpy_h, axis=0)
+    else:
+        raise NotImplementedError('plot type unknown:', type)
+    return mean, std_dev
+
 
 
 def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_dev=None, type=PLOT_TYPES.bars):
@@ -33,14 +78,7 @@ def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_d
 
     # set the y-axis to show # of 'sigmas' from mean
     if mean is None and std_dev is None:
-        # compute mean & std dev using just the given samples
-        bar_total_heights = [0]*len(yValues[0])
-        for t in range(len(yValues[0])):
-            for event in yValues:
-                bar_total_heights[t] += event[t]
-        numpy_h = numpy.array(bar_total_heights)
-        mean = numpy.mean(numpy_h, axis=0)
-        std_dev = numpy.std(numpy_h, axis=0)
+        mean, std_dev = get_stats(type, yValues)
         print "WARN: using stats computed from window only. mu=", mean, "sigma=", std_dev
     pylab.yticks([mean-5*std_dev, mean-4*std_dev, mean-3*std_dev, mean-2*std_dev, mean-std_dev,
                   mean,
@@ -51,19 +89,67 @@ def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_d
     )
     pylab.grid(True)
 
-    plotStackedBars(event_time, pnums, yValues, N, MINS)
+    if type == PLOT_TYPES.bars:
+        plotStackedBars(event_time, pnums, yValues, N, MINS)
+    elif type == PLOT_TYPES.lines:
+        plot_avg_lines(event_time, pnums, yValues, N, MINS)
+    else:
+        raise NotImplementedError('plot type not recognized:'+str(type))
 
     if event_time is not None:  # draw the event line
         pylab.axvline(x=0, linewidth=5, linestyle='--', color='gray', label='event')
         #pylab.plot(pre_win, 0, marker='*', color='black', markersize=20, fillstyle="full")
 
 
+def get_cmap():
+    return pylab.cm.get_cmap(name='spectral')
+
+
+def get_time_indicies(event_time, MINS):
+    if event_time is not None:  # adjust minutes so that event is at t=0
+        return range(-event_time, MINS-event_time)
+    else:
+        return range(MINS)  # sequential time indicies
+
+
+def plot_avg_lines(event_time, pnums, yValues, N, MINS):
+    ttt = get_time_indicies(event_time, MINS)
+
+    # compute average over all events
+    avgs = [0]*len(ttt)
+    p_avgs = [[0]*len(ttt)]*N  # list of averages list for each participant
+    n_events = len(yValues)
+    # TODO: move p_counts to this scope so i can use it later.
+    #print 'pnums len:', len(pnums)
+    #print 'yValues len:', len(yValues)
+    for i in range(len(ttt)):  # for each time index
+        sum = 0
+        p_sum = [0]*N  # sum for each pariticpant
+        p_counts = [0]*N  # count of events for each participant
+        for ev in range(n_events):  # for each event series at time i
+            pid = pnums[ev]
+            event_value = yValues[ev][i]
+            sum += event_value
+            p_sum[pid] += event_value
+            p_counts[pid] += 1
+        avgs[i] = sum / len(yValues)  # TODO: I think this gets number of events...
+        for p in range(N):  # for each participant
+            if p_counts[p] > 1:  # don't divide by 0 or 1
+                p_avgs[p][i] = p_sum[p]/p_counts[p]
+            else:
+                p_avgs[p][i] = p_sum[p]
+
+    cmap = get_cmap()
+    for p in range(N):  # for each participant
+        pylab.plt.plot(ttt, p_avgs[p], color=cmap(float(p) / N))
+
+    pylab.plt.plot(ttt, avgs, color=cmap(1.0), linewidth=4)
+
+
 def plotStackedBars(event_time, pnums, yValues, N, MINS):
-        cmap = pylab.cm.get_cmap(name='spectral')
-        if event_time is not None:  # adjust minutes so that event is at t=0
-            ttt = range(-event_time, MINS-event_time)
-        else:
-            ttt = range(MINS)  # sequential time indicies
+        cmap = get_cmap()
+        ttt = get_time_indicies(event_time, MINS)
+
         bases = [0]*len(ttt)  # keeps track of where the next bar should go
         for i in range(len(pnums)):  # for each list of steps
             steps = yValues

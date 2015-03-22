@@ -7,6 +7,11 @@ from src.data.Dataset import TimeWindowError
 import pylab
 
 def plot_individual_mirrors_together(data):
+    """
+    plots bot active & sedentary of each participant all on same plot?
+    :param data:
+    :return:
+    """
     cmap = pylab.cm.get_cmap(name='spectral')
     N = len(data)
     for pn in range(N):
@@ -63,6 +68,7 @@ def plot_individual_mirrors_together(data):
         pylab.plt.plot(tt, s_avg, color=cmap(float(pn) / N))
 
     print err
+
 
 def plot_all_avg_diffs(data, verbose=False):
     cmap = pylab.cm.get_cmap(name='spectral')

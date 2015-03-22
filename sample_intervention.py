@@ -2,11 +2,11 @@ import pylab
 from datetime import timedelta
 
 from src.settings import setup, DATA_TYPES
-from src.post_view_event_steps_bars import makeTheActualPlot
+from src.post_view_event_steps_bars import makeTheActualPlot, PLOT_TYPES
 from src.data.Dataset import Dataset
 
 
-def makePlot():
+def makePlot(type=PLOT_TYPES.bars):
 
     HIGHEST_PNUM = 2
 
@@ -32,7 +32,7 @@ def makePlot():
 
     pids = [1]*len(bars)  # all events are same participant
 
-    makeTheActualPlot(minutes, pids, bars, HIGHEST_PNUM, event_time=pre_win)
+    makeTheActualPlot(minutes, pids, bars, HIGHEST_PNUM, event_time=pre_win, type=type)
     pylab.show()
 
 if __name__ == "__main__":
