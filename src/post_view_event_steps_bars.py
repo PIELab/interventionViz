@@ -58,7 +58,7 @@ def get_stats(type, yValues):
 
 
 
-def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_dev=None, type=PLOT_TYPES.bars):
+def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_dev=None, type=PLOT_TYPES.bars, yLabel=""):
     """
     :param MINS: number of minutes
     :param pnums: list of participant id numbers (for coloring the bars)
@@ -80,6 +80,7 @@ def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_d
     if mean is None and std_dev is None:
         mean, std_dev = get_stats(type, yValues)
         print "WARN: using stats computed from window only. mu=", mean, "sigma=", std_dev
+
     pylab.yticks([mean-5*std_dev, mean-4*std_dev, mean-3*std_dev, mean-2*std_dev, mean-std_dev,
                   mean,
                   mean+std_dev, mean+2*std_dev, mean+3*std_dev, mean+4*std_dev, mean+5*std_dev],
@@ -87,7 +88,6 @@ def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_d
                   'mean',
                   r'1$\sigma$', r'+2$\sigma$', r'+3$\sigma$', r'+4$\sigma$', r'+5$\sigma$']
     )
-    pylab.grid(True)
 
     if type == PLOT_TYPES.bars:
         plotStackedBars(event_time, pnums, yValues, N, MINS)
@@ -99,6 +99,24 @@ def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_d
     if event_time is not None:  # draw the event line
         pylab.axvline(x=0, linewidth=5, linestyle='--', color='gray', label='event')
         #pylab.plot(pre_win, 0, marker='*', color='black', markersize=20, fillstyle="full")
+
+    ax = pylab.gca()
+    ax.grid(True)
+    ax.set_xlabel("Minutes Since Event")
+
+    # show dual axis of actual values
+    ax2 = ax.twinx()
+    print ax.get_ylim()
+    ax2.set_ylim(ax.get_ylim())
+    ax2.set_ylabel(yLabel)
+
+    n_events = len(yValues)
+    if type == PLOT_TYPES.bars:
+        # adjust 2ndary y axis to be average
+        ymin, ymax = ax.get_ylim()
+        ax2.set_ylim(ymin/n_events, ymax/n_events)
+        ax2.set_ylabel('average' + str(yLabel))
+
 
 
 def get_cmap():
@@ -112,7 +130,17 @@ def get_time_indicies(event_time, MINS):
         return range(MINS)  # sequential time indicies
 
 
-def plot_avg_lines(event_time, pnums, yValues, N, MINS):
+def plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=True, show_events=False):
+    """
+    :param event_time:
+    :param pnums:
+    :param yValues:
+    :param N:
+    :param MINS:
+    :param show_p_average: true to show average for each participant
+    :param show_events: true to show each event series
+    :return:
+    """
     ttt = get_time_indicies(event_time, MINS)
 
     # compute average over all events
@@ -122,26 +150,48 @@ def plot_avg_lines(event_time, pnums, yValues, N, MINS):
     # TODO: move p_counts to this scope so i can use it later.
     #print 'pnums len:', len(pnums)
     #print 'yValues len:', len(yValues)
+    pidDict = {}
     for i in range(len(ttt)):  # for each time index
         sum = 0
         p_sum = [0]*N  # sum for each pariticpant
         p_counts = [0]*N  # count of events for each participant
         for ev in range(n_events):  # for each event series at time i
-            pid = pnums[ev]
+            try:
+                pid = pidDict[pnums[ev]]
+            except KeyError as e:
+                new_pid = len(pidDict)
+                print 'remap pid', pnums[ev], '->', new_pid
+                pidDict[pnums[ev]] = new_pid
+                pid = pidDict[pnums[ev]]
             event_value = yValues[ev][i]
             sum += event_value
             p_sum[pid] += event_value
             p_counts[pid] += 1
-        avgs[i] = sum / len(yValues)  # TODO: I think this gets number of events...
+
+        print [sums for sums in p_sum]
+
+        avgs[i] = sum / n_events
         for p in range(N):  # for each participant
             if p_counts[p] > 1:  # don't divide by 0 or 1
                 p_avgs[p][i] = p_sum[p]/p_counts[p]
             else:
                 p_avgs[p][i] = p_sum[p]
 
-    cmap = get_cmap()
-    for p in range(N):  # for each participant
-        pylab.plt.plot(ttt, p_avgs[p], color=cmap(float(p) / N))
+    print [avg[1:10] for avg in p_avgs]
+
+    if show_p_averages:
+        cmap = get_cmap()
+        print 'events per particpant:', p_counts
+        print '      pids           :', range(len(pidDict))
+        for p_key, p_valu in pidDict.iteritems():  # for each participant
+            print 'plotting [', p_key, ']=', p_valu
+            pylab.plt.plot(ttt, p_avgs[p_key], color=cmap(float(p) / N))
+
+    if show_events:
+        cmap = get_cmap()
+        for ev, event_ts in enumerate(yValues):
+            pid = pnums[ev]
+            pylab.plt.plot(ttt, event_ts, color=cmap(float(pid) / N))
 
     pylab.plt.plot(ttt, avgs, color=cmap(1.0), linewidth=4)
 
@@ -159,7 +209,9 @@ def plotStackedBars(event_time, pnums, yValues, N, MINS):
             pylab.plt.bar(ttt, steps[i], bottom=bases, linewidth=1, width=1, color=cmap(float(pnums[i]) / N))
             bases = [bases[ii] + steps[i][ii] for ii in range(len(bases))]
 
-def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activity_type=None, selected_event_type=None):
+
+def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activity_type=None,
+                 selected_event_type=None, type=PLOT_TYPES.bars):
     """
     :param data: dataset object
     :param MINS: number of minutes after event which we are looking at
@@ -199,7 +251,7 @@ def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activi
     print errors
 
     # util.debug.open_console()
-    makeTheActualPlot(MINS, pnums, steps, len(data.pids))
+    makeTheActualPlot(MINS, pnums, steps, len(data.pids), type=type)
 
 
 #post_event_steps.plot_decaminutes()

@@ -25,10 +25,21 @@ if pandas.version.version < '0.12.0':
 
 ### START ACTUAL VISUALS ###
 
+from src.post_view_event_steps_bars import plot_minutes, PLOT_TYPES
+plot_minutes(data, MINS=60, verbose=False, overap_okay=True,
+                                        selected_activity_type=DAY_TYPE.active, type=PLOT_TYPES.lines)
+pylab.show()
+
 import sample_intervention
 from src.post_view_event_steps_bars import PLOT_TYPES
-print 'control stackPlot...'
+print 'control data all events...'
+sample_intervention.plot_all_events()
+pylab.show()
+
+print 'control avg...'
 sample_intervention.makePlot(type=PLOT_TYPES.lines)
+pylab.show()
+print 'control stackPlot...'
 sample_intervention.makePlot(type=PLOT_TYPES.bars)
 pylab.show()
 

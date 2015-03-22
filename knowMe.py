@@ -151,7 +151,7 @@ def makePlot():
     print 'plotting ', len(bars), 'events;', exclude_n, 'excluded'
 
     makeTheActualPlot(pre_win+post_win, pids, bars, HIGHEST_PNUM,
-                      event_time=pre_win, mean=93.11*len(pids), std_dev=21.39*len(pids))
+                      event_time=pre_win, mean=93.11*len(pids), std_dev=21.39*len(pids), yLabel="Heart Rate (BPM)")
 
 if __name__ == "__main__":
     makePlot()
