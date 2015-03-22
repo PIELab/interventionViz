@@ -7,6 +7,9 @@ from src.settings import setup, QUALITY_LEVEL, DATA_TYPES
 from src.data.mAvatar.Data import DAY_TYPE
 from src.data.Dataset import Dataset
 
+from src.post_view_event_steps_bars import test_get_avg_list
+test_get_avg_list()
+
 
 ### USF mAVATAR DATA LOADING ###
 settings = setup(dataset='USF', data_loc='../subjects/', subject_n=0)
@@ -25,9 +28,11 @@ if pandas.version.version < '0.12.0':
 
 ### START ACTUAL VISUALS ###
 
+
+
 from src.post_view_event_steps_bars import plot_minutes, PLOT_TYPES
 plot_minutes(data, MINS=60, verbose=False, overap_okay=True,
-                                        selected_activity_type=DAY_TYPE.active, type=PLOT_TYPES.lines)
+             selected_activity_type=DAY_TYPE.active, type=PLOT_TYPES.lines)
 pylab.show()
 
 import sample_intervention

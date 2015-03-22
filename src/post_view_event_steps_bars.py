@@ -14,6 +14,16 @@ class PLOT_TYPES(object):
     lines = 1
 
 
+def test_get_avg_list():
+    test_list = [[1,1,1,1,1,1,-1,-1,-1],
+                 [3,3,3,2,2,2, 1, 1, 1]]
+    res_list = get_avg_list(test_list)
+
+    print res_list
+    assert(res_list == [2,2,2,1.5,1.5,1.5,0,0,0])
+    print 'get avg list works good'
+
+
 def get_avg_list(yValues):
     """
 
@@ -29,7 +39,7 @@ def get_avg_list(yValues):
         for ev in range(n_events):  # for each event series at time i
             event_value = yValues[ev][i]
             sum += event_value
-        avgs[i] = sum / len(yValues)  # TODO: I think this gets number of events...
+        avgs[i] = sum / float(n_events)
     return avgs
 
 
@@ -118,7 +128,6 @@ def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_d
         ax2.set_ylabel('average' + str(yLabel))
 
 
-
 def get_cmap():
     return pylab.cm.get_cmap(name='spectral')
 
@@ -144,48 +153,20 @@ def plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=True, sh
     ttt = get_time_indicies(event_time, MINS)
 
     # compute average over all events
-    avgs = [0]*len(ttt)
-    p_avgs = [[0]*len(ttt)]*N  # list of averages list for each participant
-    n_events = len(yValues)
-    # TODO: move p_counts to this scope so i can use it later.
-    #print 'pnums len:', len(pnums)
-    #print 'yValues len:', len(yValues)
-    pidDict = {}
-    for i in range(len(ttt)):  # for each time index
-        sum = 0
-        p_sum = [0]*N  # sum for each pariticpant
-        p_counts = [0]*N  # count of events for each participant
-        for ev in range(n_events):  # for each event series at time i
-            try:
-                pid = pidDict[pnums[ev]]
-            except KeyError as e:
-                new_pid = len(pidDict)
-                print 'remap pid', pnums[ev], '->', new_pid
-                pidDict[pnums[ev]] = new_pid
-                pid = pidDict[pnums[ev]]
-            event_value = yValues[ev][i]
-            sum += event_value
-            p_sum[pid] += event_value
-            p_counts[pid] += 1
-
-        print [sums for sums in p_sum]
-
-        avgs[i] = sum / n_events
-        for p in range(N):  # for each participant
-            if p_counts[p] > 1:  # don't divide by 0 or 1
-                p_avgs[p][i] = p_sum[p]/p_counts[p]
-            else:
-                p_avgs[p][i] = p_sum[p]
-
-    print [avg[1:10] for avg in p_avgs]
+    avgs = get_avg_list(yValues)
 
     if show_p_averages:
         cmap = get_cmap()
-        print 'events per particpant:', p_counts
-        print '      pids           :', range(len(pidDict))
-        for p_key, p_valu in pidDict.iteritems():  # for each participant
-            print 'plotting [', p_key, ']=', p_valu
-            pylab.plt.plot(ttt, p_avgs[p_key], color=cmap(float(p) / N))
+        for pid in range(N):
+            p_events = []
+            for ev, ev_pid in enumerate(pnums):
+                if pid == ev_pid:
+                    p_events.append(yValues[ev])
+
+            p_avg = get_avg_list(p_events)
+            print 'plotting p', pid
+            print p_avg[1:5]
+            pylab.plt.plot(ttt, p_avg, color=cmap(float(pid) / N))
 
     if show_events:
         cmap = get_cmap()
