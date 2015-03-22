@@ -6,7 +6,11 @@ from src.data.mAvatar.Data import DAY_TYPE
 import pylab
 import numpy
 
-PLOT_TYPES = {bars:1, line:2}
+class PLOT_TYPES(object):
+    """
+    """
+    bars = 0
+    lines = 1
 
 
 def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_dev=None, type=PLOT_TYPES.bars):
@@ -47,25 +51,27 @@ def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_d
     )
     pylab.grid(True)
 
-    cmap = pylab.cm.get_cmap(name='spectral')
-
-    if event_time is not None:  # adjust minutes so that event is at t=0
-        ttt = range(-event_time, MINS-event_time)
-    else:
-        ttt = range(MINS)  # sequential time indicies
-    bases = [0]*len(ttt)  # keeps track of where the next bar should go
-    for i in range(len(pnums)):  # for each list of steps
-        steps = yValues
-        #print len(steps[i]), len(ttt)
-        #print steps[i]
-        #print ttt
-        pylab.plt.bar(ttt, steps[i], bottom=bases, linewidth=1, width=1, color=cmap(float(pnums[i]) / N))
-        bases = [bases[ii] + steps[i][ii] for ii in range(len(bases))]
+    plotStackedBars(event_time, pnums, yValues, N, MINS)
 
     if event_time is not None:  # draw the event line
         pylab.axvline(x=0, linewidth=5, linestyle='--', color='gray', label='event')
         #pylab.plot(pre_win, 0, marker='*', color='black', markersize=20, fillstyle="full")
 
+
+def plotStackedBars(event_time, pnums, yValues, N, MINS):
+        cmap = pylab.cm.get_cmap(name='spectral')
+        if event_time is not None:  # adjust minutes so that event is at t=0
+            ttt = range(-event_time, MINS-event_time)
+        else:
+            ttt = range(MINS)  # sequential time indicies
+        bases = [0]*len(ttt)  # keeps track of where the next bar should go
+        for i in range(len(pnums)):  # for each list of steps
+            steps = yValues
+            #print len(steps[i]), len(ttt)
+            #print steps[i]
+            #print ttt
+            pylab.plt.bar(ttt, steps[i], bottom=bases, linewidth=1, width=1, color=cmap(float(pnums[i]) / N))
+            bases = [bases[ii] + steps[i][ii] for ii in range(len(bases))]
 
 def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activity_type=None, selected_event_type=None):
     """
