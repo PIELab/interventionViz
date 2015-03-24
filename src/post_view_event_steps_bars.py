@@ -158,10 +158,7 @@ def plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=True, sh
 
     if show_p_averages:
         for pid in range(N):
-            p_events = []
-            for ev, ev_pid in enumerate(pnums):
-                if pid == ev_pid:
-                    p_events.append(yValues[ev])
+            p_events = select_participant_series(yValues, pnums, pid)
 
             p_avg = get_avg_list(p_events)
             print 'plotting p', pid
@@ -187,8 +184,25 @@ def plotStackedBars(event_time, pnums, yValues, N, MINS):
             #print len(steps[i]), len(ttt)
             #print steps[i]
             #print ttt
-            pylab.plt.bar(ttt, steps[i], bottom=bases, linewidth=1, width=1, color=cmap(float(pnums[i]) / N))
+            if N == 0:
+                c = .7
+            else:
+                c = float(pnums[i]) / N
+            pylab.plt.bar(ttt, steps[i], bottom=bases, linewidth=1, width=1, color=cmap(c))
             bases = [bases[ii] + steps[i][ii] for ii in range(len(bases))]
+
+
+def select_participant_series(series, pnums, pid):
+    """
+    :param series: list of time-series
+    :param pnums: list of pids corresponding to the time-series
+    :return: selection of series with pnum[i] matching pid
+    """
+    p_events = []
+    for ev, ev_pid in enumerate(pnums):
+        if pid == ev_pid:
+            p_events.append(series[ev])
+    return p_events
 
 
 def plot_difference(data, control_event, experimental_event, shift=0, MINS=10, verbose=True, overlap_okay=False):
@@ -202,6 +216,7 @@ def plot_difference(data, control_event, experimental_event, shift=0, MINS=10, v
     :param overlap_okay:
     :return:
     """
+
     check_activity_type(control_event)
     check_activity_type(experimental_event)
 
@@ -210,18 +225,40 @@ def plot_difference(data, control_event, experimental_event, shift=0, MINS=10, v
     ex_steps, ex_pnums = get_steps_after_event_type(data, experimental_event, MINS, overlap_okay,
                                                     shift=shift, verbose=verbose)
 
-    # TODO: get averages for each pariticpant
+    ## shows global avg only:
+    #control_avg_ts = get_avg_list(cn_steps)
+    #experiment_avg_ts = get_avg_list(ex_steps)
+    #
+    #diff_ts = list_subtract(experiment_avg_ts, control_avg_ts)
+    #
+    #makeTheActualPlot(MINS, [1], [diff_ts], len(data.pids), type=PLOT_TYPES.lines, show_p_averages=False,
+    #                  event_time=(-shift))
 
-    control_avg_ts = get_avg_list(cn_steps)
-    experiment_avg_ts = get_avg_list(ex_steps)
+    # get averages for each participant
+    diff_ts = []
+    pids = []
+    for pid in range(len(data.pids)):
+        p_cn_avg_ts = get_avg_list(select_participant_series(cn_steps, cn_pnums, pid))
+        p_ex_avg_ts = get_avg_list(select_participant_series(ex_steps, ex_pnums, pid))
+        diff_ts.append(list_subtract(p_ex_avg_ts, p_cn_avg_ts))
+        pids.append(pid)
 
-    diff_ts = [0]*len(control_avg_ts)
-    for t in range(len(control_avg_ts)):
-        diff_ts[t] = experiment_avg_ts[t] - control_avg_ts[t]
+    makeTheActualPlot(MINS, pids, diff_ts, len(data.pids), type=PLOT_TYPES.lines, show_p_averages=True,
+                  event_time=(-shift))
 
-    makeTheActualPlot(MINS, [1], [diff_ts], len(data.pids), type=PLOT_TYPES.lines, show_p_averages=False,
-                      event_time=(-shift))
 
+
+
+
+
+def list_subtract(l1, l2):
+    if len(l1) != len(l2):
+        raise ValueError('cannot subtract lists of different length.'+str(len(l1))+'-'+str(len(l2)))
+    else:
+        diff_ts = [0]*len(l1)
+        for t in range(len(l1)):
+            diff_ts[t] = l1[t] - l2[t]
+        return diff_ts
 
 
 def check_event_type(event_type):
@@ -232,6 +269,7 @@ def check_event_type(event_type):
 def check_activity_type(activity_type):
     if activity_type is not None and not DAY_TYPE.is_valid(activity_type):
         raise ValueError('unknown event type selection: ' + str(activity_type))
+
 
 def plot_minutes(data, MINS=10, verbose=True, overlap_okay=False, selected_activity_type=None,
                  selected_event_type=None, type=PLOT_TYPES.bars, shift=0):

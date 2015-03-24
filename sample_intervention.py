@@ -5,7 +5,7 @@ from src.settings import setup, DATA_TYPES
 from src.post_view_event_steps_bars import makeTheActualPlot, PLOT_TYPES, get_cmap, get_time_indicies
 from src.data.Dataset import Dataset
 
-HIGHEST_PNUM = 2
+HIGHEST_PNUM = 0
 
 
 def get_data(pre_win, post_win):

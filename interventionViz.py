@@ -42,7 +42,6 @@ plot_difference(data, MINS=60, shift=-30, verbose=False, overlap_okay=True,
                 control_event=DAY_TYPE.sedentary, experimental_event=DAY_TYPE.active)
 pylab.show()
 
-# TODO: shift view to a little bit before the event by modifying plot_minutes to take another parameter
 print 'mAvatar post-event graphs comparison lines vs stack bars...'
 # TODO: variance of the sum is NOT the sum of the variances.
 plot_minutes(data, MINS=60, verbose=False, overlap_okay=True, shift=-30,
