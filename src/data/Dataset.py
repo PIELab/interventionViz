@@ -103,6 +103,7 @@ class Dataset(object):
         :param event: ViewEvent I'm looking up
         :param mins: number of minutes after event you want
         :param overlap_okay: bool; throw TimeWindowError if number of minutes
+        :param shift: number of minutes to shift past event (CAN be negative... I think)
         :return: list of step counts for <mins> minutes after event (len=mins)
         """
         if not event.has_next_event:

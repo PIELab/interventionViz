@@ -191,7 +191,7 @@ def plotStackedBars(event_time, pnums, yValues, N, MINS):
             bases = [bases[ii] + steps[i][ii] for ii in range(len(bases))]
 
 
-def plot_difference(data, control_event, experimental_event, MINS=10, verbose=True, overlap_okay=False):
+def plot_difference(data, control_event, experimental_event, shift=0, MINS=10, verbose=True, overlap_okay=False):
     """
     makes plot of difference between experimental event and control event
     :param data:
@@ -205,8 +205,10 @@ def plot_difference(data, control_event, experimental_event, MINS=10, verbose=Tr
     check_activity_type(control_event)
     check_activity_type(experimental_event)
 
-    cn_steps, cn_pnums = get_steps_after_event_type(data, control_event, MINS, overlap_okay, verbose=verbose)
-    ex_steps, ex_pnums = get_steps_after_event_type(data, experimental_event, MINS, overlap_okay, verbose=verbose)
+    cn_steps, cn_pnums = get_steps_after_event_type(data, control_event, MINS, overlap_okay,
+                                                    shift=shift, verbose=verbose)
+    ex_steps, ex_pnums = get_steps_after_event_type(data, experimental_event, MINS, overlap_okay,
+                                                    shift=shift, verbose=verbose)
 
     # TODO: get averages for each pariticpant
 
@@ -217,7 +219,8 @@ def plot_difference(data, control_event, experimental_event, MINS=10, verbose=Tr
     for t in range(len(control_avg_ts)):
         diff_ts[t] = experiment_avg_ts[t] - control_avg_ts[t]
 
-    makeTheActualPlot(MINS, [1], [diff_ts], len(data.pids), type=PLOT_TYPES.lines, show_p_averages=False)
+    makeTheActualPlot(MINS, [1], [diff_ts], len(data.pids), type=PLOT_TYPES.lines, show_p_averages=False,
+                      event_time=(-shift))
 
 
 
@@ -231,7 +234,7 @@ def check_activity_type(activity_type):
         raise ValueError('unknown event type selection: ' + str(activity_type))
 
 def plot_minutes(data, MINS=10, verbose=True, overlap_okay=False, selected_activity_type=None,
-                 selected_event_type=None, type=PLOT_TYPES.bars):
+                 selected_event_type=None, type=PLOT_TYPES.bars, shift=0):
     """
     plots minutes following specified event type
     :param data: dataset object
@@ -244,13 +247,13 @@ def plot_minutes(data, MINS=10, verbose=True, overlap_okay=False, selected_activ
     check_event_type(selected_event_type)
     check_activity_type(selected_activity_type)
 
-    steps, pnums = get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay, verbose=verbose)
+    steps, pnums = get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay, shift=shift, verbose=verbose)
 
     # util.debug.open_console()
-    makeTheActualPlot(MINS, pnums, steps, len(data.pids), type=type)
+    makeTheActualPlot(MINS, pnums, steps, len(data.pids), event_time=(-shift), type=type)
 
 
-def get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay, verbose=False):
+def get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay, verbose=False, shift=0):
     """
     :param data: subject data obj
     :param selected_activity_type: evt.activity_type selected for
@@ -265,7 +268,7 @@ def get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay,
     for evt in events:  # lookup each event and get steps following event
         if selected_activity_type is None or evt.activity_type == selected_activity_type:
             try:
-                steps.append(data.get_steps_after_event(evt, MINS, overlap_okay=overlap_okay))
+                steps.append(data.get_steps_after_event(evt, MINS, shift=shift, overlap_okay=overlap_okay))
                 pnums.append(evt.pnum)
             except TimeWindowError as e:  # if not enough time between events error
                 skipped += 1

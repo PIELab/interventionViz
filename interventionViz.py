@@ -38,27 +38,19 @@ if pandas.version.version < '0.12.0':
 # TODO: fig line graph of controlData avg(intervention)-avg(control)
 
 print 'mAvatar active-sedentary comparison...'
-plot_difference(data, MINS=60, verbose=False, overlap_okay=True, control_event=DAY_TYPE.sedentary,
-                experimental_event=DAY_TYPE.active)
-pylab.show()
-
-#[8, 10, 11, 12, 13, 15, 26, 28, 32, 44, 49]
-day_step_compare.plot_all_avg_diffs(data)
-
-pylab.show()
-# TODO: pass variables into this...
-day_step_compare.plot_individual_mirrors_together(data)
+plot_difference(data, MINS=60, shift=-30, verbose=False, overlap_okay=True,
+                control_event=DAY_TYPE.sedentary, experimental_event=DAY_TYPE.active)
 pylab.show()
 
 # TODO: shift view to a little bit before the event by modifying plot_minutes to take another parameter
 print 'mAvatar post-event graphs comparison lines vs stack bars...'
 # TODO: variance of the sum is NOT the sum of the variances.
-plot_minutes(data, MINS=60, verbose=False, overlap_okay=True,
+plot_minutes(data, MINS=60, verbose=False, overlap_okay=True, shift=-30,
              selected_activity_type=DAY_TYPE.active, type=PLOT_TYPES.lines)
 pylab.show()
-# plot_minutes(data, MINS=60, verbose=False, overlap_okay=True,
-#              selected_activity_type=DAY_TYPE.active, type=PLOT_TYPES.bars)
-# pylab.show()
+plot_minutes(data, MINS=60, verbose=False, overlap_okay=True, shift=-30,
+             selected_activity_type=DAY_TYPE.active, type=PLOT_TYPES.bars)
+pylab.show()
 
 print 'control data all events...'
 sample_intervention.plot_all_events()
