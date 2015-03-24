@@ -33,33 +33,49 @@ if pandas.version.version < '0.12.0':
 
 
 ### START ACTUAL VISUALS ###
-# roughly in reverse order that they appear in the paper...
 
-# TODO: fig line graph of controlData avg(intervention)-avg(control)
-
-print 'mAvatar active-sedentary comparison...'
-print 'mAvatar post-event graphs comparison lines vs stack bars...'
-plot_difference(data, MINS=60, shift=-30, verbose=False, overlap_okay=True,
-                control_event=DAY_TYPE.sedentary, experimental_event=DAY_TYPE.active, type=PLOT_TYPES.lines)
-pylab.show()
-#plot_difference(data, MINS=60, shift=-30, verbose=False, overlap_okay=True,
-#                control_event=DAY_TYPE.sedentary, experimental_event=DAY_TYPE.active, type=PLOT_TYPES.bars)
-#pylab.show()
-
+# plot all event responses together
+# ctrl
 print 'control data all events...'
 sample_intervention.plot_all_events()
 pylab.show()
+# knowMe
+# TODO
+# mAvatar
+# TODO
 
+# plot participant averages & global average response (lines)
+# ctrl
 print 'control avg...'
 sample_intervention.makePlot(type=PLOT_TYPES.lines)
 pylab.show()
+# knowMe
+# TODO
+# mAvatar
+# looking at sedentary, active, or all not very interesting
+
+
+# plot stackGraphs of event response
+# ctrl
 print 'control stackPlot...'
 sample_intervention.makePlot(type=PLOT_TYPES.bars)
 pylab.show()
-
-
+# knowMe
 print 'knowMe stackPlot...'
 knowMe.makePlot()
 pylab.show()
+# mAvatar
+# looking at sedentary, active, or all not very interesting
+
+# plot differences
+# ctrl real vs random pt
+# TODO: fig line graph of controlData avg(intervention)-avg(control)
+# knowMe intervention vs other sms
+# TODO: knowMe control/experimental?
+# mAvatar sedentary vs active avatar
+plot_difference(data, MINS=60, shift=-30, verbose=False, overlap_okay=True,
+                control_event=DAY_TYPE.sedentary, experimental_event=DAY_TYPE.active, type=PLOT_TYPES.lines)
+pylab.show()
+
 
 # TODO http://matplotlib.org/examples/pylab_examples/arrow_demo.html maybe?
