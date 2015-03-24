@@ -205,7 +205,8 @@ def select_participant_series(series, pnums, pid):
     return p_events
 
 
-def plot_difference(data, control_event, experimental_event, shift=0, MINS=10, verbose=True, overlap_okay=False):
+def plot_difference(data, control_event, experimental_event, shift=0, MINS=10, verbose=True, overlap_okay=False,
+                    type=PLOT_TYPES.lines):
     """
     makes plot of difference between experimental event and control event
     :param data:
@@ -243,12 +244,11 @@ def plot_difference(data, control_event, experimental_event, shift=0, MINS=10, v
         diff_ts.append(list_subtract(p_ex_avg_ts, p_cn_avg_ts))
         pids.append(pid)
 
-    makeTheActualPlot(MINS, pids, diff_ts, len(data.pids), type=PLOT_TYPES.lines, show_p_averages=True,
+    if type == PLOT_TYPES.bars:
+        raise NotImplementedError('stacked bars with possible negative values will not work')
+
+    makeTheActualPlot(MINS, pids, diff_ts, len(data.pids), type=type, show_p_averages=True,
                   event_time=(-shift))
-
-
-
-
 
 
 def list_subtract(l1, l2):
