@@ -50,7 +50,9 @@ print 'control avg...'
 sample_intervention.makePlot(type=PLOT_TYPES.lines)
 pylab.show()
 # knowMe
-# TODO
+print 'knowMe stackPlot...'
+knowMe.makePlot(type=PLOT_TYPES.lines)
+pylab.show()
 # mAvatar
 # looking at sedentary, active, or all not very interesting
 
@@ -62,7 +64,7 @@ sample_intervention.makePlot(type=PLOT_TYPES.bars)
 pylab.show()
 # knowMe
 print 'knowMe stackPlot...'
-knowMe.makePlot()
+knowMe.makePlot(type=PLOT_TYPES.bars)
 pylab.show()
 # mAvatar
 # looking at sedentary, active, or all not very interesting

@@ -1,6 +1,6 @@
 import pylab
 import savReaderWriter
-from src.post_view_event_steps_bars import makeTheActualPlot
+from src.post_view_event_steps_bars import makeTheActualPlot, PLOT_TYPES
 
  # list of indicies which are manually identified as interventions
 INDEXES_TAGGED_INTERVENTION = [5, 7, 9, 10, 30, 33, 34, 38, 41, 42, 47, 52, 56, 57, 58, 60, 62, 66, 70, 97,
@@ -100,7 +100,7 @@ def get_data_sections(file_name):
     return data_sections
 
 
-def makePlot():
+def makePlot(type=PLOT_TYPES.bars):
     save_file = "./../knowMeData/knowMeData.sav"
     sections = get_data_sections(save_file)
 
@@ -150,8 +150,8 @@ def makePlot():
 
     print 'plotting ', len(bars), 'events;', exclude_n, 'excluded'
 
-    makeTheActualPlot(pre_win+post_win, pids, bars, HIGHEST_PNUM,
-                      event_time=pre_win, mean=93.11*len(pids), std_dev=21.39*len(pids), yLabel="Heart Rate (BPM)")
+    makeTheActualPlot(pre_win+post_win, pids, bars, HIGHEST_PNUM, type=type,
+                      event_time=pre_win, yLabel="Heart Rate (BPM)")
 
 if __name__ == "__main__":
     makePlot()

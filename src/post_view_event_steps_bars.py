@@ -159,11 +159,13 @@ def plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=True, sh
     if show_p_averages:
         for pid in range(N):
             p_events = select_participant_series(yValues, pnums, pid)
-
-            p_avg = get_avg_list(p_events)
-            print 'plotting p', pid
-            print p_avg[1:5]
-            pylab.plt.plot(ttt, p_avg, color=cmap(float(pid) / N))
+            try:
+                p_avg = get_avg_list(p_events)
+                print 'plotting p', pid
+                print p_avg[1:5]
+                pylab.plt.plot(ttt, p_avg, color=cmap(float(pid) / N))
+            except IndexError as err:
+                print "WARN: pid,", pid, "has no events; excluded from analysis"
 
     if show_events:
         cmap = get_cmap()
