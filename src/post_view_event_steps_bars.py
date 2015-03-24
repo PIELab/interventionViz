@@ -67,8 +67,8 @@ def get_stats(type, yValues):
     return mean, std_dev
 
 
-
-def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_dev=None, type=PLOT_TYPES.bars, yLabel=""):
+def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_dev=None,
+                      type=PLOT_TYPES.bars, yLabel="", show_p_averages=True):
     """
     :param MINS: number of minutes
     :param pnums: list of participant id numbers (for coloring the bars)
@@ -102,7 +102,7 @@ def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_d
     if type == PLOT_TYPES.bars:
         plotStackedBars(event_time, pnums, yValues, N, MINS)
     elif type == PLOT_TYPES.lines:
-        plot_avg_lines(event_time, pnums, yValues, N, MINS)
+        plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=show_p_averages)
     else:
         raise NotImplementedError('plot type not recognized:'+str(type))
 
@@ -154,9 +154,9 @@ def plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=True, sh
 
     # compute average over all events
     avgs = get_avg_list(yValues)
+    cmap = get_cmap()
 
     if show_p_averages:
-        cmap = get_cmap()
         for pid in range(N):
             p_events = []
             for ev, ev_pid in enumerate(pnums):
@@ -191,9 +191,49 @@ def plotStackedBars(event_time, pnums, yValues, N, MINS):
             bases = [bases[ii] + steps[i][ii] for ii in range(len(bases))]
 
 
+def plot_difference(data, control_event, experimental_event, MINS=10, verbose=True, overlap_okay=False):
+    """
+    makes plot of difference between experimental event and control event
+    :param data:
+    :param control_event:
+    :param experimental_event:
+    :param MINS:
+    :param verbose:
+    :param overlap_okay:
+    :return:
+    """
+    check_activity_type(control_event)
+    check_activity_type(experimental_event)
+
+    cn_steps, cn_pnums = get_steps_after_event_type(data, control_event, MINS, overlap_okay, verbose=verbose)
+    ex_steps, ex_pnums = get_steps_after_event_type(data, experimental_event, MINS, overlap_okay, verbose=verbose)
+
+    # TODO: get averages for each pariticpant
+
+    control_avg_ts = get_avg_list(cn_steps)
+    experiment_avg_ts = get_avg_list(ex_steps)
+
+    diff_ts = [0]*len(control_avg_ts)
+    for t in range(len(control_avg_ts)):
+        diff_ts[t] = experiment_avg_ts[t] - control_avg_ts[t]
+
+    makeTheActualPlot(MINS, [1], [diff_ts], len(data.pids), type=PLOT_TYPES.lines, show_p_averages=False)
+
+
+
+def check_event_type(event_type):
+    if event_type is not None:
+        raise NotImplementedError("event type selection not yet implemented")  # TODO: implement!
+
+
+def check_activity_type(activity_type):
+    if activity_type is not None and not DAY_TYPE.is_valid(activity_type):
+        raise ValueError('unknown event type selection: ' + str(activity_type))
+
 def plot_minutes(data, MINS=10, verbose=True, overlap_okay=False, selected_activity_type=None,
                  selected_event_type=None, type=PLOT_TYPES.bars):
     """
+    plots minutes following specified event type
     :param data: dataset object
     :param MINS: number of minutes after event which we are looking at
     :param selected_activity_type: type of physical activity level selected for (must be in mAvatar.Data.DAY_TYPE)
@@ -201,13 +241,10 @@ def plot_minutes(data, MINS=10, verbose=True, overlap_okay=False, selected_activ
     :param verbose:
     :return:
     """
-    if selected_event_type is not None:
-        raise NotImplementedError("event type selection not yet implemented")  # TODO: implement!
+    check_event_type(selected_event_type)
+    check_activity_type(selected_activity_type)
 
-    if selected_activity_type is not None and not DAY_TYPE.is_valid(selected_activity_type):
-        raise ValueError('unknown event type selection: ' + str(selected_activity_type))
-
-    events, pnums = get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay, verbose=verbose)
+    steps, pnums = get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay, verbose=verbose)
 
     # util.debug.open_console()
     makeTheActualPlot(MINS, pnums, steps, len(data.pids), type=type)

@@ -8,11 +8,11 @@ from src.data.mAvatar.Data import DAY_TYPE
 from src.data.Dataset import Dataset
 
 import src.day_step_compare as day_step_compare
-from src.post_view_event_steps_bars import plot_minutes, PLOT_TYPES
+from src.post_view_event_steps_bars import plot_minutes, PLOT_TYPES, plot_difference
 import sample_intervention
 import knowMe
 
-
+# some optional tests:
 # from src.post_view_event_steps_bars import test_get_avg_list
 # test_get_avg_list()
 
@@ -38,7 +38,9 @@ if pandas.version.version < '0.12.0':
 # TODO: fig line graph of controlData avg(intervention)-avg(control)
 
 print 'mAvatar active-sedentary comparison...'
-
+plot_difference(data, MINS=60, verbose=False, overlap_okay=True, control_event=DAY_TYPE.sedentary,
+                experimental_event=DAY_TYPE.active)
+pylab.show()
 
 #[8, 10, 11, 12, 13, 15, 26, 28, 32, 44, 49]
 day_step_compare.plot_all_avg_diffs(data)
@@ -67,7 +69,7 @@ sample_intervention.makePlot(type=PLOT_TYPES.lines)
 pylab.show()
 print 'control stackPlot...'
 sample_intervention.makePlot(type=PLOT_TYPES.bars)
-pylab.show()import sample_intervention
+pylab.show()
 
 
 print 'knowMe stackPlot...'
