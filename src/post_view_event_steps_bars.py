@@ -141,9 +141,9 @@ def get_time_indicies(event_time, MINS):
 
 def plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=True, show_events=False):
     """
-    :param event_time:
-    :param pnums:
-    :param yValues:
+    :param event_time: index of the event in yValues ts
+    :param pnums: list of pids matching yValues
+    :param yValues: list of time-series hieght values
     :param N:
     :param MINS:
     :param show_p_average: true to show average for each participant
@@ -244,8 +244,3 @@ def get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay,
     print errors
     return steps, pnums
 
-#post_event_steps.plot_decaminutes()
-# Figure ###: Sum of Step Counts Following An Avatar Viewing (10m-level)
-
-#post_event_steps.plot_hours()
-# Figure ###: Sum of Step Counts Following An Avatar Viewing (hour-level)

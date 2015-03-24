@@ -7,8 +7,14 @@ from src.settings import setup, QUALITY_LEVEL, DATA_TYPES
 from src.data.mAvatar.Data import DAY_TYPE
 from src.data.Dataset import Dataset
 
-from src.post_view_event_steps_bars import test_get_avg_list
-test_get_avg_list()
+import src.day_step_compare as day_step_compare
+from src.post_view_event_steps_bars import plot_minutes, PLOT_TYPES
+import sample_intervention
+import knowMe
+
+
+# from src.post_view_event_steps_bars import test_get_avg_list
+# test_get_avg_list()
 
 
 ### USF mAVATAR DATA LOADING ###
@@ -32,9 +38,11 @@ if pandas.version.version < '0.12.0':
 # TODO: fig line graph of controlData avg(intervention)-avg(control)
 
 print 'mAvatar active-sedentary comparison...'
+
+
 #[8, 10, 11, 12, 13, 15, 26, 28, 32, 44, 49]
-import src.day_step_compare as day_step_compare
 day_step_compare.plot_all_avg_diffs(data)
+
 pylab.show()
 # TODO: pass variables into this...
 day_step_compare.plot_individual_mirrors_together(data)
@@ -43,7 +51,6 @@ pylab.show()
 # TODO: shift view to a little bit before the event by modifying plot_minutes to take another parameter
 print 'mAvatar post-event graphs comparison lines vs stack bars...'
 # TODO: variance of the sum is NOT the sum of the variances.
-from src.post_view_event_steps_bars import plot_minutes, PLOT_TYPES
 plot_minutes(data, MINS=60, verbose=False, overlap_okay=True,
              selected_activity_type=DAY_TYPE.active, type=PLOT_TYPES.lines)
 pylab.show()
@@ -51,7 +58,6 @@ pylab.show()
 #              selected_activity_type=DAY_TYPE.active, type=PLOT_TYPES.bars)
 # pylab.show()
 
-import sample_intervention
 print 'control data all events...'
 sample_intervention.plot_all_events()
 pylab.show()
@@ -61,9 +67,9 @@ sample_intervention.makePlot(type=PLOT_TYPES.lines)
 pylab.show()
 print 'control stackPlot...'
 sample_intervention.makePlot(type=PLOT_TYPES.bars)
-pylab.show()
+pylab.show()import sample_intervention
 
-import knowMe
+
 print 'knowMe stackPlot...'
 knowMe.makePlot()
 pylab.show()
