@@ -126,58 +126,58 @@ import src.post_view_event_steps_bars as post_event_steps
 # Figure ###: Sum of Step Counts Following An Avatar Viewing (minute-level)
 
 ### NO OVERLAP ALLOWED ###
-# post_event_steps.plot_minutes(data, MINS=10, overap_okay=False, selected_event_type=None)
+# post_event_steps.plot_minutes(data, MINS=10, overlap_okay=False, selected_event_type=None)
 # pylab.show()
 #
-# post_event_steps.plot_minutes(data, MINS=10, overap_okay=False, selected_activity_type=DAY_TYPE.active)
+# post_event_steps.plot_minutes(data, MINS=10, overlap_okay=False, selected_activity_type=DAY_TYPE.active)
 # pylab.gcf().canvas.set_window_title('active')
 # pylab.show()
 #
-# post_event_steps.plot_minutes(data, MINS=10, overap_okay=False, selected_activity_type=DAY_TYPE.sedentary)
+# post_event_steps.plot_minutes(data, MINS=10, overlap_okay=False, selected_activity_type=DAY_TYPE.sedentary)
 # pylab.gcf().canvas.set_window_title('sedentary')
 # pylab.show()
 #
-# post_event_steps.plot_minutes(data, MINS=10, overap_okay=False, selected_activity_type=DAY_TYPE.neutral)
+# post_event_steps.plot_minutes(data, MINS=10, overlap_okay=False, selected_activity_type=DAY_TYPE.neutral)
 # pylab.gcf().canvas.set_window_title('neutral')
 # pylab.show() # this graph should be blank if phone got enough use...
 #
 # ## Figure ###: Sum of Step Counts Following An Avatar Viewing (hour-level)
-# post_event_steps.plot_minutes(data, MINS=60, overap_okay=False)
+# post_event_steps.plot_minutes(data, MINS=60, overlap_okay=False)
 # pylab.show()
 
-post_event_steps.plot_minutes(data, MINS=60, overap_okay=False, selected_activity_type=DAY_TYPE.active)
+post_event_steps.plot_minutes(data, MINS=60, overlap_okay=False, selected_activity_type=DAY_TYPE.active)
 pylab.gcf().canvas.set_window_title('active')
 pylab.show()
 
-post_event_steps.plot_minutes(data, MINS=60, overap_okay=False, selected_activity_type=DAY_TYPE.sedentary)
+post_event_steps.plot_minutes(data, MINS=60, overlap_okay=False, selected_activity_type=DAY_TYPE.sedentary)
 pylab.gcf().canvas.set_window_title('sedentary')
 pylab.show()
 
-post_event_steps.plot_minutes(data, MINS=60, overap_okay=False, selected_activity_type=DAY_TYPE.neutral)
+post_event_steps.plot_minutes(data, MINS=60, overlap_okay=False, selected_activity_type=DAY_TYPE.neutral)
 pylab.gcf().canvas.set_window_title('neutral')
 pylab.show() # this graph should be blank if phone got enough use...
 
 
-post_event_steps.plot_minutes(data, MINS=60*3, overap_okay=False)
+post_event_steps.plot_minutes(data, MINS=60*3, overlap_okay=False)
 pylab.show()
 
-post_event_steps.plot_minutes(data, MINS=60*6, overap_okay=False)
+post_event_steps.plot_minutes(data, MINS=60*6, overlap_okay=False)
 pylab.show()
 
 
 ### OVERLAP ALLOWED ###
-post_event_steps.plot_minutes(data, MINS=10, overap_okay=True)
+post_event_steps.plot_minutes(data, MINS=10, overlap_okay=True)
 pylab.show()
 
 ## Figure ###: Sum of Step Counts Following An Avatar Viewing (hour-level)
-post_event_steps.plot_minutes(data, MINS=60, overap_okay=True)
+post_event_steps.plot_minutes(data, MINS=60, overlap_okay=True)
 pylab.show()
 
-post_event_steps.plot_minutes(data, MINS=60*3, overap_okay=True)
+post_event_steps.plot_minutes(data, MINS=60*3, overlap_okay=True)
 pylab.show()
 
 # this is a huge amount of data that is likely to cause a python MemoryError
-post_event_steps.plot_minutes(data, MINS=60*6, overap_okay=True)
+post_event_steps.plot_minutes(data, MINS=60*6, overlap_okay=True)
 pylab.show()
 
 

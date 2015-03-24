@@ -6,6 +6,7 @@ from src.data.Dataset import TimeWindowError
 
 import pylab
 
+
 def plot_individual_mirrors_together(data):
     """
     plots bot active & sedentary of each participant all on same plot?

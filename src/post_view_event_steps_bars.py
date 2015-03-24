@@ -191,7 +191,7 @@ def plotStackedBars(event_time, pnums, yValues, N, MINS):
             bases = [bases[ii] + steps[i][ii] for ii in range(len(bases))]
 
 
-def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activity_type=None,
+def plot_minutes(data, MINS=10, verbose=True, overlap_okay=False, selected_activity_type=None,
                  selected_event_type=None, type=PLOT_TYPES.bars):
     """
     :param data: dataset object
@@ -207,6 +207,18 @@ def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activi
     if selected_activity_type is not None and not DAY_TYPE.is_valid(selected_activity_type):
         raise ValueError('unknown event type selection: ' + str(selected_activity_type))
 
+    events, pnums = get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay, verbose=verbose)
+
+    # util.debug.open_console()
+    makeTheActualPlot(MINS, pnums, steps, len(data.pids), type=type)
+
+
+def get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay, verbose=False):
+    """
+    :param data: subject data obj
+    :param selected_activity_type: evt.activity_type selected for
+    :return: list of steps & corresponding list of pids which match
+    """
     events = data.get_aggregated_avatar_view_events()
     steps = list()  # list of lists of steps
     pnums = list()
@@ -216,7 +228,7 @@ def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activi
     for evt in events:  # lookup each event and get steps following event
         if selected_activity_type is None or evt.activity_type == selected_activity_type:
             try:
-                steps.append(data.get_steps_after_event(evt, MINS, overlap_okay=overap_okay))
+                steps.append(data.get_steps_after_event(evt, MINS, overlap_okay=overlap_okay))
                 pnums.append(evt.pnum)
             except TimeWindowError as e:  # if not enough time between events error
                 skipped += 1
@@ -230,10 +242,7 @@ def plot_minutes(data, MINS=10, verbose=True, overap_okay=False, selected_activi
 
     if verbose: print len(pnums), 'event step lists loaded,', skipped, 'skipped,', undata, 'unselected. Error summary:'
     print errors
-
-    # util.debug.open_console()
-    makeTheActualPlot(MINS, pnums, steps, len(data.pids), type=type)
-
+    return steps, pnums
 
 #post_event_steps.plot_decaminutes()
 # Figure ###: Sum of Step Counts Following An Avatar Viewing (10m-level)
