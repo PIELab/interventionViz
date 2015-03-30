@@ -36,13 +36,17 @@ if pandas.version.version < '0.12.0':
 
 # plot all event responses together
 # ctrl
+print 'big control stackPlot with colored bars'
+sample_intervention.makePlot(type=PLOT_TYPES.bars, pre_win=15*60, post_win=15*60, color_events=True)
+pylab.show()
+
 print 'control data all events...'
 sample_intervention.plot_all_events()
 pylab.show()
 # knowMe
-# TODO
+# TODO: (maybe... not expecting anything interesting)
 # mAvatar
-# TODO
+# TODO: (maybe... not expecting anything interesting)
 
 # plot participant averages & global average response (lines)
 # ctrl
@@ -50,7 +54,7 @@ print 'control avg...'
 sample_intervention.makePlot(type=PLOT_TYPES.lines)
 pylab.show()
 # knowMe
-print 'knowMe stackPlot...'
+print 'knowMe lines...'
 knowMe.makePlot(type=PLOT_TYPES.lines)
 pylab.show()
 # mAvatar

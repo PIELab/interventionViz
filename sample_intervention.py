@@ -47,7 +47,7 @@ def plot_all_events():
     ax.set_ylabel(str('step count'))
 
 
-def makePlot(type=PLOT_TYPES.bars, pre_win=60*5, post_win=60*5):
+def makePlot(type=PLOT_TYPES.bars, pre_win=60*5, post_win=60*5, color_events=False):
     """
     makes aggregation plot of all events (stacked (bars) or average(lines))
     pre_win = 60*5   # window size before event
@@ -55,7 +55,14 @@ def makePlot(type=PLOT_TYPES.bars, pre_win=60*5, post_win=60*5):
     """
     minutes, pids, bars = get_data(pre_win, post_win)
 
-    makeTheActualPlot(minutes, pids, bars, HIGHEST_PNUM, event_time=pre_win, type=type, yLabel='Step Count')
+    if color_events:
+        pids = range(len(bars))
+        p_count = len(bars)
+        edgecolor = "none"
+    else:
+        p_count = HIGHEST_PNUM
+
+    makeTheActualPlot(minutes, pids, bars, p_count, event_time=pre_win, type=type, yLabel='Step Count', edgecolor=edgecolor)
 
 if __name__ == "__main__":
     makePlot()

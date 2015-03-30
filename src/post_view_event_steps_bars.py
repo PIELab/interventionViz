@@ -68,7 +68,7 @@ def get_stats(type, yValues):
 
 
 def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_dev=None,
-                      type=PLOT_TYPES.bars, yLabel="", show_p_averages=True):
+                      type=PLOT_TYPES.bars, yLabel="", show_p_averages=True, edgecolor=None):
     """
     :param MINS: number of minutes
     :param pnums: list of participant id numbers (for coloring the bars)
@@ -100,7 +100,7 @@ def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_d
     )
 
     if type == PLOT_TYPES.bars:
-        plotStackedBars(event_time, pnums, yValues, N, MINS)
+        plotStackedBars(event_time, pnums, yValues, N, MINS, edgecolor=edgecolor)
     elif type == PLOT_TYPES.lines:
         plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=show_p_averages)
     else:
@@ -176,7 +176,7 @@ def plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=True, sh
     pylab.plt.plot(ttt, avgs, color=cmap(1.0), linewidth=4)
 
 
-def plotStackedBars(event_time, pnums, yValues, N, MINS):
+def plotStackedBars(event_time, pnums, yValues, N, MINS, edgecolor=None):
         cmap = get_cmap()
         ttt = get_time_indicies(event_time, MINS)
 
@@ -190,7 +190,7 @@ def plotStackedBars(event_time, pnums, yValues, N, MINS):
                 c = .7
             else:
                 c = float(pnums[i]) / N
-            pylab.plt.bar(ttt, steps[i], bottom=bases, linewidth=1, width=1, color=cmap(c))
+            pylab.plt.bar(ttt, steps[i], bottom=bases, linewidth=1, width=1, color=cmap(c), edgecolor=edgecolor)
             bases = [bases[ii] + steps[i][ii] for ii in range(len(bases))]
 
 
