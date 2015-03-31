@@ -16,8 +16,8 @@ import knowMe
 # from src.post_view_event_steps_bars import test_get_avg_list
 # test_get_avg_list()
 
+knowMe.makePlots(type=PLOT_TYPES.lines, show=False)
 knowMe.makePlots(type=PLOT_TYPES.bars, show=True)
-knowMe.makePlots(type=PLOT_TYPES.lines, show=True)
 
 ### USF mAVATAR DATA LOADING ###
 settings = setup(dataset='USF', data_loc='../subjects/', subject_n=0)

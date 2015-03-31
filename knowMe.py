@@ -12,7 +12,6 @@ INDEXES_TAGGED_REINFORCEMENT = [0, 16, 19, 55, 71, 98, 111, 112, 130, 136, 143, 
                                 # also 157 (but praise is for previous day so not included above)
 
 FILE_END = 41970
-HIGHEST_PNUM = 36
 
 """
 NOTES:
@@ -148,9 +147,18 @@ def makePlot(type=PLOT_TYPES.bars, selected_data='km_hr', yLabel="Heart Rate (BP
                 "s=", len(data[:event.index]), '\t:\t', len(data[event.index:]), '\t(', len(data), ')'
             exclude_n += 1
 
+    pid_remap = list()
+    seen_pids = list()
+    for pid in pids:
+        if pid not in seen_pids:
+            seen_pids.append(pid)
+        pid_remap.append(seen_pids.index(pid))
+
+    highest_pnum = len(seen_pids)
+
     print 'plotting ', len(bars), 'events;', exclude_n, 'excluded'
 
-    makeTheActualPlot(pre_win+post_win, pids, bars, HIGHEST_PNUM, type=type,
+    makeTheActualPlot(pre_win+post_win, pid_remap, bars, highest_pnum, type=type,
                       event_time=pre_win, yLabel=yLabel)
 
 
@@ -172,6 +180,9 @@ def makePlots(type=PLOT_TYPES.bars, show=True):
     for data_type in interesting_data_types:
         key = data_type
         descrip = interesting_data_types[key]
+        if not show:
+            print 'plotting ', descrip
+            pylab.figure(key)
         makePlot(type=type, selected_data=key, yLabel=descrip)
         if show:
             pylab.show()
