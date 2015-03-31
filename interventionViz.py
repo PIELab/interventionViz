@@ -39,60 +39,67 @@ if pandas.version.version < '0.12.0':
 # to demonstrate difference (especially at high time intervals like no-overlap for 3hrs around event)
 #plot_minutes(data, MINS=12*60, overlap_okay=True, shift=-6*60, edgecolor='none')
 #pylab.show()
-#plot_minutes(data, MINS=60, overlap_okay=True, shift=-30)
-#pylab.show()
+plot_minutes(data, MINS=60, overlap_okay=True, shift=-30, edgecolor='none')
+pylab.show()
 #plot_minutes(data, MINS=60, overlap_okay=False, shift=-30)
 #pylab.show()
 
 
 ### START ACTUAL VISUALS ###
 
+# plot_minutes(data, MINS=80, shift=-20, overlap_okay=True, selected_activity_type=DAY_TYPE.active)
+# pylab.show()
+#
+# knowMe.makePlot(type=PLOT_TYPES.bars)
+# pylab.show()
+
 # plot all event responses together
-# ctrl
-print 'big control stackPlot with colored bars'
-sample_intervention.makePlot(type=PLOT_TYPES.bars, pre_win=15*60, post_win=15*60, color_events=True)
-pylab.show()
+# print 'big control stackPlot with colored bars'
+# sample_intervention.makePlot(type=PLOT_TYPES.bars, pre_win=15*60, post_win=15*60, color_events=True)
+# pylab.show()
 
-print 'control data all events...'
-sample_intervention.plot_all_events()
+# print 'control data all events...'
+# sample_intervention.plot_all_events()
+# pylab.figure('smoothed')
+sample_intervention.plot_all_events(smooth=7)
 pylab.show()
 # knowMe
 # TODO: (maybe... not expecting anything interesting)
 # mAvatar
 # TODO: (maybe... not expecting anything interesting)
 
-# plot participant averages & global average response (lines)
-# ctrl
-print 'control avg...'
-sample_intervention.makePlot(type=PLOT_TYPES.lines)
-pylab.show()
-# knowMe
+# # plot participant averages & global average response (lines)
+# # ctrl
+# print 'control avg...'
+# sample_intervention.makePlot(type=PLOT_TYPES.lines)
+# pylab.show()
+# # knowMe
 print 'knowMe lines...'
-knowMe.makePlot(type=PLOT_TYPES.lines)
+knowMe.makePlot(type=PLOT_TYPES.lines, selected_data='int_acc_cnts', smooth=7)
 pylab.show()
 # mAvatar
 # looking at sedentary, active, or all not very interesting
 
+#
+# # plot stackGraphs of event response
+# # ctrl
+# print 'control stackPlot...'
+# sample_intervention.makePlot(type=PLOT_TYPES.bars, pre_win=20, post_win=60, color_events=False)
+# pylab.show()
+# # knowMe
+# print 'knowMe stackPlot...'
+# knowMe.makePlot(type=PLOT_TYPES.bars)
+# pylab.show()
+# # mAvatar
+# # looking at sedentary, active, or all not very interesting
 
-# plot stackGraphs of event response
-# ctrl
-print 'control stackPlot...'
-sample_intervention.makePlot(type=PLOT_TYPES.bars)
-pylab.show()
-# knowMe
-print 'knowMe stackPlot...'
-knowMe.makePlot(type=PLOT_TYPES.bars)
-pylab.show()
-# mAvatar
-# looking at sedentary, active, or all not very interesting
-
-# plot differences
-# ctrl real vs random pt
-sample_intervention.makePlot(type=PLOT_TYPES.lines, comparison=True)
-# knowMe intervention vs other sms
-# TODO: knowMe control/experimental?
-# mAvatar sedentary vs active avatar
-plot_difference(data, MINS=60, shift=-30, verbose=False, overlap_okay=True,
+# # plot differences
+# # ctrl real vs random pt
+# sample_intervention.makePlot(type=PLOT_TYPES.lines, comparison=True)
+# # knowMe intervention vs other sms
+# # TODO: knowMe control/experimental?
+# # mAvatar sedentary vs active avatar
+plot_difference(data, MINS=60, shift=-30, verbose=False, overlap_okay=True, smooth=7,
                 control_event=DAY_TYPE.sedentary, experimental_event=DAY_TYPE.active, type=PLOT_TYPES.lines)
 pylab.show()
 

@@ -99,7 +99,8 @@ def get_data_sections(file_name):
     return data_sections
 
 
-def makePlot(type=PLOT_TYPES.bars, selected_data='km_hr', yLabel="Heart Rate (BPM)", pre_win=20, post_win=40):
+def makePlot(type=PLOT_TYPES.bars, selected_data='km_hr', yLabel="Heart Rate (BPM)",
+             pre_win=20, post_win=40, smooth=None):
     """
     pre_win = 20  # window size before event
     post_win = 40  # window size after event
@@ -168,7 +169,7 @@ def makePlot(type=PLOT_TYPES.bars, selected_data='km_hr', yLabel="Heart Rate (BP
     print 'plotting ', len(bars), 'events;', exclude_n, 'excluded'
 
     makeTheActualPlot(pre_win+post_win, pid_remap, bars, highest_pnum, type=type,
-                      event_time=pre_win, yLabel=yLabel)
+                      event_time=pre_win, yLabel=yLabel, smooth=smooth)
 
 
 def makePlots(type=PLOT_TYPES.bars, show=True, pre_win=20, post_win=40):

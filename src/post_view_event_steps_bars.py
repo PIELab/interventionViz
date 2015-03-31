@@ -68,7 +68,7 @@ def get_stats(type, yValues):
 
 
 def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_dev=None,
-                      type=PLOT_TYPES.bars, yLabel="", show_p_averages=True, edgecolor=None):
+                      type=PLOT_TYPES.bars, yLabel="", show_p_averages=True, edgecolor=None, smooth=None):
     """
     :param MINS: number of minutes
     :param pnums: list of participant id numbers (for coloring the bars)
@@ -102,7 +102,7 @@ def makeTheActualPlot(MINS, pnums, yValues, N, event_time=None, mean=None, std_d
     if type == PLOT_TYPES.bars:
         plotStackedBars(event_time, pnums, yValues, N, MINS, edgecolor=edgecolor)
     elif type == PLOT_TYPES.lines:
-        plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=show_p_averages)
+        plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=show_p_averages, smooth=smooth)
     else:
         raise NotImplementedError('plot type not recognized:'+str(type))
 
@@ -139,7 +139,7 @@ def get_time_indicies(event_time, MINS):
         return range(MINS)  # sequential time indicies
 
 
-def plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=True, show_events=False):
+def plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=True, show_events=False, smooth=None):
     """
     :param event_time: index of the event in yValues ts
     :param pnums: list of pids matching yValues
@@ -161,6 +161,15 @@ def plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=True, sh
             p_events = select_participant_series(yValues, pnums, pid)
             try:
                 p_avg = get_avg_list(p_events)
+                if smooth is not None:
+                    for i in range(len(p_avg)):
+                        try:
+                            if i-smooth < 0:
+                                continue
+                            new_v = sum(p_avg[(i-smooth):(i+smooth+1)])/(2.0*smooth+1.0)
+                            p_avg[i] = new_v
+                        except IndexError as err:
+                            continue
                 print 'plotting p', pid
                 print p_avg[1:5]
                 pylab.plt.plot(ttt, p_avg, color=cmap(float(pid) / N))
@@ -208,7 +217,7 @@ def select_participant_series(series, pnums, pid):
 
 
 def plot_difference(data, control_event, experimental_event, shift=0, MINS=10, verbose=True, overlap_okay=False,
-                    type=PLOT_TYPES.lines):
+                    type=PLOT_TYPES.lines, smooth=None):
     """
     makes plot of difference between experimental event and control event
     :param data:
@@ -250,7 +259,7 @@ def plot_difference(data, control_event, experimental_event, shift=0, MINS=10, v
         raise NotImplementedError('stacked bars with possible negative values will not work')
 
     makeTheActualPlot(MINS, pids, diff_ts, len(data.pids), type=type, show_p_averages=True,
-                  event_time=(-shift))
+                  event_time=(-shift), smooth=smooth)
 
 
 def list_subtract(l1, l2):

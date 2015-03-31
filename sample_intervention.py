@@ -1,5 +1,7 @@
 import pylab
 from datetime import timedelta
+import numpy as np
+from scipy.interpolate import spline
 
 from src.settings import setup, DATA_TYPES
 from src.post_view_event_steps_bars import makeTheActualPlot, PLOT_TYPES, get_cmap, get_time_indicies, list_subtract
@@ -31,7 +33,8 @@ def get_data(pre_win, post_win):
     return minutes, pids, bars
 
 
-def plot_all_events():
+def plot_all_events(smooth=None):
+    # :param smooth: size of smoothing window on either side (1 avgs 3, 2 avgs 5, etc)
     pre_win = 60*5   # window size before event
     post_win = 60*5  # window size after event
     event_time = pre_win
@@ -41,6 +44,12 @@ def plot_all_events():
     N = len(bars)
     ttt = get_time_indicies(event_time, MINS)
     for ev, event_ts in enumerate(bars):
+        if smooth is not None:
+            for i in range(len(event_ts)):
+                try:
+                    event_ts[i] = sum(event_ts[(i-smooth):(i+smooth+1)])/(2.0*smooth+1.0)
+                except IndexError as err:
+                    continue
         pylab.plt.plot(ttt, event_ts, color=cmap(float(ev) / N))
     ax = pylab.gca()
     ax.set_xlabel("minutes since event")
@@ -71,7 +80,8 @@ def get_fake_data(pre_win, post_win, minutes, pids, bars):
     return minutes, pids, diff_bars
 
 
-def makePlot(type=PLOT_TYPES.bars, pre_win=60*5, post_win=60*5, color_events=False, comparison=False, edgecolor=None):
+def makePlot(type=PLOT_TYPES.bars, pre_win=60*5, post_win=60*5, color_events=False,
+             comparison=False, edgecolor=None, smooth=None):
     """
     makes aggregation plot of all events (stacked (bars) or average(lines))
     pre_win = 60*5   # window size before event
@@ -89,7 +99,7 @@ def makePlot(type=PLOT_TYPES.bars, pre_win=60*5, post_win=60*5, color_events=Fal
     else:
         p_count = HIGHEST_PNUM
 
-    makeTheActualPlot(minutes, pids, bars, p_count, event_time=pre_win, type=type, yLabel='Step Count', edgecolor=edgecolor)
+    makeTheActualPlot(minutes, pids, bars, p_count, smooth=smooth, event_time=pre_win, type=type, yLabel='Step Count', edgecolor=edgecolor)
 
 if __name__ == "__main__":
     makePlot()
