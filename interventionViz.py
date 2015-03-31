@@ -9,6 +9,7 @@ from src.data.Dataset import Dataset
 
 import src.day_step_compare as day_step_compare
 from src.post_view_event_steps_bars import plot_minutes, PLOT_TYPES, plot_difference
+
 import sample_intervention
 import knowMe
 
@@ -32,6 +33,16 @@ UP_TO_DATE = True  # true if software versions are good
 if pandas.version.version < '0.12.0':
     UP_TO_DATE = False
     print '\n\nWARN: Some analysis cannot be completed due to outdated pandas version ' + pandas.version.version + '\n\n'
+
+
+# comparison of events selected with/without overlap from mAvatar dataset
+# to demonstrate difference (especially at high time intervals like no-overlap for 3hrs around event)
+#plot_minutes(data, MINS=12*60, overlap_okay=True, shift=-6*60, edgecolor='none')
+#pylab.show()
+#plot_minutes(data, MINS=60, overlap_okay=True, shift=-30)
+#pylab.show()
+#plot_minutes(data, MINS=60, overlap_okay=False, shift=-30)
+#pylab.show()
 
 
 ### START ACTUAL VISUALS ###

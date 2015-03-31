@@ -274,9 +274,10 @@ def check_activity_type(activity_type):
 
 
 def plot_minutes(data, MINS=10, verbose=True, overlap_okay=False, selected_activity_type=None,
-                 selected_event_type=None, type=PLOT_TYPES.bars, shift=0):
+                 selected_event_type=None, type=PLOT_TYPES.bars, shift=0, edgecolor=None):
     """
     plots minutes following specified event type
+    :param shift: number of minutes past the event to start (negative works for b4 event)
     :param data: dataset object
     :param MINS: number of minutes after event which we are looking at
     :param selected_activity_type: type of physical activity level selected for (must be in mAvatar.Data.DAY_TYPE)
@@ -290,7 +291,7 @@ def plot_minutes(data, MINS=10, verbose=True, overlap_okay=False, selected_activ
     steps, pnums = get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay, shift=shift, verbose=verbose)
 
     # util.debug.open_console()
-    makeTheActualPlot(MINS, pnums, steps, len(data.pids), event_time=(-shift), type=type)
+    makeTheActualPlot(MINS, pnums, steps, len(data.pids), event_time=(-shift), type=type, edgecolor=edgecolor)
 
 
 def get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay, verbose=False, shift=0):
