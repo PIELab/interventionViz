@@ -100,7 +100,7 @@ def get_data_sections(file_name):
     return data_sections
 
 
-def makePlot(type=PLOT_TYPES.bars):
+def makePlot(type=PLOT_TYPES.bars, selected_data='km_hr', yLabel="Heart Rate (BPM)"):
     save_file = "./../knowMeData/knowMeData.sav"
     sections = get_data_sections(save_file)
 
@@ -136,7 +136,7 @@ def makePlot(type=PLOT_TYPES.bars):
         for data_point in event.data_section:
             if event_pid != data_point['pid']:
                 raise Error('pid changed without change in sensor section!')
-            data.append(data_point['km_hr'])
+            data.append(data_point[selected_data])
         start = event.index - pre_win
         end = event.index + post_win
         dat = data[start:end]
@@ -151,8 +151,31 @@ def makePlot(type=PLOT_TYPES.bars):
     print 'plotting ', len(bars), 'events;', exclude_n, 'excluded'
 
     makeTheActualPlot(pre_win+post_win, pids, bars, HIGHEST_PNUM, type=type,
-                      event_time=pre_win, yLabel="Heart Rate (BPM)")
+                      event_time=pre_win, yLabel=yLabel)
+
+
+def makePlots(type=PLOT_TYPES.bars, show=True):
+    interesting_data_types = {
+        "km_hr": "Heart Rate (BPM)",
+        "int_acc_cnts": "Accelerometry Count",
+        "km_lying_min": "s lying down",
+        "km_sit_min": "s sitting",
+        "km_sitfidg_min": "s fidgiting",
+        "km_stnd_min": "s standing",
+        "km_stndfidg_min": "s standing and fidgiting",
+        "km_Wii_Min": "s playing wii",
+        "km_slwwlk_min": "s walking slow",
+        "km_brskwlk_min": "s brisk walking",
+        "km_run_min": "s running"
+    }
+
+    for data_type in interesting_data_types:
+        key = data_type
+        descrip = interesting_data_types[key]
+        makePlot(type=type, selected_data=key, yLabel=descrip)
+        if show:
+            pylab.show()
+
 
 if __name__ == "__main__":
-    makePlot()
-    pylab.show()
+    makePlots()

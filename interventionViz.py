@@ -16,6 +16,8 @@ import knowMe
 # from src.post_view_event_steps_bars import test_get_avg_list
 # test_get_avg_list()
 
+knowMe.makePlots(type=PLOT_TYPES.bars, show=True)
+knowMe.makePlots(type=PLOT_TYPES.lines, show=True)
 
 ### USF mAVATAR DATA LOADING ###
 settings = setup(dataset='USF', data_loc='../subjects/', subject_n=0)
@@ -55,7 +57,7 @@ sample_intervention.makePlot(type=PLOT_TYPES.lines)
 pylab.show()
 # knowMe
 print 'knowMe lines...'
-knowMe.makePlot(type=PLOT_TYPES.lines)
+knowMe.makePlots(type=PLOT_TYPES.lines)
 pylab.show()
 # mAvatar
 # looking at sedentary, active, or all not very interesting
