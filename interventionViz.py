@@ -16,8 +16,8 @@ import knowMe
 # from src.post_view_event_steps_bars import test_get_avg_list
 # test_get_avg_list()
 
-knowMe.makePlots(type=PLOT_TYPES.lines, show=False)
-knowMe.makePlots(type=PLOT_TYPES.bars, show=True)
+#knowMe.makePlots(type=PLOT_TYPES.bars, show=True, pre_win=10, post_win=40)
+#knowMe.makePlots(type=PLOT_TYPES.bars, show=True)
 
 ### USF mAVATAR DATA LOADING ###
 settings = setup(dataset='USF', data_loc='../subjects/', subject_n=0)
@@ -57,7 +57,7 @@ sample_intervention.makePlot(type=PLOT_TYPES.lines)
 pylab.show()
 # knowMe
 print 'knowMe lines...'
-knowMe.makePlots(type=PLOT_TYPES.lines)
+knowMe.makePlot(type=PLOT_TYPES.lines)
 pylab.show()
 # mAvatar
 # looking at sedentary, active, or all not very interesting
@@ -77,7 +77,7 @@ pylab.show()
 
 # plot differences
 # ctrl real vs random pt
-# TODO: fig line graph of controlData avg(intervention)-avg(control)
+sample_intervention.makePlot(type=PLOT_TYPES.lines, comparison=True)
 # knowMe intervention vs other sms
 # TODO: knowMe control/experimental?
 # mAvatar sedentary vs active avatar

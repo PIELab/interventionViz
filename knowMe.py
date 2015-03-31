@@ -99,7 +99,15 @@ def get_data_sections(file_name):
     return data_sections
 
 
-def makePlot(type=PLOT_TYPES.bars, selected_data='km_hr', yLabel="Heart Rate (BPM)"):
+def makePlot(type=PLOT_TYPES.bars, selected_data='km_hr', yLabel="Heart Rate (BPM)", pre_win=20, post_win=40):
+    """
+    pre_win = 20  # window size before event
+    post_win = 40  # window size after event
+    :param type:
+    :param selected_data:
+    :param yLabel:
+    :return:
+    """
     save_file = "./../knowMeData/knowMeData.sav"
     sections = get_data_sections(save_file)
 
@@ -117,17 +125,18 @@ def makePlot(type=PLOT_TYPES.bars, selected_data='km_hr', yLabel="Heart Rate (BP
     print "\t===\ntotal messages:", len(msg_send_events)
 
     # select intervention events from event list
-    intervention_events = list()
+    intervention_events = []
+    control_events = []
     for e_i, event in enumerate(msg_send_events):
         if e_i in INDEXES_TAGGED_INTERVENTION:
             intervention_events.append(event)
             #print event.data['sent_txt']
+        elif e_i in INDEXES_TAGGED_REINFORCEMENT:
+            control_events.append(event)
 
     # get everything into arrays for plotting
     pids = list()
     bars = list()
-    pre_win = 20  # window size before event
-    post_win = 40  # window size after event
     exclude_n = 0
     for e_i, event in enumerate(intervention_events):
         data = list()
@@ -162,7 +171,7 @@ def makePlot(type=PLOT_TYPES.bars, selected_data='km_hr', yLabel="Heart Rate (BP
                       event_time=pre_win, yLabel=yLabel)
 
 
-def makePlots(type=PLOT_TYPES.bars, show=True):
+def makePlots(type=PLOT_TYPES.bars, show=True, pre_win=20, post_win=40):
     interesting_data_types = {
         "km_hr": "Heart Rate (BPM)",
         "int_acc_cnts": "Accelerometry Count",
@@ -183,7 +192,7 @@ def makePlots(type=PLOT_TYPES.bars, show=True):
         if not show:
             print 'plotting ', descrip
             pylab.figure(key)
-        makePlot(type=type, selected_data=key, yLabel=descrip)
+        makePlot(type=type, selected_data=key, yLabel=descrip, pre_win=pre_win, post_win=post_win)
         if show:
             pylab.show()
 
