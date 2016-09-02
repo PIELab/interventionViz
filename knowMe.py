@@ -109,7 +109,7 @@ def makePlot(type=PLOT_TYPES.bars, selected_data='km_hr', yLabel="Heart Rate (BP
     :param yLabel:
     :return:
     """
-    save_file = "./../knowMeData/knowMeData.sav"
+    save_file = "./data/knowMeData.sav"
     sections = get_data_sections(save_file)
 
     # make event list

@@ -7,16 +7,16 @@ Some sample data is included in the /data directory; this should be pretty simil
 GPS location is generally stored in the /GPSLogger folder. Here we should have .txt files with comma-separated date and long/lat values. There may be just one file with a full week of data or there may be on file for each day; it just depends on how the app was set up.
 
 ### Physical Activity ###
-Physical activity data comes in two forms: mMonitor data (generally in the /miles folder) or fitbit data. 
+Physical activity data comes in two forms: mMonitor data (generally in the /miles folder) or fitbit data.
 
 *For mMonitor:*
-Daily totals from mMonitor should be available for each day the app was run. Additionally, minute-level data should be recorded. There will also be second-level data files, but these should be empty. The file name corresponds to the day that the file was made, but files from later days also contain the previous days. This means that the simplest way to look at all of the data is to just load up the largest file (this is almost always the one with the latest date). 
+Daily totals from mMonitor should be available for each day the app was run. Additionally, minute-level data should be recorded. There will also be second-level data files, but these should be empty. The file name corresponds to the day that the file was made, but files from later days also contain the previous days. This means that the simplest way to look at all of the data is to just load up the largest file (this is almost always the one with the latest date).
 
 *For Fitbit:*
-Images of the fitbit website may be included, but raw data will not be available until the study is complete and the database(s) are downloaded. 
+Images of the fitbit website may be included, but raw data will not be available until the study is complete and the database(s) are downloaded.
 
 ### Avatar-Influence Data ###
-This file is almost always named dataLog.txt, and it contains a comma-separated description of when the avatar was shown on the phone. Included should be a starttime, endtime, and elapsed time as well as the name of the avatar animation that was displayed. 
+This file is almost always named dataLog.txt, and it contains a comma-separated description of when the avatar was shown on the phone. Included should be a starttime, endtime, and elapsed time as well as the name of the avatar animation that was displayed.
 
 ## Script Organization ##
 
@@ -59,3 +59,7 @@ src/				Top-level package
 ```
 
 To run a particular script, start from the top-level and do something like ```import src.interaction.timeSeries.simple```
+
+
+### A note on KNOWME data usage
+This functionality depends on [savReaderWriter](https://github.com/fomcl/savreaderwriter). Place un-encrypted .sav file from spss into the `/data` directory. If you need to decrypt use `pspp-convert encryptedFilename.sav decryptedFilename.sav`.
