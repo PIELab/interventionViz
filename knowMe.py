@@ -1,6 +1,7 @@
 import pylab
 import savReaderWriter
 from src.post_view_event_steps_bars import makeTheActualPlot, PLOT_TYPES
+from math import log
 
  # list of indicies which are manually identified as interventions
 INDEXES_TAGGED_INTERVENTION = [5, 7, 9, 10, 30, 33, 34, 38, 41, 42, 47, 52, 56, 57, 58, 60, 62, 66, 70, 97,
@@ -71,6 +72,7 @@ def get_data_dict(line, index):
         "km_brskwlk_min": line[25],
         "km_run_min": line[26],
         "km_hr": line[27],
+        "sms_intervention": line[28],
         "index": index
         # NOTE: the indexes in consts are relative to the index of outgoing sms, not all rows, so this doesn't work:
         #"intervention": (index in INDEXES_TAGGED_INTERVENTION),
@@ -78,26 +80,84 @@ def get_data_dict(line, index):
     }
 
 
-def get_data_sections(file_name):
+def get_data_sections(file_name, filterColumnNumber=16):# or 27
     """
+    loads chunks of data surrounding sms interventions.
+    assumes data is sorted by pid, day, and time.
     :param file_name: name of save file to read
+    :param filterColumnNumber: column which must be present for data to be included
     :return: array of arrays of consecutive data like [[d1, d2], [d6, d7, d8]]
     """
     data_sections = [[]]
     with savReaderWriter.SavReader(file_name, ioLocale='en_US.UTF-8') as reader:
         row_n = 0
+        currentPID = 9
         for line in reader:
-            if line[27] is not None:  # test for if line has data we want in it
+            if (line[filterColumnNumber] is not None  # test for if line has data we want in it
+                and line[0] == currentPID):
                 #print get_data_dict(line, row_n)
                 data_sections[-1].append(get_data_dict(line, row_n))
             else:  # move to next data section
                 if len(data_sections[-1]) > 0:  # only move if not already an empty array
                     data_sections.append([])
+                currentPID = line[0]
             row_n += 1
             if row_n >= FILE_END:  # yeah... that happens...
                 break
     return data_sections
 
+def load_arx_model_data(file_name):
+    """
+    assumes data in file_name is sorted by pid, day, and time.
+    loads SMS_intervention and heart rate data for use in arx modeling.
+    NOTE: current implementation ignores gaps in data and simply concats.
+    """
+    filterColumnNumber = 16  # or 27
+    SMS_INTERVENTION_KEY = 'sms_intervention'
+    SMS_INTERVENTION_COL = 28
+    INT_ACC_CNTS_KEY = 'int_acc_cnts'
+    INT_ACC_CNTS_COL = 16
+    PID_COL = 0
+
+
+    data = {}
+    with savReaderWriter.SavReader(file_name, ioLocale='en_US.UTF-8') as reader:
+
+        # data {
+        #     9: {
+        #         'SMS_intervention': [1,2,3,6,2,23], 'int_acc_cnts':[34,1,5,63]
+        #     },
+        #     15: {
+        #         '':[], '':[]
+        #     }
+        # }
+        row_n = 0
+        for line in reader:
+            pid = line[PID_COL]
+            if line[filterColumnNumber] is not None:  # test for if line has data we want in it
+                # print pid, line[SMS_INTERVENTION_COL], line[INT_ACC_CNTS_COL]
+                try:  # append to existing participant
+                    sms_interv = line[SMS_INTERVENTION_COL] or 0
+                    acc_cnt = line[INT_ACC_CNTS_COL] or 0
+                    if acc_cnt > 0:
+                        acc_cnt = log(acc_cnt)
+                    if sms_interv != 0 or acc_cnt != 0:
+                        # print 'append ' + str(sms_interv) + ',' + str(acc_cnt)
+                        data[pid][SMS_INTERVENTION_KEY].append(sms_interv)
+                        data[pid][INT_ACC_CNTS_KEY].append(acc_cnt)
+                        # TODO: use actual dates
+                        # data[pid][DATE_KEY].append(#TODO: format date)
+                        # print data[pid]
+                    # else nvm
+                except KeyError as ex:  # new participant
+                    data[pid] = {}
+                    data[pid][SMS_INTERVENTION_KEY] = []
+                    data[pid][INT_ACC_CNTS_KEY] = []
+                    # data[pid][DATE_KEY] = []
+            row_n += 1
+            if row_n >= FILE_END:  # yeah... that happens...
+                break
+    return data
 
 def makePlot(type=PLOT_TYPES.bars, selected_data='km_hr', yLabel="Heart Rate (BPM)",
              pre_win=20, post_win=40, smooth=None):
@@ -144,7 +204,7 @@ def makePlot(type=PLOT_TYPES.bars, selected_data='km_hr', yLabel="Heart Rate (BP
         event_pid = event.data_section[0]['pid']
         for data_point in event.data_section:
             if event_pid != data_point['pid']:
-                raise Error('pid changed without change in sensor section!')
+                raise Exception('pid changed without change in sensor section!')
             data.append(data_point[selected_data])
         start = event.index - pre_win
         end = event.index + post_win

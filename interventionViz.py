@@ -94,9 +94,9 @@ if knowme:
     # sample_intervention.makePlot(type=PLOT_TYPES.bars, pre_win=20, post_win=60, color_events=False)
     # pylab.show()
     # # knowMe
-    # print 'knowMe stackPlot...'
-    # knowMe.makePlot(type=PLOT_TYPES.bars)
-    # pylab.show()
+    print 'knowMe stackPlot...'
+    knowMe.makePlot(type=PLOT_TYPES.bars, selected_data='int_acc_cnts')
+    pylab.show()
     # # mAvatar
     # # looking at sedentary, active, or all not very interesting
 
