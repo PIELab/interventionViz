@@ -21,6 +21,37 @@ NOTES:
 
 """
 
+columnHeader = [
+    "pid",
+    "day",
+    "rcvd_consec",
+    "sent_consec",
+    "sms_rec",
+    "sms_sent",
+    "time",
+    "sent_txt",
+    "rcvd_txt",
+    "sms_type",  # Type of SMS(1=text sent , 2= text received, 3=text received and text sent
+    "rcvd_daily",
+    "sent_daily",
+    "total_Consec",
+    "total_daily",
+    "all_txt",
+    "base_acc_cnts",
+    "int_acc_cnts",
+    "flup_acc_cnts",
+    "km_lying_min",
+    "km_sit_min",
+    "km_sitfidg_min",
+    "km_stnd_min",
+    "km_stndfidg_min",
+    "km_Wii_Min",
+    "km_slwwlk_min",
+    "km_brskwlk_min",
+    "km_run_min",
+    "km_hr",
+    "sms_intervention"
+]
 
 class MessageData(object):
     """
@@ -35,7 +66,6 @@ class MessageData(object):
         self.index = index
         self.data = data_section[index]
 
-
 def get_data_dict(line, index):
     """
     returns data dict for given line in file
@@ -43,41 +73,14 @@ def get_data_dict(line, index):
     :param index: original index of row
     :return: dict with keyed data
     """
-    return {
-        "pid": line[0],
-        "day": line[1],
-        "rcvd_consec": line[2],
-        "sent_consec": line[3],
-        "sms_rec": line[4],
-        "sms_sent": line[5],
-        "time": line[6],
-        "sent_txt": line[7].strip(),
-        "rcvd_txt": line[8].strip(),
-        "sms_type": line[9],  # Type of SMS(1=text sent , 2= text received, 3=text received and text sent
-        "rcvd_daily": line[10],
-        "sent_daily": line[11],
-        "total_Consec": line[12],
-        "total_daily": line[13],
-        "all_txt": line[14].strip(),
-        "base_acc_cnts": line[15],
-        "int_acc_cnts": line[16],
-        "flup_acc_cnts": line[17],
-        "km_lying_min": line[18],
-        "km_sit_min": line[19],
-        "km_sitfidg_min": line[20],
-        "km_stnd_min": line[21],
-        "km_stndfidg_min": line[22],
-        "km_Wii_Min": line[23],
-        "km_slwwlk_min": line[24],
-        "km_brskwlk_min": line[25],
-        "km_run_min": line[26],
-        "km_hr": line[27],
-        "sms_intervention": line[28],
-        "index": index
+    res = {}
+    for i in range(0, len(columnHeader)):
+        res[columnHeader[i]] = line[i]
+        res["index"] = index
         # NOTE: the indexes in consts are relative to the index of outgoing sms, not all rows, so this doesn't work:
         #"intervention": (index in INDEXES_TAGGED_INTERVENTION),
         #"reinforcement": (index in INDEXES_TAGGED_REINFORCEMENT)
-    }
+    return res
 
 
 def get_data_sections(file_name, filterColumnNumber=16):# or 27
@@ -106,19 +109,19 @@ def get_data_sections(file_name, filterColumnNumber=16):# or 27
                 break
     return data_sections
 
-def load_arx_model_data(file_name):
+def load_arx_model_data(file_name, OUTPUT_COL):
     """
     assumes data in file_name is sorted by pid, day, and time.
     loads SMS_intervention and heart rate data for use in arx modeling.
     NOTE: current implementation ignores gaps in data and simply concats.
     """
-    filterColumnNumber = 16  # or 27
-    SMS_INTERVENTION_KEY = 'sms_intervention'
     SMS_INTERVENTION_COL = 28
-    INT_ACC_CNTS_KEY = 'int_acc_cnts'
-    INT_ACC_CNTS_COL = 16
+    SMS_INTERVENTION_KEY = columnHeader[SMS_INTERVENTION_COL]
+    OUTPUT_KEY = columnHeader[OUTPUT_COL]
+    DAY_COL = 1
+    TIME_COL = 6
+    filterColumnNumber = OUTPUT_COL
     PID_COL = 0
-
 
     data = {}
     with savReaderWriter.SavReader(file_name, ioLocale='en_US.UTF-8') as reader:
@@ -135,24 +138,27 @@ def load_arx_model_data(file_name):
         for line in reader:
             pid = line[PID_COL]
             if line[filterColumnNumber] is not None:  # test for if line has data we want in it
-                # print pid, line[SMS_INTERVENTION_COL], line[INT_ACC_CNTS_COL]
+                # print pid, line[SMS_INTERVENTION_COL], line[OUTPUT_COL]
                 try:  # append to existing participant
                     sms_interv = line[SMS_INTERVENTION_COL] or 0
-                    acc_cnt = line[INT_ACC_CNTS_COL] or 0
+                    acc_cnt = line[OUTPUT_COL] or 0
                     if acc_cnt > 0:
                         acc_cnt = log(acc_cnt)
-                    if sms_interv != 0 or acc_cnt != 0:
+                    if True: #sms_interv != 0 or acc_cnt != 0:
                         # print 'append ' + str(sms_interv) + ',' + str(acc_cnt)
                         data[pid][SMS_INTERVENTION_KEY].append(sms_interv)
-                        data[pid][INT_ACC_CNTS_KEY].append(acc_cnt)
+                        data[pid][OUTPUT_KEY].append(acc_cnt)
                         # TODO: use actual dates
-                        # data[pid][DATE_KEY].append(#TODO: format date)
+                        data[pid]['datetime'].append(
+                            '2012-01-' + str(int(line[DAY_COL])) + 'T' + str(line[TIME_COL])
+                        )
                         # print data[pid]
                     # else nvm
                 except KeyError as ex:  # new participant
                     data[pid] = {}
                     data[pid][SMS_INTERVENTION_KEY] = []
-                    data[pid][INT_ACC_CNTS_KEY] = []
+                    data[pid][OUTPUT_KEY] = []
+                    data[pid]['datetime'] = []
                     # data[pid][DATE_KEY] = []
             row_n += 1
             if row_n >= FILE_END:  # yeah... that happens...

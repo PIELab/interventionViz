@@ -38,9 +38,7 @@ import knowMe
 
 FIG_DIR = 'sampleOutputs/behavARX/'
 
-def loadSampleData():
-
-
+def loadSampleData(pid, filterOutliers=False):
     # print sm.datasets.sunspots.NOTE
     #
     # dta = sm.datasets.sunspots.load_pandas().data
@@ -48,33 +46,73 @@ def loadSampleData():
     # dta.index = pandas.Index(sm.tsa.datetools.dates_from_range('1700', '2008'))
     # del dta["YEAR"]
 
-    data = knowMe.load_arx_model_data('./data/knowMeData.sav')
+    OUTPUT_INDEX = 16 # 27=HeartRate 16=Accelerometry
+    data = knowMe.load_arx_model_data('./data/knowMeData.sav', OUTPUT_INDEX)
+    from knowMe import columnHeader as dataColumns
+    INPUT_INDEX = 28
+    OUTPUT_KEY = dataColumns[OUTPUT_INDEX]
+    INPUT_KEY = dataColumns[INPUT_INDEX]
     # print data
-    pid = 11
-    print pid
     dat = data[pid]
-    indices = pandas.date_range('1/1/2012', freq='Min', periods=len(dat['int_acc_cnts']))
-    print dat
-    print indices
+    indices = pandas.DatetimeIndex(dat['datetime'])#pandas.date_range('1/1/2012', freq='Min', periods=len(dat[OUTPUT_KEY]))
+    # print dat
+    # print indices
     dta = pandas.DataFrame(
-        data=dat['int_acc_cnts'],
+        data=dat[OUTPUT_KEY],
+        columns=[OUTPUT_KEY],
         index=indices
     )
     interven = pandas.DataFrame(
-        data=dat['sms_intervention'],
+        data=dat[INPUT_KEY],
+        columns=[OUTPUT_KEY],
         index=indices
     )
 
-    dta.plot(figsize=(12,8))
+    if filterOutliers:
+        # filter outliers:
+        # print dta
+        dataFrame = dta.copy()
+        statBefore = pandas.DataFrame({
+            'q1': dataFrame[OUTPUT_KEY].quantile(.25),
+            'median': dataFrame[OUTPUT_KEY].median(),
+            'q3' : dataFrame[OUTPUT_KEY].quantile(.75),
+            'temp' : [0]
+        })
 
-    plt.savefig(FIG_DIR+'dataView.png', bbox_inches='tight')
+        def is_outlier(row):
+            iq_range = statBefore['q3'] - statBefore['q1']
+            median = statBefore['median']
+            # print str((row[OUTPUT_KEY] > (median + (1.5* iq_range)))[0]) + '\r'
+            if (row[OUTPUT_KEY] > (median + (1.5* iq_range)))[0] \
+            or (row[OUTPUT_KEY] < (median - (1.5* iq_range)))[0]:
+                return True
+            else:
+                return False
+
+        #apply the function to the original df:
+        dataFrame.loc[:, 'outlier'] = dataFrame.apply(is_outlier, axis = 1)
+        #filter to only non-outliers:
+        dta_no_outliers = dta[~(dataFrame.outlier)]
+        interven_no_outliers = interven[~(dataFrame.outlier)]
+    else:
+        dta_no_outliers = dta
+        interven_no_outliers = interven
+
+
+
+    plt.subplot(211)
+    # dta.plot(figsize=(12,8))
+    plt.plot(dta_no_outliers, label='out ('+str(OUTPUT_KEY)+')')
+    plt.subplot(212)
+    plt.plot(interven_no_outliers, label='in1 ('+str(INPUT_KEY)+')')
+    plt.savefig(FIG_DIR+'dataView'+str(pid)+'.png', bbox_inches='tight')
     # plt.show()
 
-    return dta, interven
+    return dta_no_outliers, interven_no_outliers
 
 def seasonalDecompose(data, saveFigName=None):
     from statsmodels.tsa.seasonal import seasonal_decompose
-    seasonLen = 60 #60*24 # expected season length [min]
+    seasonLen = 60*24 # expected season length [min]
     dataResolution = 1 # [min]
     decompfreq = seasonLen/dataResolution
     decomposition = seasonal_decompose(data.values, freq=decompfreq)
@@ -101,48 +139,28 @@ def seasonalDecompose(data, saveFigName=None):
     else:
         plt.savefig(FIG_DIR+str(saveFigName))
 
-def plot_ccf(x, y, ax=None, lags=None, alpha=.05, use_vlines=True, unbiased=True,
-            fft=False, **kwargs):
-    """
-    Plot the cross-correlation function
-    """
-    from statsmodels.graphics import utils
+def plotCCF(dta, exog, saveFigName, **kwargs):
+    zoomLagView = 120   # max lag of interest (for zoomed view)
 
-    fig, ax = utils.create_mpl_ax(ax)
-
-    if lags is None:
-        lags = np.arange(len(x))
-        nlags = len(lags) - 1
-    else:
-        nlags = lags
-        lags = np.arange(lags + 1) # +1 for zero lag
-
-    acf_x = sm.tsa.ccf(x, y, unbiased=unbiased)
-
-    if use_vlines:
-        ax.vlines(lags, [0], acf_x, **kwargs)
-        ax.axhline(**kwargs)
-
-    # center the confidence interval TODO: do in acf?
-    # confint = confint - confint.mean(1)[:,None]
     kwargs.setdefault('marker', 'o')
     kwargs.setdefault('markersize', 5)
     kwargs.setdefault('linestyle', 'None')
-    ax.margins(.05)
-    ax.plot(lags, acf_x[:nlags+1], **kwargs)
-    # ax.fill_between(lags, confint[:,0], confint[:,1], alpha=.25)
-    ax.set_title("Cross-correlation")
 
-    return fig
-
-def plotCCF(dta, exog, saveFigName):
     fig = plt.figure(figsize=(12,8))
-    ax1=fig.add_subplot(111)
+    ax1=fig.add_subplot(211)
 
     ax1.set_ylabel('CCF')
-    ax1.set_xlabel('lag')
+    ax1.set_xlabel('lag?')
+    # print dta
+
     print 'SIZES:',len(dta.values.squeeze()), ',', len(exog.values.squeeze())
-    fig = plot_ccf(dta.values.squeeze(), exog.values.squeeze(), lags=20, ax=ax1)
+
+    ccf_x = sm.tsa.ccf(dta.values.squeeze(), exog.values.squeeze())
+    ax1.plot(range(1,len(ccf_x)+1), ccf_x, **kwargs)
+
+    ax2=fig.add_subplot(212)
+    ax2.plot(range(1,zoomLagView+1), ccf_x[:zoomLagView], **kwargs)
+
     if (saveFigName==None):
         plt.show()
     else:
@@ -175,7 +193,7 @@ def fitModel(dta, interven):
     # arma_mod20 = model20.fit()
     # print arma_mod20.params
 
-    model30 = sm.tsa.ARMA(dta, (2,1,10), exog=interven)
+    model30 = sm.tsa.ARMA(dta, (1,0,0), exog=interven)
     arma_mod30 = model30.fit()
     # print arma_mod20.aic, arma_mod20.bic, arma_mod20.hqic
     print '=== MODEL PARAMS ==='
@@ -186,7 +204,7 @@ def fitModel(dta, interven):
 
     return arma_mod30
 
-def testModelFit(arma_mod30, dta):
+def testModelFit(arma_mod30, dta, pid):
     # does our model fit the theory?
     residuals = arma_mod30.resid
     sm.stats.durbin_watson(residuals.values)
@@ -204,7 +222,7 @@ def testModelFit(arma_mod30, dta):
     ax = fig.add_subplot(111)
     ax = arma_mod30.resid.plot(ax=ax);
 
-    plt.savefig(FIG_DIR+'residualsVsTime.png', bbox_inches='tight')
+    plt.savefig(FIG_DIR+'residualsVsTime'+str(pid)+'.png', bbox_inches='tight')
 #    plt.show()
 
     # tests if samples are different from normal dist.
@@ -222,45 +240,52 @@ def testModelFit(arma_mod30, dta):
     # resid_std = (resid_dev - resid_dev.mean()) / resid_dev.std()
     plt.hist(residuals, bins=25);
     plt.title('Histogram of standardized deviance residuals');
-    plt.savefig(FIG_DIR+'residualsNormality.png', bbox_inches='tight')
+    plt.savefig(FIG_DIR+'residualsNormality'+str(pid)+'.png', bbox_inches='tight')
 
     # plot ACF/PACF for residuals
-    plotACFAndPACF(residuals, 'residualsACFAndPACF.png')
+    plotACFAndPACF(residuals, 'residualsACFAndPACF'+str(pid)+'.png')
 
     r,q,p = sm.tsa.acf(residuals.values.squeeze(), qstat=True)
     data = np.c_[range(1,41), r[1:], q, p]
     table = pandas.DataFrame(data, columns=['lag', "AC", "Q", "Prob(>Q)"])
-    print table.set_index('lag')
+    # print table.set_index('lag')
 
-    # sameple data indicates a lack of fit.
+    # sample data indicates a lack of fit.
 
 
-def testDynamicPrediction(arma_mod30, dta, interven):
+def testDynamicPrediction(arma_mod30, dta, interven, pid):
     tf = len(dta)
     t0 = tf*2/3
     predict_sunspots = arma_mod30.predict(t0, tf, exog=interven, dynamic=True)
-    print predict_sunspots
+    # print predict_sunspots
 
     ax = dta.ix['2012':].plot(figsize=(12,8))
     ax = predict_sunspots.plot(ax=ax, style='r--', label='Dynamic Prediction');
     ax.legend();
     # ax.axis((-20.0, 38.0, -4.0, 200.0));
-    plt.savefig(FIG_DIR+'dynamicPrediction.png', bbox_inches='tight')
+    plt.savefig(FIG_DIR+'dynamicPrediction'+str(pid)+'.png', bbox_inches='tight')
 
     def mean_forecast_err(y, yhat):
         return y.sub(yhat).mean()
 
-    mf_err = mean_forecast_err(dta.SUNACTIVITY, predict_sunspots)
+    # mf_err = mean_forecast_err(dta.SUNACTIVITY, predict_sunspots)
 
-    print ('mean forcast err: ' + str(mf_err))
+    # print ('mean forcast err: ' + str(mf_err))
+
+def behavARX(pid):
+    print '\n\n=== PID # ' + str(pid) + ' ==='
+    [dta, interven] = loadSampleData(pid)
+    plotCCF(dta, interven, 'CCF'+str(pid)+'.png')
+    seasonalDecompose(dta, 'seasonalDecomposition'+str(pid)+'.png')
+    plotACFAndPACF(dta, 'acf_and_pacf'+str(pid)+'.png')
+    arma_mod30 = fitModel(dta, interven)
+    testModelFit(arma_mod30, dta, pid)
+    testDynamicPrediction(arma_mod30, dta, interven, pid)
+    # more example methods @:
+
 
 if __name__ == '__main__':
-    [dta, interven] = loadSampleData()
-    plotCCF(dta, interven, 'CCF.png')
-    seasonalDecompose(dta, 'seasonalDecomposition.png')
-    plotACFAndPACF(dta, 'acf_and_pacf.png')
-    arma_mod30 = fitModel(dta, interven)
-    testModelFit(arma_mod30, dta)
-    testDynamicPrediction(arma_mod30, dta, interven)
+    for pid in [9, 10, 11, 13, 19, 22, 23, 32, 35]:  # 21 exlcuded
+        behavARX(pid)
     # more example methods @:
     # Simulated ARMA(4,1): Model Identification is Difficult
