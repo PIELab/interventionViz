@@ -82,7 +82,9 @@ if avatar:
 if knowme:
     # # knowMe
     print 'knowMe lines...'
-    knowMe.makePlot(type=PLOT_TYPES.lines, selected_data='int_acc_cnts', smooth=7)
+    TARGET_COLUMN_INDEX = 16 # 27=HeartRate 16=Accelerometry
+    TARGET_COLUMN_KEY = knowMe.columnHeader[TARGET_COLUMN_INDEX]
+    knowMe.makePlot(type=PLOT_TYPES.lines, selected_data=TARGET_COLUMN_KEY, smooth=7, pre_win=120, post_win=6*60)
     pylab.show()
     # mAvatar
     # looking at sedentary, active, or all not very interesting
@@ -95,7 +97,7 @@ if knowme:
     # pylab.show()
     # # knowMe
     print 'knowMe stackPlot...'
-    knowMe.makePlot(type=PLOT_TYPES.bars, selected_data='int_acc_cnts')
+    knowMe.makePlot(type=PLOT_TYPES.bars, selected_data=TARGET_COLUMN_KEY)
     pylab.show()
     # # mAvatar
     # # looking at sedentary, active, or all not very interesting

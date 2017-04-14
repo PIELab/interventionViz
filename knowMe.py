@@ -60,7 +60,7 @@ class MessageData(object):
     def __init__(self, data_section, index):
         """
         :param data_section: the section of data containing the message
-        :param index: the index of the message
+        :param index: the index of the messages
         """
         self.data_section = data_section
         self.index = index
@@ -109,11 +109,13 @@ def get_data_sections(file_name, filterColumnNumber=16):# or 27
                 break
     return data_sections
 
-def load_arx_model_data(file_name, OUTPUT_COL):
+def load_arx_model_data(file_name, OUTPUT_COL, logarithmic=False):
     """
     assumes data in file_name is sorted by pid, day, and time.
     loads SMS_intervention and heart rate data for use in arx modeling.
     NOTE: current implementation ignores gaps in data and simply concats.
+
+    :param logarithmic: True if log transform data, False for raw
     """
     SMS_INTERVENTION_COL = 28
     SMS_INTERVENTION_KEY = columnHeader[SMS_INTERVENTION_COL]
@@ -125,7 +127,6 @@ def load_arx_model_data(file_name, OUTPUT_COL):
 
     data = {}
     with savReaderWriter.SavReader(file_name, ioLocale='en_US.UTF-8') as reader:
-
         # data {
         #     9: {
         #         'SMS_intervention': [1,2,3,6,2,23], 'int_acc_cnts':[34,1,5,63]
@@ -135,22 +136,33 @@ def load_arx_model_data(file_name, OUTPUT_COL):
         #     }
         # }
         row_n = 0
+        pid_list = []
         for line in reader:
             pid = line[PID_COL]
+            if pid not in pid_list:
+                pid_list.append(pid)
             if line[filterColumnNumber] is not None:  # test for if line has data we want in it
                 # print pid, line[SMS_INTERVENTION_COL], line[OUTPUT_COL]
                 try:  # append to existing participant
                     sms_interv = line[SMS_INTERVENTION_COL] or 0
                     acc_cnt = line[OUTPUT_COL] or 0
                     if acc_cnt > 0:
-                        acc_cnt = log(acc_cnt)
+                        if logarithmic:
+                            acc_cnt = log(acc_cnt)
+                        else:
+                            acc_cnt = acc_cnt
                     if True: #sms_interv != 0 or acc_cnt != 0:
                         # print 'append ' + str(sms_interv) + ',' + str(acc_cnt)
                         data[pid][SMS_INTERVENTION_KEY].append(sms_interv)
                         data[pid][OUTPUT_KEY].append(acc_cnt)
-                        # TODO: use actual dates
+                        fakeDay = int(line[DAY_COL]) + (len(pid_list)-1)*3
+                        fakeMonth = 1
+                        while fakeDay > 31:
+                            # we only have to worry about jan bc we don't have that much data
+                            fakeDay-=30
+                            fakeMonth+=1
                         data[pid]['datetime'].append(
-                            '2012-01-' + str(int(line[DAY_COL])) + 'T' + str(line[TIME_COL])
+                            '2012-0'+str(fakeMonth)+'-' + str(fakeDay) + 'T' + str(line[TIME_COL])
                         )
                         # print data[pid]
                     # else nvm

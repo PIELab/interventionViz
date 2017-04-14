@@ -38,7 +38,10 @@ def get_avg_list(yValues):
         sum = 0
         for ev in range(n_events):  # for each event series at time i
             event_value = yValues[ev][i]
-            sum += event_value
+            if event_value == None:
+                print 'ERR: event_value == None @ tao=' + str(i) + ' event ' + str(ev)
+            else:
+                sum += event_value
         avgs[i] = sum / float(n_events)
     return avgs
 
@@ -183,6 +186,7 @@ def plot_avg_lines(event_time, pnums, yValues, N, MINS, show_p_averages=True, sh
             pylab.plt.plot(ttt, event_ts, color=cmap(float(pid) / N))
 
     pylab.plt.plot(ttt, avgs, color=cmap(1.0), linewidth=4)
+    pylab.plt.legend(range(0,N))
 
 
 def plotStackedBars(event_time, pnums, yValues, N, MINS, edgecolor=None):
@@ -333,4 +337,3 @@ def get_steps_after_event_type(data, selected_activity_type, MINS, overlap_okay,
     if verbose: print len(pnums), 'event step lists loaded,', skipped, 'skipped,', undata, 'unselected. Error summary:'
     print errors
     return steps, pnums
-

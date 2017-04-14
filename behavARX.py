@@ -38,7 +38,7 @@ import knowMe
 
 FIG_DIR = 'sampleOutputs/behavARX/'
 
-def loadSampleData(pid, filterOutliers=False):
+def loadKnowMeData(pid, filter_outliers=False):
     # print sm.datasets.sunspots.NOTE
     #
     # dta = sm.datasets.sunspots.load_pandas().data
@@ -46,12 +46,11 @@ def loadSampleData(pid, filterOutliers=False):
     # dta.index = pandas.Index(sm.tsa.datetools.dates_from_range('1700', '2008'))
     # del dta["YEAR"]
 
-    OUTPUT_INDEX = 16 # 27=HeartRate 16=Accelerometry
+    OUTPUT_INDEX = 27 # 27=HeartRate 16=Accelerometry
     data = knowMe.load_arx_model_data('./data/knowMeData.sav', OUTPUT_INDEX)
-    from knowMe import columnHeader as dataColumns
     INPUT_INDEX = 28
-    OUTPUT_KEY = dataColumns[OUTPUT_INDEX]
-    INPUT_KEY = dataColumns[INPUT_INDEX]
+    OUTPUT_KEY = knowMe.columnHeader[OUTPUT_INDEX]
+    INPUT_KEY = knowMe.columnHeader[INPUT_INDEX]
     # print data
     dat = data[pid]
     indices = pandas.DatetimeIndex(dat['datetime'])#pandas.date_range('1/1/2012', freq='Min', periods=len(dat[OUTPUT_KEY]))
@@ -68,37 +67,13 @@ def loadSampleData(pid, filterOutliers=False):
         index=indices
     )
 
-    if filterOutliers:
+    if filter_outliers:
         # filter outliers:
         # print dta
-        dataFrame = dta.copy()
-        statBefore = pandas.DataFrame({
-            'q1': dataFrame[OUTPUT_KEY].quantile(.25),
-            'median': dataFrame[OUTPUT_KEY].median(),
-            'q3' : dataFrame[OUTPUT_KEY].quantile(.75),
-            'temp' : [0]
-        })
-
-        def is_outlier(row):
-            iq_range = statBefore['q3'] - statBefore['q1']
-            median = statBefore['median']
-            # print str((row[OUTPUT_KEY] > (median + (1.5* iq_range)))[0]) + '\r'
-            if (row[OUTPUT_KEY] > (median + (1.5* iq_range)))[0] \
-            or (row[OUTPUT_KEY] < (median - (1.5* iq_range)))[0]:
-                return True
-            else:
-                return False
-
-        #apply the function to the original df:
-        dataFrame.loc[:, 'outlier'] = dataFrame.apply(is_outlier, axis = 1)
-        #filter to only non-outliers:
-        dta_no_outliers = dta[~(dataFrame.outlier)]
-        interven_no_outliers = interven[~(dataFrame.outlier)]
+        dta_no_outliers, interven_no_outliers = filterOutliers(dta, interven, OUTPUT_KEY)
     else:
         dta_no_outliers = dta
         interven_no_outliers = interven
-
-
 
     plt.subplot(211)
     # dta.plot(figsize=(12,8))
@@ -107,6 +82,33 @@ def loadSampleData(pid, filterOutliers=False):
     plt.plot(interven_no_outliers, label='in1 ('+str(INPUT_KEY)+')')
     plt.savefig(FIG_DIR+'dataView'+str(pid)+'.png', bbox_inches='tight')
     # plt.show()
+
+    return dta_no_outliers, interven_no_outliers
+
+def filterOutliers(dta, interven, OUTPUT_KEY):
+    dataFrame = dta.copy()
+    statBefore = pandas.DataFrame({
+        'q1': dataFrame[OUTPUT_KEY].quantile(.25),
+        'median': dataFrame[OUTPUT_KEY].median(),
+        'q3' : dataFrame[OUTPUT_KEY].quantile(.75),
+        'temp' : [0]
+    })
+
+    def is_outlier(row):
+        iq_range = statBefore['q3'] - statBefore['q1']
+        median = statBefore['median']
+        # print str((row[OUTPUT_KEY] > (median + (1.5* iq_range)))[0]) + '\r'
+        if (row[OUTPUT_KEY] > (median + (1.5* iq_range)))[0] \
+        or (row[OUTPUT_KEY] < (median - (1.5* iq_range)))[0]:
+            return True
+        else:
+            return False
+
+    #apply the function to the original df:
+    dataFrame.loc[:, 'outlier'] = dataFrame.apply(is_outlier, axis = 1)
+    #filter to only non-outliers:
+    dta_no_outliers = dta[~(dataFrame.outlier)]
+    interven_no_outliers = interven[~(dataFrame.outlier)]
 
     return dta_no_outliers, interven_no_outliers
 
@@ -150,7 +152,7 @@ def plotCCF(dta, exog, saveFigName, **kwargs):
     ax1=fig.add_subplot(211)
 
     ax1.set_ylabel('CCF')
-    ax1.set_xlabel('lag?')
+    ax1.set_xlabel('lag')
     # print dta
 
     print 'SIZES:',len(dta.values.squeeze()), ',', len(exog.values.squeeze())
@@ -223,8 +225,7 @@ def testModelFit(arma_mod30, dta, pid):
     ax = arma_mod30.resid.plot(ax=ax);
 
     plt.savefig(FIG_DIR+'residualsVsTime'+str(pid)+'.png', bbox_inches='tight')
-#    plt.show()
-
+    #    plt.show()
     # tests if samples are different from normal dist.
     k2, p = stats.normaltest(residuals)
     print ("residuals skew (k2):" + str(k2) +
@@ -252,7 +253,6 @@ def testModelFit(arma_mod30, dta, pid):
 
     # sample data indicates a lack of fit.
 
-
 def testDynamicPrediction(arma_mod30, dta, interven, pid):
     tf = len(dta)
     t0 = tf*2/3
@@ -272,20 +272,97 @@ def testDynamicPrediction(arma_mod30, dta, interven, pid):
 
     # print ('mean forcast err: ' + str(mf_err))
 
+def plotCCFAllData(saveFigName, filter_outliers=True, **kwargs):
+    # LOAD DATA
+    OUTPUT_INDEX = 27 # 27=HeartRate 16=Accelerometry
+    data = knowMe.load_arx_model_data('./data/knowMeData.sav', OUTPUT_INDEX)
+    INPUT_INDEX = 28
+    OUTPUT_KEY = knowMe.columnHeader[OUTPUT_INDEX]
+    INPUT_KEY = knowMe.columnHeader[INPUT_INDEX]
+    # print data
+    dat = {'datetime': []}
+    dat[INPUT_KEY] = []
+    dat[OUTPUT_KEY] = []
+    for pid in data:
+        dat['datetime'] += data[pid]['datetime']
+        dat[INPUT_KEY] += data[pid][INPUT_KEY]
+        dat[OUTPUT_KEY] += data[pid][OUTPUT_KEY]
+
+    # print dat
+    # dat = data[pid]  #(this is what it looks like for one participant)
+    indices = pandas.DatetimeIndex(dat['datetime'])#pandas.date_range('1/1/2012', freq='Min', periods=len(dat[OUTPUT_KEY]))
+    # print dat
+    # print indices
+    dta = pandas.DataFrame(
+        data=dat[OUTPUT_KEY],
+        columns=[OUTPUT_KEY],
+        index=indices
+    )
+    interven = pandas.DataFrame(
+        data=dat[INPUT_KEY],
+        columns=[OUTPUT_KEY],
+        index=indices
+    )
+
+    if filter_outliers:
+        # filter outliers:
+        # print dta
+        dta, exog = filterOutliers(dta, interven, OUTPUT_KEY)
+    else:
+        dta = dta
+        exog = interven
+
+    plt.subplot(211)
+    # dta.plot(figsize=(12,8))
+    plt.plot(dta, label='out ('+str(OUTPUT_KEY)+')')
+    plt.subplot(212)
+    plt.plot(exog, label='in1 ('+str(INPUT_KEY)+')')
+    plt.savefig(FIG_DIR+'dataView_ALL.png', bbox_inches='tight')
+
+
+    # MAKE PLOT
+    zoomLagView = 60*6   # max lag of interest (for zoomed view)
+
+    kwargs.setdefault('marker', 'o')
+    kwargs.setdefault('markersize', 5)
+    kwargs.setdefault('linestyle', 'None')
+
+    fig = plt.figure(figsize=(12,8))
+    ax1=fig.add_subplot(211)
+
+    ax1.set_ylabel('CCF')
+    ax1.set_xlabel('lag [mins]')
+    # print dta
+
+    print 'SIZES:',len(dta.values.squeeze()), ',', len(exog.values.squeeze())
+
+    ccf_x = sm.tsa.ccf(dta.values.squeeze(), exog.values.squeeze())
+    ax1.plot(range(1,len(ccf_x)+1), ccf_x, **kwargs)
+
+    ax2=fig.add_subplot(212)
+    ax2.plot(range(1,zoomLagView+1), ccf_x[:zoomLagView], **kwargs)
+
+    if (saveFigName==None):
+        plt.show()
+    else:
+        plt.savefig(FIG_DIR+str(saveFigName), bbox_inches='tight')
+
 def behavARX(pid):
     print '\n\n=== PID # ' + str(pid) + ' ==='
-    [dta, interven] = loadSampleData(pid)
+    [dta, interven] = loadKnowMeData(pid)
     plotCCF(dta, interven, 'CCF'+str(pid)+'.png')
-    seasonalDecompose(dta, 'seasonalDecomposition'+str(pid)+'.png')
+    # seasonalDecompose(dta, 'seasonalDecomposition'+str(pid)+'.png')
     plotACFAndPACF(dta, 'acf_and_pacf'+str(pid)+'.png')
     arma_mod30 = fitModel(dta, interven)
     testModelFit(arma_mod30, dta, pid)
     testDynamicPrediction(arma_mod30, dta, interven, pid)
     # more example methods @:
 
-
 if __name__ == '__main__':
+    plotCCFAllData('CCF_all.png')
+
     for pid in [9, 10, 11, 13, 19, 22, 23, 32, 35]:  # 21 exlcuded
         behavARX(pid)
+
     # more example methods @:
     # Simulated ARMA(4,1): Model Identification is Difficult
